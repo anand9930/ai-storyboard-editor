@@ -67,9 +67,6 @@ function ImageNodeComponent({ data, id, selected }: NodeProps) {
         handles={{ inputs: ['any'], outputs: ['image'] }}
         selected={selected}
         status={nodeData.status}
-        resizable
-        minWidth={240}
-        minHeight={200}
         onPlusClick={() => setShowGeneratePopup(true)}
         nodeName={nodeData.name}
         onNameChange={handleNameChange}
