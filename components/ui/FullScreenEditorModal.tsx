@@ -6,8 +6,6 @@ import { TextStyle } from '@tiptap/extension-text-style';
 import { Color } from '@tiptap/extension-color';
 import { useState, useEffect, useCallback } from 'react';
 import {
-  Bold,
-  Italic,
   List,
   ListOrdered,
   Minus,

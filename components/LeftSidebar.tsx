@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useWorkflowStore } from '@/store/workflowStore';
-import { getDefaultNodeData, NodeType } from '@/types/nodes';
+import { getDefaultNodeData } from '@/types/nodes';
 import * as Tooltip from '@radix-ui/react-tooltip';
 
 // Node types available for adding

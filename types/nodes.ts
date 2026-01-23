@@ -2,12 +2,6 @@ import { Node } from '@xyflow/react';
 
 export type NodeStatus = 'idle' | 'processing' | 'completed' | 'error';
 
-export enum NodeType {
-  TEXT = 'text',
-  IMAGE = 'image',
-  SOURCE = 'source',
-}
-
 // Fixed models for MVP (no user selection)
 export const FIXED_MODELS = {
   text: { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash', provider: 'google' },
@@ -70,8 +64,6 @@ export interface SourceNodeData {
 export type TextNode = Node<TextNodeData, 'text'>;
 export type ImageNode = Node<ImageNodeData, 'image'>;
 export type SourceNode = Node<SourceNodeData, 'source'>;
-
-export type AppNode = TextNode | ImageNode | SourceNode;
 
 // Default data creators
 export function getDefaultTextNodeData(): TextNodeData {

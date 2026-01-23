@@ -5,7 +5,7 @@ import { NodeProps, useHandleConnections, useNodesData } from '@xyflow/react';
 import { RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { BaseNode } from './BaseNode';
-import { ImageNodeData, NODE_ACTIONS, SourceNodeData } from '@/types/nodes';
+import { ImageNodeData, NODE_ACTIONS } from '@/types/nodes';
 import { useWorkflowStore } from '@/store/workflowStore';
 import { StatusIndicator } from '../ui/StatusIndicator';
 import { GenerateFromNodePopup } from '../ui/GenerateFromNodePopup';

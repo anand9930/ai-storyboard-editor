@@ -2,8 +2,6 @@
 
 import { Editor } from '@tiptap/react';
 import {
-  Bold,
-  Italic,
   List,
   ListOrdered,
   Minus,

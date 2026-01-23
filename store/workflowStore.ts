@@ -20,10 +20,6 @@ interface WorkflowState {
   // Theme
   colorMode: ColorMode;
 
-  // Execution state
-  isExecuting: boolean;
-  executionProgress: Record<string, number>;
-
   // Actions
   setNodes: (nodes: Node[]) => void;
   setEdges: (edges: Edge[]) => void;
@@ -50,8 +46,6 @@ export const useWorkflowStore = create<WorkflowState>()(
       edges: [],
       selectedNodeId: null,
       colorMode: 'dark' as ColorMode,
-      isExecuting: false,
-      executionProgress: {},
 
       setNodes: (nodes) => set({ nodes }),
       setEdges: (edges) => set({ edges }),
@@ -123,7 +117,6 @@ export const useWorkflowStore = create<WorkflowState>()(
             nodes: data.nodes || [],
             edges: data.edges || [],
             selectedNodeId: null,
-            executionProgress: {},
           });
         } catch (error) {
           console.error('Failed to import workflow:', error);
@@ -137,7 +130,6 @@ export const useWorkflowStore = create<WorkflowState>()(
           nodes: [],
           edges: [],
           selectedNodeId: null,
-          executionProgress: {},
         }),
     }),
     {
