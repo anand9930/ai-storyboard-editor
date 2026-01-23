@@ -1,41 +1,54 @@
 'use client';
 
-import { useState, memo, useEffect } from 'react';
-import { NodeProps, useReactFlow } from '@xyflow/react';
-import { RefreshCw, Plus } from 'lucide-react';
+import { useState, memo, useEffect, useMemo } from 'react';
+import { NodeProps, useHandleConnections, useNodesData } from '@xyflow/react';
+import { RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { BaseNode } from './BaseNode';
-import { ImageNodeData, NODE_ACTIONS } from '@/types/nodes';
+import { ImageNodeData, NODE_ACTIONS, SourceNodeData } from '@/types/nodes';
 import { useWorkflowStore } from '@/store/workflowStore';
 import { StatusIndicator } from '../ui/StatusIndicator';
 import { GenerateFromNodePopup } from '../ui/GenerateFromNodePopup';
 
 function ImageNodeComponent({ data, id, selected }: NodeProps) {
   const nodeData = data as unknown as ImageNodeData;
-  const { updateNodeData, setSelectedNodeId, edges, nodes } = useWorkflowStore();
+  const { updateNodeData, setSelectedNodeId } = useWorkflowStore();
   const [showGeneratePopup, setShowGeneratePopup] = useState(false);
 
-  // Find connected source image
-  useEffect(() => {
-    const incomingEdge = edges.find((edge) => edge.target === id);
-    if (incomingEdge) {
-      const sourceNode = nodes.find((n) => n.id === incomingEdge.source);
-      if (sourceNode) {
-        let sourceImage: string | undefined;
-        const sourceData = sourceNode.data as any;
+  // Use React Flow hooks for reactive connection tracking
+  const connections = useHandleConnections({ type: 'target', id: 'any' });
+  const connectedNodeIds = useMemo(
+    () => connections.map((c) => c.source),
+    [connections]
+  );
+  const connectedNodesData = useNodesData(connectedNodeIds);
 
-        if (sourceNode.type === 'source' && sourceData.image) {
-          sourceImage = sourceData.image.url;
-        } else if (sourceNode.type === 'image' && sourceData.generatedImage) {
-          sourceImage = sourceData.generatedImage;
+  // Extract source image from connected nodes reactively
+  useEffect(() => {
+    if (connectedNodesData.length > 0) {
+      const sourceNodeData = connectedNodesData[0];
+      if (sourceNodeData) {
+        let sourceImage: string | undefined;
+        const nodeDataRaw = sourceNodeData.data as any;
+
+        // Check if it's a source node with an image
+        if (sourceNodeData.type === 'source' && nodeDataRaw?.image) {
+          sourceImage = nodeDataRaw.image.url;
+        }
+        // Check if it's an image node with a generated image
+        else if (sourceNodeData.type === 'image' && nodeDataRaw?.generatedImage) {
+          sourceImage = nodeDataRaw.generatedImage;
         }
 
         if (sourceImage && sourceImage !== nodeData.sourceImage) {
           updateNodeData(id, { sourceImage });
         }
       }
+    } else if (nodeData.sourceImage) {
+      // Clear source image when disconnected
+      updateNodeData(id, { sourceImage: undefined });
     }
-  }, [edges, nodes, id, nodeData.sourceImage, updateNodeData]);
+  }, [connectedNodesData, id, nodeData.sourceImage, updateNodeData]);
 
   // Handle action click
   const handleActionClick = (action: 'image_to_image') => {
@@ -50,11 +63,15 @@ function ImageNodeComponent({ data, id, selected }: NodeProps) {
         handles={{ inputs: ['any'], outputs: ['image'] }}
         selected={selected}
         status={nodeData.status}
+        resizable
+        minWidth={240}
+        minHeight={200}
+        onPlusClick={() => setShowGeneratePopup(true)}
       >
         <div className="space-y-3">
           {/* Header */}
           <div className="flex items-center justify-between">
-            <span className="font-medium text-zinc-200">Image</span>
+            <span className="font-medium text-zinc-800 dark:text-zinc-200">Image</span>
             <StatusIndicator status={nodeData.status} />
           </div>
 
@@ -68,8 +85,8 @@ function ImageNodeComponent({ data, id, selected }: NodeProps) {
                 className={cn(
                   'w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-left transition-colors',
                   nodeData.selectedAction === action.id
-                    ? 'bg-zinc-700 text-zinc-100'
-                    : 'hover:bg-zinc-800 text-zinc-400'
+                    ? 'bg-zinc-200 dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100'
+                    : 'hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400'
                 )}
               >
                 <RefreshCw className="w-4 h-4" />
@@ -96,13 +113,13 @@ function ImageNodeComponent({ data, id, selected }: NodeProps) {
                 className="w-full aspect-square object-cover"
                 draggable={false}
               />
-              <span className="absolute inset-0 flex items-center justify-center text-xs text-zinc-400 bg-zinc-900/50">
+              <span className="absolute inset-0 flex items-center justify-center text-xs text-zinc-500 dark:text-zinc-400 bg-white/50 dark:bg-zinc-900/50">
                 Waiting for generation...
               </span>
             </div>
           ) : (
-            <div className="aspect-square bg-zinc-950 rounded-lg flex items-center justify-center">
-              <span className="text-zinc-600 text-xs">No image connected</span>
+            <div className="aspect-square bg-zinc-100 dark:bg-zinc-950 rounded-lg flex items-center justify-center">
+              <span className="text-zinc-500 dark:text-zinc-600 text-xs">No image connected</span>
             </div>
           )}
 
@@ -112,19 +129,6 @@ function ImageNodeComponent({ data, id, selected }: NodeProps) {
               {nodeData.error}
             </div>
           )}
-
-          {/* Plus Button */}
-          <div className="flex justify-end">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowGeneratePopup(true);
-              }}
-              className="p-1.5 hover:bg-zinc-800 rounded-full transition-colors text-zinc-400"
-            >
-              <Plus className="w-4 h-4" />
-            </button>
-          </div>
         </div>
       </BaseNode>
 

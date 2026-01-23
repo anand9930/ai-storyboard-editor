@@ -9,11 +9,16 @@ import {
   EdgeChange,
 } from '@xyflow/react';
 
+export type ColorMode = 'dark' | 'light';
+
 interface WorkflowState {
   // Workflow data
   nodes: Node[];
   edges: Edge[];
   selectedNodeId: string | null;
+
+  // Theme
+  colorMode: ColorMode;
 
   // Execution state
   isExecuting: boolean;
@@ -22,6 +27,7 @@ interface WorkflowState {
   // Actions
   setNodes: (nodes: Node[]) => void;
   setEdges: (edges: Edge[]) => void;
+  setColorMode: (mode: ColorMode) => void;
   onNodesChange: (changes: NodeChange[]) => void;
   onEdgesChange: (changes: EdgeChange[]) => void;
   addNode: (node: Node) => void;
@@ -43,11 +49,13 @@ export const useWorkflowStore = create<WorkflowState>()(
       nodes: [],
       edges: [],
       selectedNodeId: null,
+      colorMode: 'dark' as ColorMode,
       isExecuting: false,
       executionProgress: {},
 
       setNodes: (nodes) => set({ nodes }),
       setEdges: (edges) => set({ edges }),
+      setColorMode: (mode) => set({ colorMode: mode }),
 
       onNodesChange: (changes) => {
         set({
@@ -137,6 +145,7 @@ export const useWorkflowStore = create<WorkflowState>()(
       partialize: (state) => ({
         nodes: state.nodes,
         edges: state.edges,
+        colorMode: state.colorMode,
       }),
     }
   )

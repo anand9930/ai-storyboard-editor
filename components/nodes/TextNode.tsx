@@ -2,7 +2,7 @@
 
 import { useState, memo } from 'react';
 import { NodeProps } from '@xyflow/react';
-import { Pencil, ImageIcon, Plus } from 'lucide-react';
+import { Pencil, ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { BaseNode } from './BaseNode';
 import { TextNodeData, NODE_ACTIONS } from '@/types/nodes';
@@ -33,11 +33,12 @@ function TextNodeComponent({ data, id, selected }: NodeProps) {
         handles={{ inputs: ['any'], outputs: ['text'] }}
         selected={selected}
         status={nodeData.status}
+        onPlusClick={() => setShowGeneratePopup(true)}
       >
         <div className="space-y-3">
           {/* Header */}
           <div className="flex items-center justify-between">
-            <span className="font-medium text-zinc-200">Text</span>
+            <span className="font-medium text-zinc-800 dark:text-zinc-200">Text</span>
             <StatusIndicator status={nodeData.status} />
           </div>
 
@@ -55,8 +56,8 @@ function TextNodeComponent({ data, id, selected }: NodeProps) {
                   className={cn(
                     'w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-left transition-colors',
                     nodeData.selectedAction === action.id
-                      ? 'bg-zinc-700 text-zinc-100'
-                      : 'hover:bg-zinc-800 text-zinc-400'
+                      ? 'bg-zinc-200 dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100'
+                      : 'hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400'
                   )}
                 >
                   <Icon className="w-4 h-4" />
@@ -68,7 +69,7 @@ function TextNodeComponent({ data, id, selected }: NodeProps) {
 
           {/* Inline Output Display */}
           {nodeData.content && (
-            <div className="bg-zinc-950 rounded-lg p-3 text-sm text-zinc-300 max-h-40 overflow-y-auto">
+            <div className="bg-zinc-100 dark:bg-zinc-950 rounded-lg p-3 text-sm text-zinc-700 dark:text-zinc-300 max-h-40 overflow-y-auto">
               <p className="whitespace-pre-wrap">{nodeData.content}</p>
             </div>
           )}
@@ -79,19 +80,6 @@ function TextNodeComponent({ data, id, selected }: NodeProps) {
               {nodeData.error}
             </div>
           )}
-
-          {/* Plus Button */}
-          <div className="flex justify-end">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowGeneratePopup(true);
-              }}
-              className="p-1.5 hover:bg-zinc-800 rounded-full transition-colors text-zinc-400"
-            >
-              <Plus className="w-4 h-4" />
-            </button>
-          </div>
         </div>
       </BaseNode>
 

@@ -2,8 +2,7 @@
 
 import { useRef, useState, memo } from 'react';
 import { NodeProps } from '@xyflow/react';
-import { Upload, Crop, Download, Maximize2, Plus } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Upload, Crop, Download, Maximize2 } from 'lucide-react';
 import { BaseNode } from './BaseNode';
 import { SourceNodeData } from '@/types/nodes';
 import { useWorkflowStore } from '@/store/workflowStore';
@@ -56,15 +55,17 @@ function SourceNodeComponent({ data, id, selected }: NodeProps) {
         id={id}
         handles={{ outputs: ['image'] }}
         selected={selected}
+        onPlusClick={() => setShowGeneratePopup(true)}
+        plusDisabled={!nodeData.image}
       >
         <div className="space-y-3">
           {/* Header */}
           <div className="flex items-center justify-between">
-            <span className="font-medium text-zinc-200">Source</span>
+            <span className="font-medium text-zinc-800 dark:text-zinc-200">Source</span>
             {nodeData.image && (
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                className="text-xs text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors"
               >
                 Replace
               </button>
@@ -81,34 +82,34 @@ function SourceNodeComponent({ data, id, selected }: NodeProps) {
                 draggable={false}
               />
               {/* Toolbar - appears on hover */}
-              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 bg-zinc-900/90 backdrop-blur rounded-lg p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 bg-white/90 dark:bg-zinc-900/90 backdrop-blur rounded-lg p-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button
-                  className="p-1.5 hover:bg-zinc-800 rounded transition-colors"
+                  className="p-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded transition-colors"
                   title="Crop"
                 >
-                  <Crop className="w-4 h-4 text-zinc-400" />
+                  <Crop className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />
                 </button>
                 <button
                   onClick={handleDownload}
-                  className="p-1.5 hover:bg-zinc-800 rounded transition-colors"
+                  className="p-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded transition-colors"
                   title="Download"
                 >
-                  <Download className="w-4 h-4 text-zinc-400" />
+                  <Download className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />
                 </button>
                 <button
-                  className="p-1.5 hover:bg-zinc-800 rounded transition-colors"
+                  className="p-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded transition-colors"
                   title="Fullscreen"
                 >
-                  <Maximize2 className="w-4 h-4 text-zinc-400" />
+                  <Maximize2 className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />
                 </button>
               </div>
             </div>
           ) : (
             <div
               onClick={() => fileInputRef.current?.click()}
-              className="aspect-square bg-zinc-950 border-2 border-dashed border-zinc-700 hover:border-zinc-500 rounded-lg flex flex-col items-center justify-center cursor-pointer transition-colors"
+              className="aspect-square bg-zinc-100 dark:bg-zinc-950 border-2 border-dashed border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 rounded-lg flex flex-col items-center justify-center cursor-pointer transition-colors"
             >
-              <Upload className="w-8 h-8 text-zinc-600 mb-2" />
+              <Upload className="w-8 h-8 text-zinc-400 dark:text-zinc-600 mb-2" />
               <span className="text-xs text-zinc-500">Click to upload</span>
             </div>
           )}
@@ -125,25 +126,6 @@ function SourceNodeComponent({ data, id, selected }: NodeProps) {
             }}
             className="hidden"
           />
-
-          {/* Plus Button */}
-          <div className="flex justify-end">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                if (nodeData.image) setShowGeneratePopup(true);
-              }}
-              disabled={!nodeData.image}
-              className={cn(
-                'p-1.5 rounded-full transition-colors',
-                nodeData.image
-                  ? 'hover:bg-zinc-800 text-zinc-400'
-                  : 'text-zinc-600 cursor-not-allowed'
-              )}
-            >
-              <Plus className="w-4 h-4" />
-            </button>
-          </div>
         </div>
       </BaseNode>
 

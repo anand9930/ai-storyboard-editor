@@ -98,7 +98,7 @@ export function LeftSidebar() {
   return (
     <div className="relative">
       {/* Main sidebar buttons */}
-      <div className="flex flex-col gap-2 bg-zinc-900/95 backdrop-blur border border-zinc-800 rounded-xl p-2">
+      <div className="flex flex-col gap-2 bg-white/95 dark:bg-zinc-900/95 backdrop-blur border border-zinc-200 dark:border-zinc-800 rounded-xl p-2">
         {/* Add Node Button */}
         <Tooltip.Root>
           <Tooltip.Trigger asChild>
@@ -107,8 +107,8 @@ export function LeftSidebar() {
               className={cn(
                 'p-2 rounded-lg transition-colors',
                 showNodeMenu
-                  ? 'bg-zinc-700 text-zinc-100'
-                  : 'hover:bg-zinc-800 text-zinc-400'
+                  ? 'bg-zinc-200 dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100'
+                  : 'hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400'
               )}
             >
               <Plus className="w-5 h-5" />
@@ -126,12 +126,12 @@ export function LeftSidebar() {
         </Tooltip.Root>
 
         {/* Divider */}
-        <div className="w-full h-px bg-zinc-800" />
+        <div className="w-full h-px bg-zinc-200 dark:bg-zinc-800" />
 
         {/* Templates */}
         <Tooltip.Root>
           <Tooltip.Trigger asChild>
-            <button className="p-2 hover:bg-zinc-800 rounded-lg transition-colors text-zinc-400">
+            <button className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors text-zinc-600 dark:text-zinc-400">
               <LayoutTemplate className="w-5 h-5" />
             </button>
           </Tooltip.Trigger>
@@ -149,7 +149,7 @@ export function LeftSidebar() {
         {/* Layers */}
         <Tooltip.Root>
           <Tooltip.Trigger asChild>
-            <button className="p-2 hover:bg-zinc-800 rounded-lg transition-colors text-zinc-400">
+            <button className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors text-zinc-600 dark:text-zinc-400">
               <Layers className="w-5 h-5" />
             </button>
           </Tooltip.Trigger>
@@ -167,7 +167,7 @@ export function LeftSidebar() {
         {/* Chat */}
         <Tooltip.Root>
           <Tooltip.Trigger asChild>
-            <button className="p-2 hover:bg-zinc-800 rounded-lg transition-colors text-zinc-400">
+            <button className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors text-zinc-600 dark:text-zinc-400">
               <MessageSquare className="w-5 h-5" />
             </button>
           </Tooltip.Trigger>
@@ -185,7 +185,7 @@ export function LeftSidebar() {
         {/* History */}
         <Tooltip.Root>
           <Tooltip.Trigger asChild>
-            <button className="p-2 hover:bg-zinc-800 rounded-lg transition-colors text-zinc-400">
+            <button className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors text-zinc-600 dark:text-zinc-400">
               <History className="w-5 h-5" />
             </button>
           </Tooltip.Trigger>
@@ -203,7 +203,7 @@ export function LeftSidebar() {
         {/* Gallery */}
         <Tooltip.Root>
           <Tooltip.Trigger asChild>
-            <button className="p-2 hover:bg-zinc-800 rounded-lg transition-colors text-zinc-400">
+            <button className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors text-zinc-600 dark:text-zinc-400">
               <ImagePlay className="w-5 h-5" />
             </button>
           </Tooltip.Trigger>
@@ -221,11 +221,11 @@ export function LeftSidebar() {
 
       {/* Node Menu Dropdown */}
       {showNodeMenu && (
-        <div className="absolute left-full ml-2 top-0 bg-zinc-900 border border-zinc-800 rounded-xl p-3 w-56 shadow-xl z-50">
+        <div className="absolute left-full ml-2 top-0 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 w-56 shadow-xl z-50">
           {/* Close button */}
           <button
             onClick={() => setShowNodeMenu(false)}
-            className="absolute top-2 right-2 p-1 hover:bg-zinc-800 rounded"
+            className="absolute top-2 right-2 p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded"
           >
             <X className="w-4 h-4 text-zinc-500" />
           </button>
@@ -237,9 +237,9 @@ export function LeftSidebar() {
               <button
                 key={item.type}
                 onClick={() => handleAddNode(item.type)}
-                className="w-full flex items-center gap-3 px-2 py-2 rounded-lg text-left hover:bg-zinc-800 text-zinc-200 transition-colors"
+                className="w-full flex items-center gap-3 px-2 py-2 rounded-lg text-left hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 transition-colors"
               >
-                <item.icon className="w-5 h-5 text-zinc-400" />
+                <item.icon className="w-5 h-5 text-zinc-500 dark:text-zinc-400" />
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium">{item.label}</span>
@@ -260,9 +260,9 @@ export function LeftSidebar() {
             <div className="text-xs text-zinc-500 px-2 py-1 mb-2">Add Source</div>
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="w-full flex items-center gap-3 px-2 py-2 rounded-lg text-left hover:bg-zinc-800 text-zinc-200 transition-colors"
+              className="w-full flex items-center gap-3 px-2 py-2 rounded-lg text-left hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 transition-colors"
             >
-              <Upload className="w-5 h-5 text-zinc-400" />
+              <Upload className="w-5 h-5 text-zinc-500 dark:text-zinc-400" />
               <span className="text-sm font-medium">Upload</span>
             </button>
           </div>

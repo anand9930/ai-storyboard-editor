@@ -1,13 +1,27 @@
 'use client';
 
-import { useRef } from 'react';
-import { Download, Upload, Trash2, Sparkles } from 'lucide-react';
-import { useWorkflowStore } from '@/store/workflowStore';
+import { useRef, useEffect } from 'react';
+import { Download, Upload, Trash2, Sparkles, Sun, Moon } from 'lucide-react';
+import { useWorkflowStore, ColorMode } from '@/store/workflowStore';
 import { toast } from 'sonner';
 
 export function TopBar() {
-  const { exportWorkflow, importWorkflow, clearWorkflow } = useWorkflowStore();
+  const { exportWorkflow, importWorkflow, clearWorkflow, colorMode, setColorMode } = useWorkflowStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Apply theme class to document
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.toggle('dark', colorMode === 'dark');
+  }, [colorMode]);
+
+  const cycleTheme = () => {
+    const nextMode: ColorMode = colorMode === 'dark' ? 'light' : 'dark';
+    setColorMode(nextMode);
+    toast.success(`Theme: ${nextMode}`);
+  };
+
+  const ThemeIcon = colorMode === 'dark' ? Moon : Sun;
 
   const handleExport = () => {
     try {
@@ -52,17 +66,17 @@ export function TopBar() {
   };
 
   return (
-    <div className="flex items-center gap-2 bg-zinc-900/95 backdrop-blur border border-zinc-800 rounded-xl px-3 py-2">
+    <div className="flex items-center gap-2 bg-white/95 dark:bg-zinc-900/95 backdrop-blur border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2">
       {/* Logo */}
-      <div className="flex items-center gap-2 pr-3 border-r border-zinc-800">
+      <div className="flex items-center gap-2 pr-3 border-r border-zinc-200 dark:border-zinc-800">
         <Sparkles className="w-5 h-5 text-blue-500" />
-        <span className="font-semibold text-zinc-200">Storyboard</span>
+        <span className="font-semibold text-zinc-800 dark:text-zinc-200">Storyboard</span>
       </div>
 
       {/* Actions */}
       <button
         onClick={handleExport}
-        className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-zinc-300 hover:bg-zinc-800 rounded-lg transition-colors"
+        className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
       >
         <Download className="w-4 h-4" />
         Export
@@ -70,7 +84,7 @@ export function TopBar() {
 
       <button
         onClick={() => fileInputRef.current?.click()}
-        className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-zinc-300 hover:bg-zinc-800 rounded-lg transition-colors"
+        className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
       >
         <Upload className="w-4 h-4" />
         Import
@@ -84,7 +98,7 @@ export function TopBar() {
         className="hidden"
       />
 
-      <div className="w-px h-6 bg-zinc-700" />
+      <div className="w-px h-6 bg-zinc-700 dark:bg-zinc-700" />
 
       <button
         onClick={handleClear}
@@ -92,6 +106,16 @@ export function TopBar() {
       >
         <Trash2 className="w-4 h-4" />
         Clear
+      </button>
+
+      <div className="w-px h-6 bg-zinc-700 dark:bg-zinc-700" />
+
+      <button
+        onClick={cycleTheme}
+        className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
+        title={`Theme: ${colorMode}`}
+      >
+        <ThemeIcon className="w-4 h-4" />
       </button>
     </div>
   );

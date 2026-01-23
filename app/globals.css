@@ -3,7 +3,42 @@
 @tailwind utilities;
 
 @layer base {
+  /* Light mode (default root) */
   :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 217.2 91.2% 59.8%;
+    --radius: 0.5rem;
+
+    /* Node colors for light mode */
+    --node-bg: 0 0% 98%;
+    --node-border: 240 5.9% 90%;
+    --node-border-hover: 240 5.9% 80%;
+    --handle-source: 217.2 91.2% 59.8%;
+    --handle-target: 240 3.7% 46%;
+    --edge-stroke: 240 5.9% 80%;
+    --canvas-bg: 240 4.8% 95.9%;
+    --canvas-dots: 240 5.9% 85%;
+  }
+
+  /* Dark mode */
+  .dark {
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
     --card: 240 10% 3.9%;
@@ -23,7 +58,16 @@
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
     --ring: 217.2 91.2% 59.8%;
-    --radius: 0.5rem;
+
+    /* Node colors for dark mode */
+    --node-bg: 240 6% 10%;
+    --node-border: 240 3.7% 15.9%;
+    --node-border-hover: 240 3.7% 25%;
+    --handle-source: 217.2 91.2% 59.8%;
+    --handle-target: 240 4% 32%;
+    --edge-stroke: 240 3.7% 25%;
+    --canvas-bg: 240 10% 3.9%;
+    --canvas-dots: 240 3.7% 15.9%;
   }
 }
 
@@ -36,48 +80,48 @@
   }
 }
 
-/* ReactFlow custom styles for dark theme */
+/* ReactFlow custom styles - uses CSS variables for theming */
 .react-flow__background {
-  background-color: #09090b !important;
+  background-color: hsl(var(--canvas-bg)) !important;
 }
 
 .react-flow__minimap {
-  background-color: #18181b !important;
-  border: 1px solid #27272a !important;
+  background-color: hsl(var(--card)) !important;
+  border: 1px solid hsl(var(--border)) !important;
   border-radius: 8px !important;
 }
 
 .react-flow__minimap-mask {
-  fill: rgba(0, 0, 0, 0.8) !important;
+  fill: hsl(var(--background) / 0.8) !important;
 }
 
 .react-flow__minimap-node {
-  fill: #3f3f46 !important;
+  fill: hsl(var(--muted-foreground)) !important;
 }
 
 .react-flow__controls {
-  background-color: #18181b !important;
-  border: 1px solid #27272a !important;
+  background-color: hsl(var(--card)) !important;
+  border: 1px solid hsl(var(--border)) !important;
   border-radius: 8px !important;
 }
 
 .react-flow__controls-button {
-  background-color: #18181b !important;
-  border-color: #27272a !important;
-  fill: #a1a1aa !important;
+  background-color: hsl(var(--card)) !important;
+  border-color: hsl(var(--border)) !important;
+  fill: hsl(var(--muted-foreground)) !important;
 }
 
 .react-flow__controls-button:hover {
-  background-color: #27272a !important;
+  background-color: hsl(var(--accent)) !important;
 }
 
 .react-flow__edge-path {
-  stroke: #3f3f46 !important;
+  stroke: hsl(var(--edge-stroke)) !important;
   stroke-width: 2 !important;
 }
 
 .react-flow__connection-line {
-  stroke: #3b82f6 !important;
+  stroke: hsl(var(--primary)) !important;
   stroke-width: 2 !important;
 }
 
@@ -85,15 +129,15 @@
   width: 12px !important;
   height: 12px !important;
   border-radius: 50% !important;
-  border: 2px solid #27272a !important;
+  border: 2px solid hsl(var(--border)) !important;
 }
 
 .react-flow__handle-left {
-  background-color: #52525b !important;
+  background-color: hsl(var(--handle-target)) !important;
 }
 
 .react-flow__handle-right {
-  background-color: #3b82f6 !important;
+  background-color: hsl(var(--handle-source)) !important;
 }
 
 /* Custom scrollbar */
