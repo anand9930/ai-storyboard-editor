@@ -1,0 +1,116 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 217.2 91.2% 59.8%;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* ReactFlow custom styles for dark theme */
+.react-flow__background {
+  background-color: #09090b !important;
+}
+
+.react-flow__minimap {
+  background-color: #18181b !important;
+  border: 1px solid #27272a !important;
+  border-radius: 8px !important;
+}
+
+.react-flow__minimap-mask {
+  fill: rgba(0, 0, 0, 0.8) !important;
+}
+
+.react-flow__minimap-node {
+  fill: #3f3f46 !important;
+}
+
+.react-flow__controls {
+  background-color: #18181b !important;
+  border: 1px solid #27272a !important;
+  border-radius: 8px !important;
+}
+
+.react-flow__controls-button {
+  background-color: #18181b !important;
+  border-color: #27272a !important;
+  fill: #a1a1aa !important;
+}
+
+.react-flow__controls-button:hover {
+  background-color: #27272a !important;
+}
+
+.react-flow__edge-path {
+  stroke: #3f3f46 !important;
+  stroke-width: 2 !important;
+}
+
+.react-flow__connection-line {
+  stroke: #3b82f6 !important;
+  stroke-width: 2 !important;
+}
+
+.react-flow__handle {
+  width: 12px !important;
+  height: 12px !important;
+  border-radius: 50% !important;
+  border: 2px solid #27272a !important;
+}
+
+.react-flow__handle-left {
+  background-color: #52525b !important;
+}
+
+.react-flow__handle-right {
+  background-color: #3b82f6 !important;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #18181b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #52525b;
+}
