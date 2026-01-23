@@ -76,6 +76,7 @@ export function LeftSidebar() {
           type: 'source',
           position: getNewNodePosition(),
           data: {
+            name: 'Source',
             image: {
               id: `src-${Date.now()}`,
               url: dataUrl,

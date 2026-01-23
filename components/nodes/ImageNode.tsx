@@ -1,13 +1,12 @@
 'use client';
 
-import { useState, memo, useEffect, useMemo } from 'react';
+import { useState, memo, useEffect, useMemo, useCallback } from 'react';
 import { NodeProps, useHandleConnections, useNodesData } from '@xyflow/react';
 import { RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { BaseNode } from './BaseNode';
 import { ImageNodeData, NODE_ACTIONS } from '@/types/nodes';
 import { useWorkflowStore } from '@/store/workflowStore';
-import { StatusIndicator } from '../ui/StatusIndicator';
 import { GenerateFromNodePopup } from '../ui/GenerateFromNodePopup';
 
 function ImageNodeComponent({ data, id, selected }: NodeProps) {
@@ -56,6 +55,11 @@ function ImageNodeComponent({ data, id, selected }: NodeProps) {
     setSelectedNodeId(id);
   };
 
+  // Handle name change
+  const handleNameChange = useCallback((newName: string) => {
+    updateNodeData(id, { name: newName });
+  }, [id, updateNodeData]);
+
   return (
     <>
       <BaseNode
@@ -67,14 +71,10 @@ function ImageNodeComponent({ data, id, selected }: NodeProps) {
         minWidth={240}
         minHeight={200}
         onPlusClick={() => setShowGeneratePopup(true)}
+        nodeName={nodeData.name}
+        onNameChange={handleNameChange}
       >
         <div className="space-y-3">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <span className="font-medium text-zinc-800 dark:text-zinc-200">Image</span>
-            <StatusIndicator status={nodeData.status} />
-          </div>
-
           {/* Action Options - only show when no generated image */}
           {!nodeData.generatedImage && (
             <div className="space-y-2">

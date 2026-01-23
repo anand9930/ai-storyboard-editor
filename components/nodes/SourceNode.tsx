@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, memo } from 'react';
+import { useRef, useState, memo, useCallback } from 'react';
 import { NodeProps } from '@xyflow/react';
 import { Upload, Crop, Download, Maximize2 } from 'lucide-react';
 import { BaseNode } from './BaseNode';
@@ -49,6 +49,11 @@ function SourceNodeComponent({ data, id, selected }: NodeProps) {
     }
   };
 
+  // Handle name change
+  const handleNameChange = useCallback((newName: string) => {
+    updateNodeData(id, { name: newName });
+  }, [id, updateNodeData]);
+
   return (
     <>
       <BaseNode
@@ -57,20 +62,21 @@ function SourceNodeComponent({ data, id, selected }: NodeProps) {
         selected={selected}
         onPlusClick={() => setShowGeneratePopup(true)}
         plusDisabled={!nodeData.image}
+        nodeName={nodeData.name}
+        onNameChange={handleNameChange}
       >
         <div className="space-y-3">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <span className="font-medium text-zinc-800 dark:text-zinc-200">Source</span>
-            {nodeData.image && (
+          {/* Replace Button */}
+          {nodeData.image && (
+            <div className="flex items-center justify-end">
               <button
                 onClick={() => fileInputRef.current?.click()}
                 className="text-xs text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors"
               >
                 Replace
               </button>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Image Display or Upload Zone */}
           {nodeData.image ? (

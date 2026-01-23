@@ -28,6 +28,7 @@ export const GENERATE_OPTIONS = [
 
 // Node data interfaces with index signature for ReactFlow compatibility
 export interface TextNodeData {
+  name: string;
   content: string;
   prompt: string;
   selectedAction: 'write' | 'prompt_from_image' | null;
@@ -38,6 +39,7 @@ export interface TextNodeData {
 }
 
 export interface ImageNodeData {
+  name: string;
   sourceImage?: string;
   generatedImage?: string;
   prompt: string;
@@ -48,6 +50,7 @@ export interface ImageNodeData {
 }
 
 export interface SourceNodeData {
+  name: string;
   image: {
     id: string;
     url: string;
@@ -68,6 +71,7 @@ export type SourceNode = Node<SourceNodeData, 'source'>;
 // Default data creators
 export function getDefaultTextNodeData(): TextNodeData {
   return {
+    name: 'Text',
     content: '',
     prompt: '',
     selectedAction: null,
@@ -77,6 +81,7 @@ export function getDefaultTextNodeData(): TextNodeData {
 
 export function getDefaultImageNodeData(): ImageNodeData {
   return {
+    name: 'Image',
     sourceImage: undefined,
     generatedImage: undefined,
     prompt: '',
@@ -87,6 +92,7 @@ export function getDefaultImageNodeData(): ImageNodeData {
 
 export function getDefaultSourceNodeData(): SourceNodeData {
   return {
+    name: 'Source',
     image: null,
   };
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, useState, useRef, useEffect, useCallback } from 'react';
 import { Handle, Position, NodeResizer, NodeToolbar } from '@xyflow/react';
 import { Trash2, Copy, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -24,6 +24,8 @@ interface BaseNodeProps {
   onPlusClick?: () => void;
   plusDisabled?: boolean;
   toolbarContent?: ReactNode;
+  nodeName?: string;
+  onNameChange?: (newName: string) => void;
 }
 
 export function BaseNode({
@@ -40,9 +42,53 @@ export function BaseNode({
   onPlusClick,
   plusDisabled = false,
   toolbarContent,
+  nodeName,
+  onNameChange,
 }: BaseNodeProps) {
   const { inputs = [], outputs = [] } = handles;
   const { deleteNode, addNode, nodes } = useWorkflowStore();
+
+  // Editable name state
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editedName, setEditedName] = useState(nodeName || '');
+  const nameInputRef = useRef<HTMLInputElement>(null);
+
+  // Update local state when nodeName prop changes
+  useEffect(() => {
+    if (!isEditingName) {
+      setEditedName(nodeName || '');
+    }
+  }, [nodeName, isEditingName]);
+
+  // Focus input when entering edit mode
+  useEffect(() => {
+    if (isEditingName && nameInputRef.current) {
+      nameInputRef.current.focus();
+    }
+  }, [isEditingName]);
+
+  const handleNameClick = useCallback(() => {
+    setIsEditingName(true);
+  }, []);
+
+  const handleNameBlur = useCallback(() => {
+    setIsEditingName(false);
+    if (editedName.trim() && editedName !== nodeName && onNameChange) {
+      onNameChange(editedName.trim());
+    } else {
+      setEditedName(nodeName || '');
+    }
+  }, [editedName, nodeName, onNameChange]);
+
+  const handleNameKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleNameBlur();
+    } else if (e.key === 'Escape') {
+      setEditedName(nodeName || '');
+      setIsEditingName(false);
+    }
+  }, [handleNameBlur, nodeName]);
 
   const handleDelete = () => {
     deleteNode(id);
@@ -70,6 +116,7 @@ export function BaseNode({
         <NodeToolbar
           isVisible={selected}
           position={Position.Top}
+          offset={20}
           className="flex gap-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-1 shadow-lg"
         >
           {/* Custom toolbar content (e.g., formatting buttons) */}
@@ -100,6 +147,33 @@ export function BaseNode({
           handleClassName="!w-2 !h-2 !bg-blue-500 !border-blue-500"
         />
       )}
+
+      {/* Editable Node Name - Outside the node border */}
+      {nodeName !== undefined && (
+        <div className="absolute -top-7 left-0 z-10">
+          {isEditingName ? (
+            <input
+              ref={nameInputRef}
+              type="text"
+              value={editedName}
+              onChange={(e) => setEditedName(e.target.value)}
+              onBlur={handleNameBlur}
+              onKeyDown={handleNameKeyDown}
+              className="text-xs font-medium bg-transparent text-zinc-700 dark:text-zinc-300 outline-none min-w-[60px]"
+              style={{ width: `${Math.max(60, editedName.length * 7)}px` }}
+            />
+          ) : (
+            <span
+              onClick={handleNameClick}
+              className="text-xs font-medium text-zinc-500 dark:text-zinc-400 cursor-text hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
+              title="Click to edit name"
+            >
+              {nodeName}
+            </span>
+          )}
+        </div>
+      )}
+
       <div
         className={cn(
           'group relative bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-lg',

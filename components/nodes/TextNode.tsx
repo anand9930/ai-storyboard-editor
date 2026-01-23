@@ -8,7 +8,6 @@ import { cn } from '@/lib/utils';
 import { BaseNode } from './BaseNode';
 import { TextNodeData, NODE_ACTIONS } from '@/types/nodes';
 import { useWorkflowStore } from '@/store/workflowStore';
-import { StatusIndicator } from '../ui/StatusIndicator';
 import { GenerateFromNodePopup } from '../ui/GenerateFromNodePopup';
 import { RichTextEditor } from '../ui/RichTextEditor';
 import { TextFormattingToolbar } from '../ui/TextFormattingToolbar';
@@ -31,6 +30,11 @@ function TextNodeComponent({ data, id, selected }: NodeProps) {
     updateNodeData(id, { selectedAction: action });
     setSelectedNodeId(id);
   };
+
+  // Handle name change
+  const handleNameChange = useCallback((newName: string) => {
+    updateNodeData(id, { name: newName });
+  }, [id, updateNodeData]);
 
   const handleContentChange = useCallback((newContent: string) => {
     updateNodeData(id, { content: newContent });
@@ -70,14 +74,10 @@ function TextNodeComponent({ data, id, selected }: NodeProps) {
         status={nodeData.status}
         onPlusClick={() => setShowGeneratePopup(true)}
         toolbarContent={toolbarContent}
+        nodeName={nodeData.name}
+        onNameChange={handleNameChange}
       >
         <div className="space-y-3">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <span className="font-medium text-zinc-800 dark:text-zinc-200">Text</span>
-            <StatusIndicator status={nodeData.status} />
-          </div>
-
           {/* Action Options - only show when no content */}
           {!nodeData.content && (
             <div className="space-y-2">
