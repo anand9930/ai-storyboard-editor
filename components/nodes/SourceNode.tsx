@@ -11,7 +11,7 @@ import { GenerateFromNodePopup } from '../ui/GenerateFromNodePopup';
 function SourceNodeComponent({ data, id, selected }: NodeProps) {
   const nodeData = data as unknown as SourceNodeData;
   const { updateNodeData } = useWorkflowStore();
-  const [showGeneratePopup, setShowGeneratePopup] = useState(false);
+  const [popupSide, setPopupSide] = useState<'left' | 'right' | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Handle file upload
@@ -60,7 +60,7 @@ function SourceNodeComponent({ data, id, selected }: NodeProps) {
         id={id}
         handles={{ outputs: ['image'] }}
         selected={selected}
-        onPlusClick={() => setShowGeneratePopup(true)}
+        onPlusClick={(side) => setPopupSide(side)}
         plusDisabled={!nodeData.image}
         nodeName={nodeData.name}
         onNameChange={handleNameChange}
@@ -136,10 +136,11 @@ function SourceNodeComponent({ data, id, selected }: NodeProps) {
       </BaseNode>
 
       {/* Generate from Node Popup */}
-      {showGeneratePopup && (
+      {popupSide && (
         <GenerateFromNodePopup
           sourceNodeId={id}
-          onClose={() => setShowGeneratePopup(false)}
+          side={popupSide}
+          onClose={() => setPopupSide(null)}
         />
       )}
     </>

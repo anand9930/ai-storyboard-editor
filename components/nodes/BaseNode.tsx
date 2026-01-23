@@ -1,11 +1,15 @@
 'use client';
 
-import { ReactNode, useState, useRef, useEffect, useCallback } from 'react';
+import { ReactNode, useState, useRef, useEffect, useCallback, MouseEvent as ReactMouseEvent } from 'react';
 import { Handle, Position, NodeResizer, NodeToolbar } from '@xyflow/react';
 import { Trash2, Copy, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { NodeStatus } from '@/types/nodes';
 import { useWorkflowStore } from '@/store/workflowStore';
+
+// Magnetic button constants
+const MAGNETIC_RADIUS = 80;
+const MAGNETIC_STRENGTH = 0.3;
 
 interface BaseNodeProps {
   id: string;
@@ -21,7 +25,7 @@ interface BaseNodeProps {
   minWidth?: number;
   minHeight?: number;
   showToolbar?: boolean;
-  onPlusClick?: () => void;
+  onPlusClick?: (side: 'left' | 'right') => void;
   plusDisabled?: boolean;
   toolbarContent?: ReactNode;
   nodeName?: string;
@@ -52,6 +56,58 @@ export function BaseNode({
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState(nodeName || '');
   const nameInputRef = useRef<HTMLInputElement>(null);
+
+  // Magnetic button state - separate for left and right buttons
+  const [magneticOffsetRight, setMagneticOffsetRight] = useState({ x: 0, y: 0 });
+  const [magneticOffsetLeft, setMagneticOffsetLeft] = useState({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = useState(false);
+  const plusButtonRightRef = useRef<HTMLButtonElement>(null);
+  const plusButtonLeftRef = useRef<HTMLButtonElement>(null);
+
+  // Helper function to calculate magnetic offset for a button
+  const calculateMagneticOffset = useCallback((
+    e: ReactMouseEvent<HTMLDivElement>,
+    buttonRef: React.RefObject<HTMLButtonElement | null>
+  ) => {
+    if (!buttonRef.current) return { x: 0, y: 0 };
+
+    const rect = buttonRef.current.getBoundingClientRect();
+    const buttonCenterX = rect.left + rect.width / 2;
+    const buttonCenterY = rect.top + rect.height / 2;
+
+    const distance = Math.sqrt(
+      Math.pow(e.clientX - buttonCenterX, 2) +
+      Math.pow(e.clientY - buttonCenterY, 2)
+    );
+
+    if (distance < MAGNETIC_RADIUS) {
+      const strength = 1 - distance / MAGNETIC_RADIUS;
+      return {
+        x: (e.clientX - buttonCenterX) * strength * MAGNETIC_STRENGTH,
+        y: (e.clientY - buttonCenterY) * strength * MAGNETIC_STRENGTH,
+      };
+    }
+    return { x: 0, y: 0 };
+  }, []);
+
+  // Handle mouse move for magnetic effect on both buttons
+  const handleMouseMove = useCallback((e: ReactMouseEvent<HTMLDivElement>) => {
+    if (!onPlusClick) return;
+
+    setMagneticOffsetRight(calculateMagneticOffset(e, plusButtonRightRef));
+    setMagneticOffsetLeft(calculateMagneticOffset(e, plusButtonLeftRef));
+  }, [onPlusClick, calculateMagneticOffset]);
+
+  // Reset magnetic offset when mouse leaves
+  const handleMouseLeave = useCallback(() => {
+    setMagneticOffsetRight({ x: 0, y: 0 });
+    setMagneticOffsetLeft({ x: 0, y: 0 });
+    setIsHovered(false);
+  }, []);
+
+  const handleMouseEnter = useCallback(() => {
+    setIsHovered(true);
+  }, []);
 
   // Update local state when nodeName prop changes
   useEffect(() => {
@@ -175,6 +231,9 @@ export function BaseNode({
       )}
 
       <div
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        onMouseEnter={handleMouseEnter}
         className={cn(
           'group relative bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-lg',
           resizable ? 'w-full h-full' : 'w-[240px]',
@@ -186,7 +245,7 @@ export function BaseNode({
           className
         )}
       >
-      {/* Input Handles */}
+      {/* Input Handles - Invisible but functional */}
       {inputs.map((input, i) => (
         <Handle
           key={`input-${input}`}
@@ -195,17 +254,13 @@ export function BaseNode({
           id={input}
           style={{
             top: `${((i + 1) / (inputs.length + 1)) * 100}%`,
-            width: 12,
-            height: 12,
-            background: '#52525b',
-            border: '2px solid #27272a',
           }}
         />
       ))}
 
       {children}
 
-      {/* Output Handles */}
+      {/* Output Handles - Invisible but functional */}
       {outputs.map((output, i) => (
         <Handle
           key={`output-${output}`}
@@ -214,28 +269,56 @@ export function BaseNode({
           id={output}
           style={{
             top: `${((i + 1) / (outputs.length + 1)) * 100}%`,
-            width: 12,
-            height: 12,
-            background: '#3b82f6',
-            border: '2px solid #27272a',
           }}
         />
       ))}
 
-      {/* Floating Plus Button - Right Edge */}
+      {/* Floating Plus Button - Left Edge with Magnetic Effect */}
       {onPlusClick && (
         <button
+          ref={plusButtonLeftRef}
           onClick={(e) => {
             e.stopPropagation();
-            if (!plusDisabled) onPlusClick();
+            if (!plusDisabled) onPlusClick('left');
+          }}
+          style={{
+            transform: `translate(${magneticOffsetLeft.x}px, calc(-50% + ${magneticOffsetLeft.y}px))`,
+            transition: 'transform 0.15s ease-out, opacity 0.2s ease-out, left 0.25s ease-out',
           }}
           className={cn(
-            'absolute -right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full transition-all duration-200',
+            'absolute top-1/2 p-1.5 rounded-full',
             'bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-md',
-            'opacity-0 group-hover:opacity-100',
+            // Pop-in animation: start from outside, animate further outside when visible
+            isHovered ? 'opacity-100 -left-10' : 'opacity-0 -left-8',
             plusDisabled
               ? 'text-zinc-400 dark:text-zinc-600 cursor-not-allowed'
-              : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700 hover:text-zinc-800 dark:hover:text-zinc-200'
+              : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700 hover:text-zinc-800 dark:hover:text-zinc-200 hover:scale-110'
+          )}
+        >
+          <Plus className="w-4 h-4" />
+        </button>
+      )}
+
+      {/* Floating Plus Button - Right Edge with Magnetic Effect */}
+      {onPlusClick && (
+        <button
+          ref={plusButtonRightRef}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (!plusDisabled) onPlusClick('right');
+          }}
+          style={{
+            transform: `translate(${magneticOffsetRight.x}px, calc(-50% + ${magneticOffsetRight.y}px))`,
+            transition: 'transform 0.15s ease-out, opacity 0.2s ease-out, right 0.25s ease-out',
+          }}
+          className={cn(
+            'absolute top-1/2 p-1.5 rounded-full',
+            'bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-md',
+            // Pop-in animation: start from outside, animate further outside when visible
+            isHovered ? 'opacity-100 -right-10' : 'opacity-0 -right-8',
+            plusDisabled
+              ? 'text-zinc-400 dark:text-zinc-600 cursor-not-allowed'
+              : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700 hover:text-zinc-800 dark:hover:text-zinc-200 hover:scale-110'
           )}
         >
           <Plus className="w-4 h-4" />

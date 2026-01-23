@@ -7,6 +7,7 @@ import { getDefaultNodeData, GENERATE_OPTIONS } from '@/types/nodes';
 
 interface GenerateFromNodePopupProps {
   sourceNodeId: string;
+  side: 'left' | 'right';
   onClose: () => void;
 }
 
@@ -17,6 +18,7 @@ const iconMap: Record<string, any> = {
 
 export function GenerateFromNodePopup({
   sourceNodeId,
+  side,
   onClose,
 }: GenerateFromNodePopupProps) {
   const { addNode, addEdge, nodes, setSelectedNodeId } = useWorkflowStore();
@@ -25,9 +27,11 @@ export function GenerateFromNodePopup({
   const handleSelect = (type: 'text' | 'image') => {
     if (!sourceNode) return;
 
-    // Calculate position for new node (to the right of source)
+    // Calculate position for new node based on which side was clicked
     const newPosition = {
-      x: sourceNode.position.x + 320,
+      x: side === 'right'
+        ? sourceNode.position.x + 400  // To the right
+        : sourceNode.position.x - 400, // To the left
       y: sourceNode.position.y,
     };
 
@@ -42,20 +46,40 @@ export function GenerateFromNodePopup({
 
     addNode(newNode);
 
-    // Create edge from source to new node
+    // Create edge - direction depends on which side
+    // Right: current node → new node (current is source)
+    // Left: new node → current node (new node is source)
     const sourceHandle = sourceNode.type === 'text' ? 'text' : 'image';
-    addEdge({
-      id: `edge-${sourceNodeId}-${newNodeId}`,
-      source: sourceNodeId,
-      target: newNodeId,
-      sourceHandle,
-      targetHandle: 'any',
-      type: 'default',
-      style: {
-        stroke: '#3f3f46',
-        strokeWidth: 2,
-      },
-    });
+    const newNodeHandle = type === 'text' ? 'text' : 'image';
+
+    if (side === 'right') {
+      addEdge({
+        id: `edge-${sourceNodeId}-${newNodeId}`,
+        source: sourceNodeId,
+        target: newNodeId,
+        sourceHandle,
+        targetHandle: 'any',
+        type: 'default',
+        style: {
+          stroke: '#3f3f46',
+          strokeWidth: 2,
+        },
+      });
+    } else {
+      // Left side: new node is the source, current node is the target
+      addEdge({
+        id: `edge-${newNodeId}-${sourceNodeId}`,
+        source: newNodeId,
+        target: sourceNodeId,
+        sourceHandle: newNodeHandle,
+        targetHandle: 'any',
+        type: 'default',
+        style: {
+          stroke: '#3f3f46',
+          strokeWidth: 2,
+        },
+      });
+    }
 
     // Select the new node
     setSelectedNodeId(newNodeId);
@@ -68,8 +92,11 @@ export function GenerateFromNodePopup({
       {/* Backdrop */}
       <div className="fixed inset-0 z-40" onClick={onClose} />
 
-      {/* Popup */}
-      <div className="absolute z-50 bg-zinc-900 border border-zinc-800 rounded-xl p-2 w-56 shadow-xl left-full ml-2 top-0">
+      {/* Popup - position based on which side was clicked */}
+      <div className={cn(
+        "absolute z-50 bg-zinc-900 border border-zinc-800 rounded-xl p-2 w-56 shadow-xl top-0",
+        side === 'right' ? 'left-full ml-2' : 'right-full mr-2'
+      )}>
         <div className="text-xs text-zinc-500 px-2 py-1 mb-1">
           Generate from this node
         </div>

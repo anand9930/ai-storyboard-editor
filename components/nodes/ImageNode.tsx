@@ -12,7 +12,7 @@ import { GenerateFromNodePopup } from '../ui/GenerateFromNodePopup';
 function ImageNodeComponent({ data, id, selected }: NodeProps) {
   const nodeData = data as unknown as ImageNodeData;
   const { updateNodeData, setSelectedNodeId } = useWorkflowStore();
-  const [showGeneratePopup, setShowGeneratePopup] = useState(false);
+  const [popupSide, setPopupSide] = useState<'left' | 'right' | null>(null);
 
   // Use React Flow hooks for reactive connection tracking
   const connections = useHandleConnections({ type: 'target', id: 'any' });
@@ -67,7 +67,7 @@ function ImageNodeComponent({ data, id, selected }: NodeProps) {
         handles={{ inputs: ['any'], outputs: ['image'] }}
         selected={selected}
         status={nodeData.status}
-        onPlusClick={() => setShowGeneratePopup(true)}
+        onPlusClick={(side) => setPopupSide(side)}
         nodeName={nodeData.name}
         onNameChange={handleNameChange}
       >
@@ -132,10 +132,11 @@ function ImageNodeComponent({ data, id, selected }: NodeProps) {
       </BaseNode>
 
       {/* Generate from Node Popup */}
-      {showGeneratePopup && (
+      {popupSide && (
         <GenerateFromNodePopup
           sourceNodeId={id}
-          onClose={() => setShowGeneratePopup(false)}
+          side={popupSide}
+          onClose={() => setPopupSide(null)}
         />
       )}
     </>

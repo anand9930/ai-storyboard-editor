@@ -21,7 +21,7 @@ const iconMap: Record<string, any> = {
 function TextNodeComponent({ data, id, selected }: NodeProps) {
   const nodeData = data as unknown as TextNodeData;
   const { updateNodeData, setSelectedNodeId } = useWorkflowStore();
-  const [showGeneratePopup, setShowGeneratePopup] = useState(false);
+  const [popupSide, setPopupSide] = useState<'left' | 'right' | null>(null);
   const [editor, setEditor] = useState<Editor | null>(null);
   const [showFullScreen, setShowFullScreen] = useState(false);
 
@@ -72,7 +72,7 @@ function TextNodeComponent({ data, id, selected }: NodeProps) {
         handles={{ inputs: ['any'], outputs: ['text'] }}
         selected={selected}
         status={nodeData.status}
-        onPlusClick={() => setShowGeneratePopup(true)}
+        onPlusClick={(side) => setPopupSide(side)}
         toolbarContent={toolbarContent}
         nodeName={nodeData.name}
         onNameChange={handleNameChange}
@@ -124,10 +124,11 @@ function TextNodeComponent({ data, id, selected }: NodeProps) {
       </BaseNode>
 
       {/* Generate from Node Popup */}
-      {showGeneratePopup && (
+      {popupSide && (
         <GenerateFromNodePopup
           sourceNodeId={id}
-          onClose={() => setShowGeneratePopup(false)}
+          side={popupSide}
+          onClose={() => setPopupSide(null)}
         />
       )}
 
