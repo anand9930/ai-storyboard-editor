@@ -1,4 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { fal } from '@fal-ai/client';
+
+// Configure FAL client
+fal.config({
+  credentials: process.env.FAL_KEY,
+});
+
+// Helper to convert base64 data URL to a FAL-compatible URL
+async function prepareImageUrl(imageData: string): Promise<string> {
+  // If it's already a URL, return as-is
+  if (imageData.startsWith('http://') || imageData.startsWith('https://')) {
+    return imageData;
+  }
+
+  // If it's a base64 data URL, upload to FAL storage
+  if (imageData.startsWith('data:')) {
+    // Convert base64 to blob
+    const response = await fetch(imageData);
+    const blob = await response.blob();
+
+    // Upload to FAL storage
+    const uploadedUrl = await fal.storage.upload(blob);
+    return uploadedUrl;
+  }
+
+  throw new Error('Invalid image format');
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -11,55 +38,46 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const apiUrl = process.env.BANANA_PRO_API_URL;
-    const apiKey = process.env.BANANA_PRO_API_KEY;
+    if (!process.env.FAL_KEY) {
+      return NextResponse.json(
+        { error: 'FAL_KEY is not configured' },
+        { status: 500 }
+      );
+    }
 
-    if (!apiUrl || !apiKey) {
-      // Return a placeholder response for development/demo
-      // In production, remove this and return the error
-      console.warn('Banana Pro API not configured, returning placeholder');
-      return NextResponse.json({
-        imageUrl: `https://placehold.co/512x512/1a1a1a/3b82f6?text=${encodeURIComponent(prompt.slice(0, 20))}`,
-        warning: 'Using placeholder - configure BANANA_PRO_API_URL and BANANA_PRO_API_KEY',
+    let result;
+
+    if (sourceImage) {
+      // Convert base64 to FAL storage URL if needed
+      const imageUrl = await prepareImageUrl(sourceImage);
+
+      // Image-to-image transformation using FLUX Redux
+      result = await fal.subscribe('fal-ai/flux/dev/image-to-image', {
+        input: {
+          prompt,
+          image_url: imageUrl,
+          strength: 0.75,
+          num_images: 1,
+        },
+      });
+    } else {
+      // Text-to-image generation using FLUX
+      result = await fal.subscribe('fal-ai/flux/dev', {
+        input: {
+          prompt,
+          image_size: 'square_hd',
+          num_images: 1,
+        },
       });
     }
 
-    // Call Banana Pro API for image generation
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        prompt,
-        image: sourceImage, // For image-to-image transformation
-        num_outputs: 1,
-        guidance_scale: 7.5,
-        num_inference_steps: 50,
-      }),
-    });
+    const generatedImageUrl = result.data?.images?.[0]?.url;
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Banana API error: ${response.status} - ${errorText}`);
-    }
-
-    const result = await response.json();
-
-    // Handle different response formats from various image APIs
-    const imageUrl =
-      result.output?.[0] ||
-      result.url ||
-      result.data?.[0]?.url ||
-      result.images?.[0]?.url ||
-      result.image;
-
-    if (!imageUrl) {
+    if (!generatedImageUrl) {
       throw new Error('No image URL in response');
     }
 
-    return NextResponse.json({ imageUrl });
+    return NextResponse.json({ imageUrl: generatedImageUrl });
   } catch (error: any) {
     console.error('Image generation failed:', error);
     return NextResponse.json(

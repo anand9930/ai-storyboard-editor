@@ -75,25 +75,27 @@ function ImageNodeComponent({ data, id, selected }: NodeProps) {
             <StatusIndicator status={nodeData.status} />
           </div>
 
-          {/* Action Options */}
-          <div className="space-y-2">
-            <span className="text-xs text-zinc-500">Try to:</span>
-            {NODE_ACTIONS.image.map((action) => (
-              <button
-                key={action.id}
-                onClick={() => handleActionClick(action.id as 'image_to_image')}
-                className={cn(
-                  'w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-left transition-colors',
-                  nodeData.selectedAction === action.id
-                    ? 'bg-zinc-200 dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100'
-                    : 'hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400'
-                )}
-              >
-                <RefreshCw className="w-4 h-4" />
-                <span>{action.label}</span>
-              </button>
-            ))}
-          </div>
+          {/* Action Options - only show when no generated image */}
+          {!nodeData.generatedImage && (
+            <div className="space-y-2">
+              <span className="text-xs text-zinc-500">Try to:</span>
+              {NODE_ACTIONS.image.map((action) => (
+                <button
+                  key={action.id}
+                  onClick={() => handleActionClick(action.id as 'image_to_image')}
+                  className={cn(
+                    'w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-left transition-colors',
+                    nodeData.selectedAction === action.id
+                      ? 'bg-zinc-200 dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100'
+                      : 'hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400'
+                  )}
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  <span>{action.label}</span>
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Image Display */}
           {nodeData.generatedImage ? (

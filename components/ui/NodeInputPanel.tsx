@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { ArrowUp, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FIXED_MODELS } from '@/types/nodes';
@@ -11,6 +11,7 @@ interface NodeInputPanelProps {
   onSubmit: (prompt: string) => void;
   isGenerating: boolean;
   connectedImage?: string;
+  initialPrompt?: string;
 }
 
 export function NodeInputPanel({
@@ -19,8 +20,14 @@ export function NodeInputPanel({
   onSubmit,
   isGenerating,
   connectedImage,
+  initialPrompt = '',
 }: NodeInputPanelProps) {
-  const [prompt, setPrompt] = useState('');
+  const [prompt, setPrompt] = useState(initialPrompt);
+
+  // Sync prompt when node changes or initialPrompt updates
+  useEffect(() => {
+    setPrompt(initialPrompt);
+  }, [nodeId, initialPrompt]);
 
   const model = FIXED_MODELS[nodeType];
   const placeholder =

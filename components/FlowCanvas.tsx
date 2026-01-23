@@ -171,7 +171,7 @@ export default function FlowCanvas() {
       if (!selectedNode) return;
 
       setIsGenerating(true);
-      updateNodeData(selectedNode.id, { status: 'processing' });
+      updateNodeData(selectedNode.id, { status: 'processing', prompt });
 
       try {
         if (selectedNode.type === 'text') {
@@ -192,6 +192,7 @@ export default function FlowCanvas() {
 
           updateNodeData(selectedNode.id, {
             content: result.text,
+            prompt,
             status: 'completed',
           });
         } else if (selectedNode.type === 'image') {
@@ -213,6 +214,7 @@ export default function FlowCanvas() {
 
           updateNodeData(selectedNode.id, {
             generatedImage: result.imageUrl,
+            prompt,
             status: 'completed',
           });
         }
@@ -296,6 +298,7 @@ export default function FlowCanvas() {
                 ? (selectedNode.data as any).sourceImage
                 : undefined
             }
+            initialPrompt={(selectedNode.data as any).prompt || ''}
           />
         </div>
       )}

@@ -21,8 +21,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Use Gemini 1.5 Pro for text generation
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
+    // Use Gemini 2.5 Flash for text generation
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     const result = await model.generateContent(prompt);
     const text = result.response.text();

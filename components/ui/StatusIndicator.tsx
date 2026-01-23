@@ -9,7 +9,7 @@ interface StatusIndicatorProps {
 }
 
 export function StatusIndicator({ status }: StatusIndicatorProps) {
-  if (status === 'idle') return null;
+  if (status === 'idle' || status === 'completed') return null;
 
   const config = {
     processing: {

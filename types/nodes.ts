@@ -10,8 +10,8 @@ export enum NodeType {
 
 // Fixed models for MVP (no user selection)
 export const FIXED_MODELS = {
-  text: { id: 'gemini-1.5-pro', name: 'Gemini 3 Pro', provider: 'google' },
-  image: { id: 'banana-pro', name: 'Banana Pro', provider: 'banana' },
+  text: { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash', provider: 'google' },
+  image: { id: 'flux-dev', name: 'FLUX', provider: 'fal' },
 } as const;
 
 // Actions available for each node type
@@ -35,6 +35,7 @@ export const GENERATE_OPTIONS = [
 // Node data interfaces with index signature for ReactFlow compatibility
 export interface TextNodeData {
   content: string;
+  prompt: string;
   selectedAction: 'write' | 'prompt_from_image' | null;
   connectedSourceImage?: string;
   status: NodeStatus;
@@ -76,6 +77,7 @@ export type AppNode = TextNode | ImageNode | SourceNode;
 export function getDefaultTextNodeData(): TextNodeData {
   return {
     content: '',
+    prompt: '',
     selectedAction: null,
     status: 'idle',
   };

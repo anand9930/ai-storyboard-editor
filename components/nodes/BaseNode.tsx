@@ -23,6 +23,7 @@ interface BaseNodeProps {
   showToolbar?: boolean;
   onPlusClick?: () => void;
   plusDisabled?: boolean;
+  toolbarContent?: ReactNode;
 }
 
 export function BaseNode({
@@ -38,6 +39,7 @@ export function BaseNode({
   showToolbar = true,
   onPlusClick,
   plusDisabled = false,
+  toolbarContent,
 }: BaseNodeProps) {
   const { inputs = [], outputs = [] } = handles;
   const { deleteNode, addNode, nodes } = useWorkflowStore();
@@ -70,6 +72,9 @@ export function BaseNode({
           position={Position.Top}
           className="flex gap-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-1 shadow-lg"
         >
+          {/* Custom toolbar content (e.g., formatting buttons) */}
+          {toolbarContent}
+          {toolbarContent && <div className="w-px h-5 bg-zinc-200 dark:bg-zinc-700 mx-1" />}
           <button
             onClick={handleDuplicate}
             className="p-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded transition-colors text-zinc-600 dark:text-zinc-400"
@@ -98,7 +103,7 @@ export function BaseNode({
       <div
         className={cn(
           'group relative bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-lg',
-          resizable ? 'w-full h-full' : 'min-w-[240px]',
+          resizable ? 'w-full h-full' : 'w-[240px]',
           'hover:border-zinc-300 dark:hover:border-zinc-700 transition-all duration-200',
           selected && 'border-blue-500/50 ring-2 ring-blue-500/20',
           status === 'processing' && 'border-blue-500/50',
