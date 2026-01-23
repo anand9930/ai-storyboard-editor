@@ -78,9 +78,7 @@ ai-storyboard-editor/
 │   ├── LeftSidebar.tsx
 │   └── TopBar.tsx
 ├── lib/
-│   ├── api-clients/   # API client helpers
-│   ├── utils.ts       # Utility functions
-│   └── workflow-engine.ts
+│   └── store.ts       # Zustand state management
 ├── store/
 │   └── workflowStore.ts
 └── types/

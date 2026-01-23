@@ -1,5 +1,16 @@
 # AI Storyboard Workflow Editor - Complete Technical Specification
 
+## Implementation Note
+
+The actual implementation differs from the original specification:
+- API logic is implemented directly in Next.js route handlers (`app/api/*`) rather than in a separate abstraction layer
+- Workflow execution is handled directly in `FlowCanvas.tsx` rather than through a `WorkflowEngine` class
+- This simpler architecture was chosen for clarity and ease of maintenance
+
+This document preserves the original design specifications for reference.
+
+---
+
 ## Executive Summary
 Build a flexible node-based visual workflow editor for AI content generation using ReactFlow and Next.js 14+ (App Router). The MVP focuses on three core node types: **Text**, **Image**, and **Source** nodes that can be freely connected to create generation pipelines. Key features include:
 
