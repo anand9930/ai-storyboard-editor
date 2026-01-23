@@ -13,97 +13,56 @@ import {
   ConnectionLineType,
   BackgroundVariant,
   Edge,
-  useReactFlow,
   useStore,
+  OnSelectionChangeParams,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
 import { useWorkflowStore } from '@/store/workflowStore';
 import { LeftSidebar } from './LeftSidebar';
 import { TopBar } from './TopBar';
-import { TextNode } from './nodes/TextNode';
-import { ImageNode } from './nodes/ImageNode';
-import { SourceNode } from './nodes/SourceNode';
 import { NodeInputPanel } from './ui/NodeInputPanel';
 import { FIXED_MODELS } from '@/types/nodes';
-
-// Node types mapping
-const nodeTypes = {
-  text: TextNode,
-  image: ImageNode,
-  source: SourceNode,
-};
-
-// Custom edge styling - using bezier curves
-const defaultEdgeOptions = {
-  type: 'default',
-  style: {
-    stroke: '#3f3f46',
-    strokeWidth: 2,
-  },
-  animated: false,
-};
+import type { AppNode, ImageNodeData, TextNodeData } from '@/types/nodes';
+import { nodeTypes, defaultEdgeOptions, isValidNodeConnection } from '@/lib/flowConfig';
 
 export default function FlowCanvas() {
   const {
     nodes,
     edges,
-    selectedNodeId,
+    selectedNodeIds,
     colorMode,
     onNodesChange,
     onEdgesChange,
     setEdges,
-    setSelectedNodeId,
+    setSelection,
+    setSelectedNodeIds,
     updateNodeData,
   } = useWorkflowStore();
 
   const [isGenerating, setIsGenerating] = useState(false);
-  const { getNode } = useReactFlow();
 
-  // Connection validation - prevents invalid connections
+  // Connection validation - uses nodes from store for consistent reads
   const isValidConnection = useCallback(
     (connection: Edge | Connection) => {
-      // Prevent self-connections
-      if (connection.source === connection.target) {
-        return false;
-      }
-
-      const sourceNode = getNode(connection.source!);
-      const targetNode = getNode(connection.target!);
-
-      if (!sourceNode || !targetNode) {
-        return false;
-      }
-
-      // Prevent duplicate connections (same source to same target)
-      const existingEdge = edges.find(
-        (edge) =>
-          edge.source === connection.source && edge.target === connection.target
-      );
-      if (existingEdge) {
-        return false;
-      }
-
-      // Define valid connection rules based on node types
-      // source nodes can connect to: image, text
-      // text nodes can connect to: image, text
-      // image nodes can connect to: image, text
-      const validTargets: Record<string, string[]> = {
-        source: ['image', 'text'],
-        text: ['image', 'text'],
-        image: ['image', 'text'],
-      };
-
-      const allowedTargets = validTargets[sourceNode.type!] || [];
-      return allowedTargets.includes(targetNode.type!);
+      return isValidNodeConnection(connection, nodes as AppNode[], edges);
     },
-    [getNode, edges]
+    [nodes, edges]
   );
 
-  // Get selected node
+  // Get first selected node with proper typing
   const selectedNode = useMemo(() => {
-    return nodes.find((n) => n.id === selectedNodeId);
-  }, [nodes, selectedNodeId]);
+    if (selectedNodeIds.length === 0) return undefined;
+    return nodes.find((n) => n.id === selectedNodeIds[0]) as AppNode | undefined;
+  }, [nodes, selectedNodeIds]);
+
+  // Handle selection change - syncs React Flow selection to our store
+  const onSelectionChange = useCallback(
+    (params: OnSelectionChangeParams) => {
+      setSelection(params);
+    },
+    [setSelection]
+  );
 
   // Subscribe to viewport transform for reactive positioning
   const transform = useStore((state) => state.transform);
@@ -150,15 +109,15 @@ export default function FlowCanvas() {
   // Handle node click - select node
   const onNodeClick = useCallback(
     (_: React.MouseEvent, node: any) => {
-      setSelectedNodeId(node.id);
+      setSelectedNodeIds([node.id]);
     },
-    [setSelectedNodeId]
+    [setSelectedNodeIds]
   );
 
   // Handle pane click - deselect
   const onPaneClick = useCallback(() => {
-    setSelectedNodeId(null);
-  }, [setSelectedNodeId]);
+    setSelectedNodeIds([]);
+  }, [setSelectedNodeIds]);
 
   // Handle generation from input panel
   const handleGenerate = useCallback(
@@ -191,13 +150,14 @@ export default function FlowCanvas() {
             status: 'completed',
           });
         } else if (selectedNode.type === 'image') {
+          const imageData = selectedNode.data as ImageNodeData;
           const response = await fetch('/api/generate-image', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               prompt,
               model: FIXED_MODELS.image.id,
-              sourceImage: (selectedNode.data as any).sourceImage,
+              sourceImage: imageData.sourceImage,
             }),
           });
 
@@ -241,6 +201,7 @@ export default function FlowCanvas() {
         onConnect={onConnect}
         onNodeClick={onNodeClick}
         onPaneClick={onPaneClick}
+        onSelectionChange={onSelectionChange}
         nodeTypes={nodeTypes}
         connectionMode={ConnectionMode.Loose}
         connectionLineType={ConnectionLineType.Bezier}
@@ -291,10 +252,16 @@ export default function FlowCanvas() {
             isGenerating={isGenerating}
             connectedImage={
               selectedNode.type === 'image'
-                ? (selectedNode.data as any).sourceImage
+                ? (selectedNode.data as ImageNodeData).sourceImage
                 : undefined
             }
-            initialPrompt={(selectedNode.data as any).prompt || ''}
+            initialPrompt={
+              selectedNode.type === 'text'
+                ? (selectedNode.data as TextNodeData).prompt
+                : selectedNode.type === 'image'
+                ? (selectedNode.data as ImageNodeData).prompt
+                : ''
+            }
           />
         </div>
       )}

@@ -26,8 +26,8 @@ export const GENERATE_OPTIONS = [
   { id: 'image', label: 'Image Generation', icon: 'ImageIcon', description: 'Generate or transform images' },
 ] as const;
 
-// Node data interfaces with index signature for ReactFlow compatibility
-export interface TextNodeData {
+// Node data interfaces - properly typed without index signatures
+export interface TextNodeData extends Record<string, unknown> {
   name: string;
   content: string;
   prompt: string;
@@ -35,10 +35,9 @@ export interface TextNodeData {
   connectedSourceImage?: string;
   status: NodeStatus;
   error?: string;
-  [key: string]: unknown;
 }
 
-export interface ImageNodeData {
+export interface ImageNodeData extends Record<string, unknown> {
   name: string;
   sourceImage?: string;
   generatedImage?: string;
@@ -46,10 +45,9 @@ export interface ImageNodeData {
   selectedAction: 'image_to_image' | null;
   status: NodeStatus;
   error?: string;
-  [key: string]: unknown;
 }
 
-export interface SourceNodeData {
+export interface SourceNodeData extends Record<string, unknown> {
   name: string;
   image: {
     id: string;
@@ -60,15 +58,31 @@ export interface SourceNodeData {
       format: string;
     };
   } | null;
-  [key: string]: unknown;
 }
 
-// Type aliases for nodes
+// Type aliases for nodes with proper generic typing
 export type TextNode = Node<TextNodeData, 'text'>;
 export type ImageNode = Node<ImageNodeData, 'image'>;
 export type SourceNode = Node<SourceNodeData, 'source'>;
 
-// Default data creators
+// Union type for all app nodes
+export type AppNode = TextNode | ImageNode | SourceNode;
+export type AppNodeData = TextNodeData | ImageNodeData | SourceNodeData;
+
+// Type guard functions
+export function isTextNode(node: AppNode): node is TextNode {
+  return node.type === 'text';
+}
+
+export function isImageNode(node: AppNode): node is ImageNode {
+  return node.type === 'image';
+}
+
+export function isSourceNode(node: AppNode): node is SourceNode {
+  return node.type === 'source';
+}
+
+// Default data creators with proper return types
 export function getDefaultTextNodeData(): TextNodeData {
   return {
     name: 'Text',
@@ -97,7 +111,12 @@ export function getDefaultSourceNodeData(): SourceNodeData {
   };
 }
 
-export function getDefaultNodeData(type: string) {
+// Overloaded function for type-safe node data creation
+export function getDefaultNodeData(type: 'text'): TextNodeData;
+export function getDefaultNodeData(type: 'image'): ImageNodeData;
+export function getDefaultNodeData(type: 'source'): SourceNodeData;
+export function getDefaultNodeData(type: string): AppNodeData;
+export function getDefaultNodeData(type: string): AppNodeData {
   switch (type) {
     case 'text':
       return getDefaultTextNodeData();
@@ -106,6 +125,6 @@ export function getDefaultNodeData(type: string) {
     case 'source':
       return getDefaultSourceNodeData();
     default:
-      return {};
+      return getDefaultTextNodeData();
   }
 }

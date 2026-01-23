@@ -8,14 +8,24 @@ import {
   NodeChange,
   EdgeChange,
 } from '@xyflow/react';
+import type { AppNode, AppNodeData } from '@/types/nodes';
 
 export type ColorMode = 'dark' | 'light';
+
+// Selection change params (matches React Flow's OnSelectionChangeParams)
+interface SelectionChangeParams {
+  nodes: Node[];
+  edges: Edge[];
+}
 
 interface WorkflowState {
   // Workflow data
   nodes: Node[];
   edges: Edge[];
-  selectedNodeId: string | null;
+
+  // Selection state (synced via onSelectionChange)
+  selectedNodeIds: string[];
+  selectedEdgeIds: string[];
 
   // Theme
   colorMode: ColorMode;
@@ -28,9 +38,12 @@ interface WorkflowState {
   onEdgesChange: (changes: EdgeChange[]) => void;
   addNode: (node: Node) => void;
   addEdge: (edge: Edge) => void;
-  updateNodeData: (nodeId: string, data: Partial<any>) => void;
+  updateNodeData: (nodeId: string, data: Partial<AppNodeData>) => void;
   deleteNode: (nodeId: string) => void;
-  setSelectedNodeId: (nodeId: string | null) => void;
+
+  // Selection actions
+  setSelection: (params: SelectionChangeParams) => void;
+  setSelectedNodeIds: (nodeIds: string[]) => void;
 
   // Workflow management
   exportWorkflow: () => string;
@@ -38,13 +51,25 @@ interface WorkflowState {
   clearWorkflow: () => void;
 }
 
+// Typed selector for getting a node by ID
+export const selectNodeById = (nodes: Node[], nodeId: string): AppNode | undefined => {
+  return nodes.find((n) => n.id === nodeId) as AppNode | undefined;
+};
+
+// Selector for getting first selected node
+export const selectFirstSelectedNode = (state: WorkflowState): AppNode | undefined => {
+  if (state.selectedNodeIds.length === 0) return undefined;
+  return state.nodes.find((n) => n.id === state.selectedNodeIds[0]) as AppNode | undefined;
+};
+
 export const useWorkflowStore = create<WorkflowState>()(
   persist(
     (set, get) => ({
       // Initial state
       nodes: [],
       edges: [],
-      selectedNodeId: null,
+      selectedNodeIds: [],
+      selectedEdgeIds: [],
       colorMode: 'dark' as ColorMode,
 
       setNodes: (nodes) => set({ nodes }),
@@ -88,11 +113,21 @@ export const useWorkflowStore = create<WorkflowState>()(
           edges: state.edges.filter(
             (edge) => edge.source !== nodeId && edge.target !== nodeId
           ),
-          selectedNodeId:
-            state.selectedNodeId === nodeId ? null : state.selectedNodeId,
+          selectedNodeIds: state.selectedNodeIds.filter((id) => id !== nodeId),
+          selectedEdgeIds: state.selectedEdgeIds.filter((id) => {
+            const edge = state.edges.find((e) => e.id === id);
+            return edge && edge.source !== nodeId && edge.target !== nodeId;
+          }),
         })),
 
-      setSelectedNodeId: (nodeId) => set({ selectedNodeId: nodeId }),
+      // Selection actions - synced via onSelectionChange callback
+      setSelection: ({ nodes, edges }) =>
+        set({
+          selectedNodeIds: nodes.map((n) => n.id),
+          selectedEdgeIds: edges.map((e) => e.id),
+        }),
+
+      setSelectedNodeIds: (nodeIds) => set({ selectedNodeIds: nodeIds }),
 
       // Export workflow to JSON string
       exportWorkflow: () => {
@@ -116,7 +151,8 @@ export const useWorkflowStore = create<WorkflowState>()(
           set({
             nodes: data.nodes || [],
             edges: data.edges || [],
-            selectedNodeId: null,
+            selectedNodeIds: [],
+            selectedEdgeIds: [],
           });
         } catch (error) {
           console.error('Failed to import workflow:', error);
@@ -129,7 +165,8 @@ export const useWorkflowStore = create<WorkflowState>()(
         set({
           nodes: [],
           edges: [],
-          selectedNodeId: null,
+          selectedNodeIds: [],
+          selectedEdgeIds: [],
         }),
     }),
     {

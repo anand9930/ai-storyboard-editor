@@ -1,58 +1,38 @@
 'use client';
 
-import { useState, memo, useEffect, useMemo, useCallback } from 'react';
-import { NodeProps, useHandleConnections, useNodesData } from '@xyflow/react';
+import { useState, memo, useEffect, useCallback } from 'react';
+import { NodeProps } from '@xyflow/react';
 import { RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { BaseNode } from './BaseNode';
-import { ImageNodeData, NODE_ACTIONS } from '@/types/nodes';
+import { NODE_ACTIONS } from '@/types/nodes';
+import type { ImageNode as ImageNodeType, ImageNodeData } from '@/types/nodes';
 import { useWorkflowStore } from '@/store/workflowStore';
 import { GenerateFromNodePopup } from '../ui/GenerateFromNodePopup';
+import { useSourceConnection } from '@/hooks/useSourceConnection';
 
-function ImageNodeComponent({ data, id, selected }: NodeProps) {
-  const nodeData = data as unknown as ImageNodeData;
-  const { updateNodeData, setSelectedNodeId } = useWorkflowStore();
+function ImageNodeComponent({ data, id, selected }: NodeProps<ImageNodeType>) {
+  // data is now properly typed as ImageNodeData
+  const nodeData = data as ImageNodeData;
+  const { updateNodeData, setSelectedNodeIds } = useWorkflowStore();
   const [popupSide, setPopupSide] = useState<'left' | 'right' | null>(null);
 
-  // Use React Flow hooks for reactive connection tracking
-  const connections = useHandleConnections({ type: 'target', id: 'any' });
-  const connectedNodeIds = useMemo(
-    () => connections.map((c) => c.source),
-    [connections]
-  );
-  const connectedNodesData = useNodesData(connectedNodeIds);
+  // Use custom hook for source image tracking (replaces deprecated useHandleConnections)
+  const { sourceImage: connectedSourceImage } = useSourceConnection({
+    nodeId: id,
+  });
 
-  // Extract source image from connected nodes reactively
+  // Update source image when connection changes
   useEffect(() => {
-    if (connectedNodesData.length > 0) {
-      const sourceNodeData = connectedNodesData[0];
-      if (sourceNodeData) {
-        let sourceImage: string | undefined;
-        const nodeDataRaw = sourceNodeData.data as any;
-
-        // Check if it's a source node with an image
-        if (sourceNodeData.type === 'source' && nodeDataRaw?.image) {
-          sourceImage = nodeDataRaw.image.url;
-        }
-        // Check if it's an image node with a generated image
-        else if (sourceNodeData.type === 'image' && nodeDataRaw?.generatedImage) {
-          sourceImage = nodeDataRaw.generatedImage;
-        }
-
-        if (sourceImage && sourceImage !== nodeData.sourceImage) {
-          updateNodeData(id, { sourceImage });
-        }
-      }
-    } else if (nodeData.sourceImage) {
-      // Clear source image when disconnected
-      updateNodeData(id, { sourceImage: undefined });
+    if (connectedSourceImage !== nodeData.sourceImage) {
+      updateNodeData(id, { sourceImage: connectedSourceImage });
     }
-  }, [connectedNodesData, id, nodeData.sourceImage, updateNodeData]);
+  }, [connectedSourceImage, id, nodeData.sourceImage, updateNodeData]);
 
   // Handle action click
   const handleActionClick = (action: 'image_to_image') => {
     updateNodeData(id, { selectedAction: action });
-    setSelectedNodeId(id);
+    setSelectedNodeIds([id]);
   };
 
   // Handle name change

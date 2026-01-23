@@ -3,24 +3,26 @@
 import { useState, memo, useCallback } from 'react';
 import { NodeProps } from '@xyflow/react';
 import { Editor } from '@tiptap/react';
-import { Pencil, ImageIcon } from 'lucide-react';
+import { Pencil, ImageIcon, LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { BaseNode } from './BaseNode';
-import { TextNodeData, NODE_ACTIONS } from '@/types/nodes';
+import { NODE_ACTIONS } from '@/types/nodes';
+import type { TextNode as TextNodeType, TextNodeData } from '@/types/nodes';
 import { useWorkflowStore } from '@/store/workflowStore';
 import { GenerateFromNodePopup } from '../ui/GenerateFromNodePopup';
 import { RichTextEditor } from '../ui/RichTextEditor';
 import { TextFormattingToolbar } from '../ui/TextFormattingToolbar';
 import { FullScreenEditorModal } from '../ui/FullScreenEditorModal';
 
-const iconMap: Record<string, any> = {
+const iconMap: Record<string, LucideIcon> = {
   Pencil,
   ImageIcon,
 };
 
-function TextNodeComponent({ data, id, selected }: NodeProps) {
-  const nodeData = data as unknown as TextNodeData;
-  const { updateNodeData, setSelectedNodeId } = useWorkflowStore();
+function TextNodeComponent({ data, id, selected }: NodeProps<TextNodeType>) {
+  // data is now properly typed as TextNodeData
+  const nodeData = data as TextNodeData;
+  const { updateNodeData, setSelectedNodeIds } = useWorkflowStore();
   const [popupSide, setPopupSide] = useState<'left' | 'right' | null>(null);
   const [editor, setEditor] = useState<Editor | null>(null);
   const [showFullScreen, setShowFullScreen] = useState(false);
@@ -28,7 +30,7 @@ function TextNodeComponent({ data, id, selected }: NodeProps) {
   // Handle action click
   const handleActionClick = (action: 'write' | 'prompt_from_image') => {
     updateNodeData(id, { selectedAction: action });
-    setSelectedNodeId(id);
+    setSelectedNodeIds([id]);
   };
 
   // Handle name change

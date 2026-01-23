@@ -4,12 +4,13 @@ import { useRef, useState, memo, useCallback } from 'react';
 import { NodeProps } from '@xyflow/react';
 import { Upload, Crop, Download, Maximize2 } from 'lucide-react';
 import { BaseNode } from './BaseNode';
-import { SourceNodeData } from '@/types/nodes';
+import type { SourceNode as SourceNodeType, SourceNodeData } from '@/types/nodes';
 import { useWorkflowStore } from '@/store/workflowStore';
 import { GenerateFromNodePopup } from '../ui/GenerateFromNodePopup';
 
-function SourceNodeComponent({ data, id, selected }: NodeProps) {
-  const nodeData = data as unknown as SourceNodeData;
+function SourceNodeComponent({ data, id, selected }: NodeProps<SourceNodeType>) {
+  // data is now properly typed as SourceNodeData
+  const nodeData = data as SourceNodeData;
   const { updateNodeData } = useWorkflowStore();
   const [popupSide, setPopupSide] = useState<'left' | 'right' | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);

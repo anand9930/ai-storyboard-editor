@@ -21,7 +21,7 @@ export function GenerateFromNodePopup({
   side,
   onClose,
 }: GenerateFromNodePopupProps) {
-  const { addNode, addEdge, nodes, setSelectedNodeId } = useWorkflowStore();
+  const { addNode, addEdge, nodes, setSelectedNodeIds } = useWorkflowStore();
   const sourceNode = nodes.find((n) => n.id === sourceNodeId);
 
   const handleSelect = (type: 'text' | 'image') => {
@@ -82,7 +82,7 @@ export function GenerateFromNodePopup({
     }
 
     // Select the new node
-    setSelectedNodeId(newNodeId);
+    setSelectedNodeIds([newNodeId]);
 
     onClose();
   };
