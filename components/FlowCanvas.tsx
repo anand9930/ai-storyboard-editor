@@ -10,6 +10,7 @@ import {
   Connection,
   addEdge,
   ConnectionMode,
+  ConnectionLineType,
   BackgroundVariant,
   Edge,
   useReactFlow,
@@ -33,9 +34,9 @@ const nodeTypes = {
   source: SourceNode,
 };
 
-// Custom edge styling
+// Custom edge styling - using bezier curves
 const defaultEdgeOptions = {
-  type: 'smoothstep',
+  type: 'default',
   style: {
     stroke: '#3f3f46',
     strokeWidth: 2,
@@ -140,12 +141,6 @@ export default function FlowCanvas() {
         target: connection.target!,
         sourceHandle: connection.sourceHandle,
         targetHandle: connection.targetHandle,
-        type: 'smoothstep',
-        style: {
-          stroke: '#3f3f46',
-          strokeWidth: 2,
-        },
-        animated: false,
       };
       setEdges(addEdge(newEdge, edges));
     },
@@ -248,6 +243,7 @@ export default function FlowCanvas() {
         onPaneClick={onPaneClick}
         nodeTypes={nodeTypes}
         connectionMode={ConnectionMode.Loose}
+        connectionLineType={ConnectionLineType.Bezier}
         defaultEdgeOptions={defaultEdgeOptions}
         isValidConnection={isValidConnection}
         fitView

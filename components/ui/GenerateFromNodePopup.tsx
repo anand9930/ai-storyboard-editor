@@ -50,7 +50,7 @@ export function GenerateFromNodePopup({
       target: newNodeId,
       sourceHandle,
       targetHandle: 'any',
-      type: 'smoothstep',
+      type: 'default',
       style: {
         stroke: '#3f3f46',
         strokeWidth: 2,
