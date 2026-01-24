@@ -56,6 +56,33 @@ const config: Config = {
           track: 'hsl(var(--scrollbar-track))',
           thumb: 'hsl(var(--scrollbar-thumb))',
         },
+        /* Surface colors for consistent theming */
+        surface: {
+          primary: 'hsl(var(--surface-primary))',
+          secondary: 'hsl(var(--surface-secondary))',
+          elevated: 'hsl(var(--surface-elevated))',
+        },
+        /* Semantic text colors */
+        'theme-text': {
+          primary: 'hsl(var(--text-primary))',
+          secondary: 'hsl(var(--text-secondary))',
+          muted: 'hsl(var(--text-muted))',
+        },
+        /* Interactive state colors */
+        interactive: {
+          hover: 'hsl(var(--interactive-hover))',
+          active: 'hsl(var(--interactive-active))',
+        },
+        /* Node colors */
+        node: {
+          bg: 'hsl(var(--node-bg))',
+          border: 'hsl(var(--node-border))',
+          'border-selected': 'hsl(var(--node-border-selected))',
+        },
+      },
+      borderColor: {
+        node: 'hsl(var(--node-border))',
+        'node-selected': 'hsl(var(--node-border-selected))',
       },
       borderRadius: {
         lg: 'var(--radius)',

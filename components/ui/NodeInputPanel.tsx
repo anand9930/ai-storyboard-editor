@@ -52,17 +52,17 @@ export function NodeInputPanel({
   );
 
   return (
-    <div className="bg-white/95 dark:bg-zinc-900/95 backdrop-blur border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-xl w-[500px]">
+    <div className="bg-surface-primary/95 backdrop-blur border border-node rounded-xl p-4 shadow-xl w-[500px]">
       {/* Connected Image Preview */}
       {connectedImage && (
         <div className="flex gap-2 mb-3">
-          <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-zinc-300 dark:border-zinc-700">
+          <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-node">
             <img
               src={connectedImage}
               alt="Connected"
               className="w-full h-full object-cover"
             />
-            <span className="absolute top-0 right-0 bg-zinc-200 dark:bg-zinc-800 text-[10px] text-zinc-500 dark:text-zinc-400 px-1 rounded-bl">
+            <span className="absolute top-0 right-0 bg-interactive-active text-[10px] text-theme-text-secondary px-1 rounded-bl">
               1
             </span>
           </div>
@@ -75,33 +75,33 @@ export function NodeInputPanel({
         onChange={(e) => setPrompt(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
-        className="w-full bg-transparent text-sm text-zinc-700 dark:text-zinc-300 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 resize-none focus:outline-none min-h-[60px]"
+        className="w-full bg-transparent text-sm text-theme-text-primary placeholder:text-theme-text-muted resize-none focus:outline-none min-h-[60px]"
         rows={2}
         disabled={isGenerating}
       />
 
       {/* Bottom Controls */}
-      <div className="flex items-center justify-between pt-3 border-t border-zinc-200 dark:border-zinc-800 mt-3">
+      <div className="flex items-center justify-between pt-3 border-t border-node mt-3">
         <div className="flex items-center gap-3">
           {/* Model Badge */}
-          <div className="flex items-center gap-1.5 bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded-lg">
-            <span className="text-xs text-zinc-500">G</span>
-            <span className="text-sm text-zinc-700 dark:text-zinc-300">{model.name}</span>
+          <div className="flex items-center gap-1.5 bg-surface-secondary px-2 py-1 rounded-lg">
+            <span className="text-xs text-theme-text-secondary">G</span>
+            <span className="text-sm text-theme-text-primary">{model.name}</span>
           </div>
 
           {/* Aspect Ratio (for image only) */}
           {nodeType === 'image' && (
-            <div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded-lg">
-              <Sparkles className="w-3 h-3 text-zinc-500" />
-              <span className="text-sm text-zinc-700 dark:text-zinc-300">Auto</span>
+            <div className="flex items-center gap-1 bg-surface-secondary px-2 py-1 rounded-lg">
+              <Sparkles className="w-3 h-3 text-theme-text-secondary" />
+              <span className="text-sm text-theme-text-primary">Auto</span>
             </div>
           )}
         </div>
 
         <div className="flex items-center gap-3">
           {/* Generation Count */}
-          <span className="text-sm text-zinc-500">1x</span>
-          <span className="text-sm text-zinc-500">4</span>
+          <span className="text-sm text-theme-text-secondary">1x</span>
+          <span className="text-sm text-theme-text-secondary">4</span>
 
           {/* Submit Button */}
           <button
@@ -110,7 +110,7 @@ export function NodeInputPanel({
             className={cn(
               'p-2 rounded-full transition-all',
               isGenerating || !prompt.trim()
-                ? 'bg-zinc-200 dark:bg-zinc-700 text-zinc-500 cursor-not-allowed'
+                ? 'bg-interactive-active text-theme-text-muted cursor-not-allowed'
                 : 'bg-blue-600 hover:bg-blue-500 text-white'
             )}
           >

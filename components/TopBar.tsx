@@ -66,17 +66,17 @@ export function TopBar() {
   };
 
   return (
-    <div className="flex items-center gap-2 bg-white/95 dark:bg-zinc-900/95 backdrop-blur border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2">
+    <div className="flex items-center gap-2 bg-surface-primary/95 backdrop-blur border border-node rounded-xl px-3 py-2">
       {/* Logo */}
-      <div className="flex items-center gap-2 pr-3 border-r border-zinc-200 dark:border-zinc-800">
+      <div className="flex items-center gap-2 pr-3 border-r border-node">
         <Sparkles className="w-5 h-5 text-blue-500" />
-        <span className="font-semibold text-zinc-800 dark:text-zinc-200">Storyboard</span>
+        <span className="font-semibold text-theme-text-primary">Storyboard</span>
       </div>
 
       {/* Actions */}
       <button
         onClick={handleExport}
-        className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
+        className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-theme-text-secondary hover:bg-interactive-hover rounded-lg transition-colors"
       >
         <Download className="w-4 h-4" />
         Export
@@ -84,7 +84,7 @@ export function TopBar() {
 
       <button
         onClick={() => fileInputRef.current?.click()}
-        className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
+        className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-theme-text-secondary hover:bg-interactive-hover rounded-lg transition-colors"
       >
         <Upload className="w-4 h-4" />
         Import
@@ -98,7 +98,7 @@ export function TopBar() {
         className="hidden"
       />
 
-      <div className="w-px h-6 bg-zinc-700 dark:bg-zinc-700" />
+      <div className="w-px h-6 bg-interactive-active" />
 
       <button
         onClick={handleClear}
@@ -108,11 +108,11 @@ export function TopBar() {
         Clear
       </button>
 
-      <div className="w-px h-6 bg-zinc-700 dark:bg-zinc-700" />
+      <div className="w-px h-6 bg-interactive-active" />
 
       <button
         onClick={cycleTheme}
-        className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
+        className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-theme-text-secondary hover:bg-interactive-hover rounded-lg transition-colors"
         title={`Theme: ${colorMode}`}
       >
         <ThemeIcon className="w-4 h-4" />

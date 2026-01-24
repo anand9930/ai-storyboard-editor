@@ -30,6 +30,7 @@
     --flow-canvas-bg: 240 4.8% 95.9%;
     --flow-canvas-dots: 240 5.9% 75%;
     --flow-edge-stroke: 240 5.9% 70%;
+    --flow-edge-stroke-highlighted: 240 5.9% 45%;
     --flow-minimap-bg: 0 0% 100%;
     --flow-minimap-node: 240 5.9% 50%;
     --flow-minimap-mask: 0 0% 100%;
@@ -37,8 +38,22 @@
 
     /* Node specific - Light mode */
     --node-bg: 0 0% 100%;
-    --node-border: 240 5.9% 90%;
-    --node-border-hover: 240 5.9% 80%;
+    --node-border: 240 5.9% 70%;
+    --node-border-selected: 240 5.9% 45%;
+
+    /* Surface colors - Light mode */
+    --surface-primary: 0 0% 100%;
+    --surface-secondary: 240 4.8% 95.9%;
+    --surface-elevated: 0 0% 100%;
+
+    /* Text colors - Light mode */
+    --text-primary: 240 10% 3.9%;
+    --text-secondary: 240 3.8% 46.1%;
+    --text-muted: 240 5% 64.9%;
+
+    /* Interactive states - Light mode */
+    --interactive-hover: 240 4.8% 95.9%;
+    --interactive-active: 240 5.9% 90%;
 
     /* Scrollbar - Light mode */
     --scrollbar-track: 240 4.8% 95.9%;
@@ -72,6 +87,7 @@
     --flow-canvas-bg: 240 10% 3.9%;
     --flow-canvas-dots: 240 3.7% 15.9%;
     --flow-edge-stroke: 240 3.7% 25%;
+    --flow-edge-stroke-highlighted: 240 5% 55%;
     --flow-minimap-bg: 240 10% 3.9%;
     --flow-minimap-node: 240 3.7% 25%;
     --flow-minimap-mask: 0 0% 0%;
@@ -79,8 +95,22 @@
 
     /* Node specific - Dark mode */
     --node-bg: 240 6% 10%;
-    --node-border: 240 3.7% 15.9%;
-    --node-border-hover: 240 3.7% 25%;
+    --node-border: 240 3.7% 25%;
+    --node-border-selected: 240 5% 55%;
+
+    /* Surface colors - Dark mode */
+    --surface-primary: 240 6% 10%;
+    --surface-secondary: 240 3.7% 15.9%;
+    --surface-elevated: 240 6% 10%;
+
+    /* Text colors - Dark mode */
+    --text-primary: 0 0% 98%;
+    --text-secondary: 240 5% 64.9%;
+    --text-muted: 240 3.7% 40%;
+
+    /* Interactive states - Dark mode */
+    --interactive-hover: 240 3.7% 15.9%;
+    --interactive-active: 240 3.7% 25%;
 
     /* Scrollbar - Dark mode */
     --scrollbar-track: 240 6% 10%;

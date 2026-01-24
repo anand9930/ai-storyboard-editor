@@ -173,14 +173,14 @@ export function BaseNode({
           isVisible={selected}
           position={Position.Top}
           offset={20}
-          className="flex gap-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-1 shadow-lg"
+          className="flex gap-1 bg-surface-primary border border-node rounded-lg p-1 shadow-lg"
         >
           {/* Custom toolbar content (e.g., formatting buttons) */}
           {toolbarContent}
-          {toolbarContent && <div className="w-px h-5 bg-zinc-200 dark:bg-zinc-700 mx-1" />}
+          {toolbarContent && <div className="w-px h-5 bg-interactive-active mx-1" />}
           <button
             onClick={handleDuplicate}
-            className="p-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded transition-colors text-zinc-600 dark:text-zinc-400"
+            className="p-1.5 hover:bg-interactive-hover rounded transition-colors text-theme-text-secondary"
             title="Duplicate"
           >
             <Copy className="w-4 h-4" />
@@ -215,13 +215,13 @@ export function BaseNode({
               onChange={(e) => setEditedName(e.target.value)}
               onBlur={handleNameBlur}
               onKeyDown={handleNameKeyDown}
-              className="text-xs font-medium bg-transparent text-zinc-700 dark:text-zinc-300 outline-none min-w-[60px]"
+              className="text-xs font-medium bg-transparent text-theme-text-primary outline-none min-w-[60px]"
               style={{ width: `${Math.max(60, editedName.length * 7)}px` }}
             />
           ) : (
             <span
               onClick={handleNameClick}
-              className="text-xs font-medium text-zinc-500 dark:text-zinc-400 cursor-text hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
+              className="text-xs font-medium text-theme-text-secondary cursor-text hover:text-theme-text-primary transition-colors"
               title="Click to edit name"
             >
               {nodeName}
@@ -235,15 +235,17 @@ export function BaseNode({
         onMouseLeave={handleMouseLeave}
         onMouseEnter={handleMouseEnter}
         className={cn(
-          'group relative bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-lg',
+          'group relative bg-surface-primary rounded-xl p-4 shadow-lg',
           resizable ? 'w-full h-full' : 'w-[240px]',
-          'hover:border-zinc-300 dark:hover:border-zinc-700 transition-all duration-200',
-          selected && 'border-blue-500/50 ring-2 ring-blue-500/20',
-          status === 'processing' && 'border-blue-500/50',
-          status === 'completed' && 'border-green-500/50',
-          status === 'error' && 'border-red-500/50',
+          'transition-all duration-200',
+          status === 'processing' && 'node-status-processing',
+          status === 'completed' && 'node-status-completed',
+          status === 'error' && 'node-status-error',
           className
         )}
+        style={{
+          border: `1px solid hsl(var(${selected ? '--node-border-selected' : '--node-border'}))`,
+        }}
       >
       {/* Input Handles - Invisible but functional */}
       {inputs.map((input, i) => (
@@ -287,12 +289,12 @@ export function BaseNode({
           }}
           className={cn(
             'absolute top-1/2 p-1.5 rounded-full',
-            'bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-md',
+            'bg-surface-primary border border-node shadow-md',
             // Pop-in animation: start from outside, animate further outside when visible
             isHovered ? 'opacity-100 -left-10' : 'opacity-0 -left-8',
             plusDisabled
-              ? 'text-zinc-400 dark:text-zinc-600 cursor-not-allowed'
-              : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700 hover:text-zinc-800 dark:hover:text-zinc-200 hover:scale-110'
+              ? 'text-theme-text-muted cursor-not-allowed'
+              : 'text-theme-text-secondary hover:bg-interactive-hover hover:text-theme-text-primary hover:scale-110'
           )}
         >
           <Plus className="w-4 h-4" />
@@ -313,12 +315,12 @@ export function BaseNode({
           }}
           className={cn(
             'absolute top-1/2 p-1.5 rounded-full',
-            'bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-md',
+            'bg-surface-primary border border-node shadow-md',
             // Pop-in animation: start from outside, animate further outside when visible
             isHovered ? 'opacity-100 -right-10' : 'opacity-0 -right-8',
             plusDisabled
-              ? 'text-zinc-400 dark:text-zinc-600 cursor-not-allowed'
-              : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700 hover:text-zinc-800 dark:hover:text-zinc-200 hover:scale-110'
+              ? 'text-theme-text-muted cursor-not-allowed'
+              : 'text-theme-text-secondary hover:bg-interactive-hover hover:text-theme-text-primary hover:scale-110'
           )}
         >
           <Plus className="w-4 h-4" />

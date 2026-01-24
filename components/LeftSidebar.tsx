@@ -99,7 +99,7 @@ export function LeftSidebar() {
   return (
     <div className="relative">
       {/* Main sidebar buttons */}
-      <div className="flex flex-col gap-2 bg-white/95 dark:bg-zinc-900/95 backdrop-blur border border-zinc-200 dark:border-zinc-800 rounded-xl p-2">
+      <div className="flex flex-col gap-2 bg-surface-primary/95 backdrop-blur border border-node rounded-xl p-2">
         {/* Add Node Button */}
         <Tooltip.Root>
           <Tooltip.Trigger asChild>
@@ -108,8 +108,8 @@ export function LeftSidebar() {
               className={cn(
                 'p-2 rounded-lg transition-colors',
                 showNodeMenu
-                  ? 'bg-zinc-200 dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100'
-                  : 'hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400'
+                  ? 'bg-interactive-active text-theme-text-primary'
+                  : 'hover:bg-interactive-hover text-theme-text-secondary'
               )}
             >
               <Plus className="w-5 h-5" />
@@ -118,31 +118,31 @@ export function LeftSidebar() {
           <Tooltip.Portal>
             <Tooltip.Content
               side="right"
-              className="bg-zinc-800 text-zinc-200 text-sm px-2 py-1 rounded shadow-lg"
+              className="bg-surface-secondary text-theme-text-primary text-sm px-2 py-1 rounded shadow-lg"
             >
               Add Node
-              <Tooltip.Arrow className="fill-zinc-800" />
+              <Tooltip.Arrow className="fill-surface-secondary" />
             </Tooltip.Content>
           </Tooltip.Portal>
         </Tooltip.Root>
 
         {/* Divider */}
-        <div className="w-full h-px bg-zinc-200 dark:bg-zinc-800" />
+        <div className="w-full h-px bg-interactive-active" />
 
         {/* Templates */}
         <Tooltip.Root>
           <Tooltip.Trigger asChild>
-            <button className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors text-zinc-600 dark:text-zinc-400">
+            <button className="p-2 hover:bg-interactive-hover rounded-lg transition-colors text-theme-text-secondary">
               <LayoutTemplate className="w-5 h-5" />
             </button>
           </Tooltip.Trigger>
           <Tooltip.Portal>
             <Tooltip.Content
               side="right"
-              className="bg-zinc-800 text-zinc-200 text-sm px-2 py-1 rounded shadow-lg"
+              className="bg-surface-secondary text-theme-text-primary text-sm px-2 py-1 rounded shadow-lg"
             >
               Templates
-              <Tooltip.Arrow className="fill-zinc-800" />
+              <Tooltip.Arrow className="fill-surface-secondary" />
             </Tooltip.Content>
           </Tooltip.Portal>
         </Tooltip.Root>
@@ -150,17 +150,17 @@ export function LeftSidebar() {
         {/* Layers */}
         <Tooltip.Root>
           <Tooltip.Trigger asChild>
-            <button className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors text-zinc-600 dark:text-zinc-400">
+            <button className="p-2 hover:bg-interactive-hover rounded-lg transition-colors text-theme-text-secondary">
               <Layers className="w-5 h-5" />
             </button>
           </Tooltip.Trigger>
           <Tooltip.Portal>
             <Tooltip.Content
               side="right"
-              className="bg-zinc-800 text-zinc-200 text-sm px-2 py-1 rounded shadow-lg"
+              className="bg-surface-secondary text-theme-text-primary text-sm px-2 py-1 rounded shadow-lg"
             >
               Layers
-              <Tooltip.Arrow className="fill-zinc-800" />
+              <Tooltip.Arrow className="fill-surface-secondary" />
             </Tooltip.Content>
           </Tooltip.Portal>
         </Tooltip.Root>
@@ -168,17 +168,17 @@ export function LeftSidebar() {
         {/* Chat */}
         <Tooltip.Root>
           <Tooltip.Trigger asChild>
-            <button className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors text-zinc-600 dark:text-zinc-400">
+            <button className="p-2 hover:bg-interactive-hover rounded-lg transition-colors text-theme-text-secondary">
               <MessageSquare className="w-5 h-5" />
             </button>
           </Tooltip.Trigger>
           <Tooltip.Portal>
             <Tooltip.Content
               side="right"
-              className="bg-zinc-800 text-zinc-200 text-sm px-2 py-1 rounded shadow-lg"
+              className="bg-surface-secondary text-theme-text-primary text-sm px-2 py-1 rounded shadow-lg"
             >
               Chat
-              <Tooltip.Arrow className="fill-zinc-800" />
+              <Tooltip.Arrow className="fill-surface-secondary" />
             </Tooltip.Content>
           </Tooltip.Portal>
         </Tooltip.Root>
@@ -186,17 +186,17 @@ export function LeftSidebar() {
         {/* History */}
         <Tooltip.Root>
           <Tooltip.Trigger asChild>
-            <button className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors text-zinc-600 dark:text-zinc-400">
+            <button className="p-2 hover:bg-interactive-hover rounded-lg transition-colors text-theme-text-secondary">
               <History className="w-5 h-5" />
             </button>
           </Tooltip.Trigger>
           <Tooltip.Portal>
             <Tooltip.Content
               side="right"
-              className="bg-zinc-800 text-zinc-200 text-sm px-2 py-1 rounded shadow-lg"
+              className="bg-surface-secondary text-theme-text-primary text-sm px-2 py-1 rounded shadow-lg"
             >
               History
-              <Tooltip.Arrow className="fill-zinc-800" />
+              <Tooltip.Arrow className="fill-surface-secondary" />
             </Tooltip.Content>
           </Tooltip.Portal>
         </Tooltip.Root>
@@ -204,17 +204,17 @@ export function LeftSidebar() {
         {/* Gallery */}
         <Tooltip.Root>
           <Tooltip.Trigger asChild>
-            <button className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors text-zinc-600 dark:text-zinc-400">
+            <button className="p-2 hover:bg-interactive-hover rounded-lg transition-colors text-theme-text-secondary">
               <ImagePlay className="w-5 h-5" />
             </button>
           </Tooltip.Trigger>
           <Tooltip.Portal>
             <Tooltip.Content
               side="right"
-              className="bg-zinc-800 text-zinc-200 text-sm px-2 py-1 rounded shadow-lg"
+              className="bg-surface-secondary text-theme-text-primary text-sm px-2 py-1 rounded shadow-lg"
             >
               Gallery
-              <Tooltip.Arrow className="fill-zinc-800" />
+              <Tooltip.Arrow className="fill-surface-secondary" />
             </Tooltip.Content>
           </Tooltip.Portal>
         </Tooltip.Root>
@@ -222,25 +222,25 @@ export function LeftSidebar() {
 
       {/* Node Menu Dropdown */}
       {showNodeMenu && (
-        <div className="absolute left-full ml-2 top-0 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 w-56 shadow-xl z-50">
+        <div className="absolute left-full ml-2 top-0 bg-surface-primary border border-node rounded-xl p-3 w-56 shadow-xl z-50">
           {/* Close button */}
           <button
             onClick={() => setShowNodeMenu(false)}
-            className="absolute top-2 right-2 p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded"
+            className="absolute top-2 right-2 p-1 hover:bg-interactive-hover rounded"
           >
-            <X className="w-4 h-4 text-zinc-500" />
+            <X className="w-4 h-4 text-theme-text-secondary" />
           </button>
 
           {/* Add Nodes Section */}
           <div className="mb-4">
-            <div className="text-xs text-zinc-500 px-2 py-1 mb-2">Add Nodes</div>
+            <div className="text-xs text-theme-text-secondary px-2 py-1 mb-2">Add Nodes</div>
             {ADD_NODE_ITEMS.map((item) => (
               <button
                 key={item.type}
                 onClick={() => handleAddNode(item.type)}
-                className="w-full flex items-center gap-3 px-2 py-2 rounded-lg text-left hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 transition-colors"
+                className="w-full flex items-center gap-3 px-2 py-2 rounded-lg text-left hover:bg-interactive-hover text-theme-text-primary transition-colors"
               >
-                <item.icon className="w-5 h-5 text-zinc-500 dark:text-zinc-400" />
+                <item.icon className="w-5 h-5 text-theme-text-secondary" />
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium">{item.label}</span>
@@ -250,7 +250,7 @@ export function LeftSidebar() {
                       </span>
                     )}
                   </div>
-                  <span className="text-xs text-zinc-500">{item.description}</span>
+                  <span className="text-xs text-theme-text-muted">{item.description}</span>
                 </div>
               </button>
             ))}
@@ -258,12 +258,12 @@ export function LeftSidebar() {
 
           {/* Add Source Section */}
           <div>
-            <div className="text-xs text-zinc-500 px-2 py-1 mb-2">Add Source</div>
+            <div className="text-xs text-theme-text-secondary px-2 py-1 mb-2">Add Source</div>
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="w-full flex items-center gap-3 px-2 py-2 rounded-lg text-left hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 transition-colors"
+              className="w-full flex items-center gap-3 px-2 py-2 rounded-lg text-left hover:bg-interactive-hover text-theme-text-primary transition-colors"
             >
-              <Upload className="w-5 h-5 text-zinc-500 dark:text-zinc-400" />
+              <Upload className="w-5 h-5 text-theme-text-secondary" />
               <span className="text-sm font-medium">Upload</span>
             </button>
           </div>

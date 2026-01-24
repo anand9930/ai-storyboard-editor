@@ -57,6 +57,20 @@ export default function FlowCanvas() {
     return nodes.find((n) => n.id === selectedNodeIds[0]) as AppNode | undefined;
   }, [nodes, selectedNodeIds]);
 
+  // Compute highlighted edges based on selected nodes
+  const highlightedEdges = useMemo(() => {
+    if (selectedNodeIds.length === 0) return edges;
+
+    const selectedSet = new Set(selectedNodeIds);
+
+    return edges.map((edge) => {
+      const isConnected = selectedSet.has(edge.source) || selectedSet.has(edge.target);
+      return isConnected
+        ? { ...edge, className: edge.className ? `${edge.className} highlighted` : 'highlighted' }
+        : edge;
+    });
+  }, [edges, selectedNodeIds]);
+
   // Handle selection change - syncs React Flow selection to our store
   const onSelectionChange = useCallback(
     (params: OnSelectionChangeParams) => {
@@ -170,7 +184,7 @@ export default function FlowCanvas() {
     <div className="h-full w-full relative">
       <ReactFlow
         nodes={nodes}
-        edges={edges}
+        edges={highlightedEdges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
