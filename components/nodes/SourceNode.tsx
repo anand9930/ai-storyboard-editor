@@ -1,12 +1,15 @@
 'use client';
 
-import { useRef, useState, memo, useCallback } from 'react';
+import { useRef, useState, memo, useCallback, useMemo } from 'react';
 import { NodeProps } from '@xyflow/react';
-import { Upload, Crop, Download, Maximize2 } from 'lucide-react';
+import { Upload } from 'lucide-react';
 import { BaseNode } from './BaseNode';
 import type { SourceNode as SourceNodeType, SourceNodeData } from '@/types/nodes';
 import { useWorkflowStore } from '@/store/workflowStore';
 import { GenerateFromNodePopup } from '../ui/GenerateFromNodePopup';
+
+// Node width constant
+const NODE_WIDTH = 240;
 
 function SourceNodeComponent({ data, id, selected }: NodeProps<SourceNodeType>) {
   // data is now properly typed as SourceNodeData
@@ -14,6 +17,14 @@ function SourceNodeComponent({ data, id, selected }: NodeProps<SourceNodeType>) 
   const { updateNodeData } = useWorkflowStore();
   const [popupSide, setPopupSide] = useState<'left' | 'right' | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Calculate node height based on image aspect ratio
+  const calculatedHeight = useMemo(() => {
+    if (!nodeData.image?.metadata) return NODE_WIDTH; // Default square if no image
+    const { width, height } = nodeData.image.metadata;
+    const aspectRatio = width / height;
+    return Math.round(NODE_WIDTH / aspectRatio);
+  }, [nodeData.image?.metadata]);
 
   // Handle file upload
   const handleUpload = async (file: File) => {
@@ -40,16 +51,6 @@ function SourceNodeComponent({ data, id, selected }: NodeProps<SourceNodeType>) 
     reader.readAsDataURL(file);
   };
 
-  // Handle download
-  const handleDownload = () => {
-    if (nodeData.image) {
-      const a = document.createElement('a');
-      a.href = nodeData.image.url;
-      a.download = `source-${nodeData.image.id}.png`;
-      a.click();
-    }
-  };
-
   // Handle name change
   const handleNameChange = useCallback((newName: string) => {
     updateNodeData(id, { name: newName });
@@ -65,75 +66,52 @@ function SourceNodeComponent({ data, id, selected }: NodeProps<SourceNodeType>) 
         plusDisabled={!nodeData.image}
         nodeName={nodeData.name}
         onNameChange={handleNameChange}
+        noPadding={true}
+        autoHeight={true}
       >
-        <div className="space-y-3">
-          {/* Replace Button */}
-          {nodeData.image && (
-            <div className="flex items-center justify-end">
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="text-xs text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors"
-              >
-                Replace
-              </button>
-            </div>
-          )}
-
-          {/* Image Display or Upload Zone */}
-          {nodeData.image ? (
-            <div className="relative rounded-lg overflow-hidden group">
-              <img
-                src={nodeData.image.url}
-                alt="Source"
-                className="w-full aspect-square object-cover"
-                draggable={false}
-              />
-              {/* Toolbar - appears on hover */}
-              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 bg-white/90 dark:bg-zinc-900/90 backdrop-blur rounded-lg p-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button
-                  className="p-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded transition-colors"
-                  title="Crop"
-                >
-                  <Crop className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />
-                </button>
-                <button
-                  onClick={handleDownload}
-                  className="p-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded transition-colors"
-                  title="Download"
-                >
-                  <Download className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />
-                </button>
-                <button
-                  className="p-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded transition-colors"
-                  title="Fullscreen"
-                >
-                  <Maximize2 className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div
+        {/* Image Display or Upload Zone */}
+        {nodeData.image ? (
+          <div
+            className="relative w-full overflow-hidden"
+            style={{ height: `${calculatedHeight}px` }}
+          >
+            <img
+              src={nodeData.image.url}
+              alt="Source"
+              className="w-full h-full object-cover"
+              draggable={false}
+            />
+            {/* Upload button - always visible, top right */}
+            <button
               onClick={() => fileInputRef.current?.click()}
-              className="aspect-square bg-zinc-100 dark:bg-zinc-950 border-2 border-dashed border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 rounded-lg flex flex-col items-center justify-center cursor-pointer transition-colors"
+              className="absolute top-2 right-2 flex items-center gap-1.5 px-2.5 py-1.5 bg-zinc-800/80 hover:bg-zinc-700/80 text-white text-xs font-medium rounded-md backdrop-blur-sm transition-colors"
             >
-              <Upload className="w-8 h-8 text-zinc-400 dark:text-zinc-600 mb-2" />
-              <span className="text-xs text-zinc-500">Click to upload</span>
-            </div>
-          )}
+              <Upload className="w-3.5 h-3.5" />
+              Upload
+            </button>
+          </div>
+        ) : (
+          <div
+            onClick={() => fileInputRef.current?.click()}
+            className="w-full h-[240px] bg-surface-secondary border-2 border-dashed border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 rounded-xl flex flex-col items-center justify-center cursor-pointer transition-colors"
+          >
+            <Upload className="w-8 h-8 text-zinc-400 dark:text-zinc-600 mb-2" />
+            <span className="text-xs text-zinc-500">Click to upload</span>
+          </div>
+        )}
 
-          {/* Hidden file input */}
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) handleUpload(file);
-              e.target.value = '';
-            }}
-            className="hidden"
-          />
-        </div>
+        {/* Hidden file input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) handleUpload(file);
+            e.target.value = '';
+          }}
+          className="hidden"
+        />
       </BaseNode>
 
       {/* Generate from Node Popup */}

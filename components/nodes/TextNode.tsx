@@ -78,11 +78,12 @@ function TextNodeComponent({ data, id, selected }: NodeProps<TextNodeType>) {
         toolbarContent={toolbarContent}
         nodeName={nodeData.name}
         onNameChange={handleNameChange}
+        noPadding={true}
       >
-        <div className="space-y-3">
+        <div className="h-full flex flex-col p-2">
           {/* Action Options - only show when no content */}
           {!nodeData.content && (
-            <div className="space-y-2">
+            <div className="space-y-2 flex-shrink-0">
               <span className="text-xs text-zinc-500">Try to:</span>
               {NODE_ACTIONS.text.map((action) => {
                 const Icon = iconMap[action.icon] || Pencil;
@@ -109,16 +110,18 @@ function TextNodeComponent({ data, id, selected }: NodeProps<TextNodeType>) {
 
           {/* Rich Text Editor - show when content exists */}
           {nodeData.content && (
-            <RichTextEditor
-              content={nodeData.content}
-              onChange={handleContentChange}
-              onEditorReady={handleEditorReady}
-            />
+            <div className="flex-1 overflow-y-auto">
+              <RichTextEditor
+                content={nodeData.content}
+                onChange={handleContentChange}
+                onEditorReady={handleEditorReady}
+              />
+            </div>
           )}
 
           {/* Error Display */}
           {nodeData.error && (
-            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 text-sm text-red-400">
+            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 text-sm text-red-400 flex-shrink-0 mt-2">
               {nodeData.error}
             </div>
           )}

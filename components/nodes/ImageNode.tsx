@@ -50,11 +50,12 @@ function ImageNodeComponent({ data, id, selected }: NodeProps<ImageNodeType>) {
         onPlusClick={(side) => setPopupSide(side)}
         nodeName={nodeData.name}
         onNameChange={handleNameChange}
+        noPadding={true}
       >
-        <div className="space-y-3">
+        <div className="h-full flex flex-col p-2">
           {/* Action Options - only show when no generated image */}
           {!nodeData.generatedImage && (
-            <div className="space-y-2">
+            <div className="space-y-2 flex-shrink-0">
               <span className="text-xs text-zinc-500">Try to:</span>
               {NODE_ACTIONS.image.map((action) => (
                 <button
@@ -76,20 +77,20 @@ function ImageNodeComponent({ data, id, selected }: NodeProps<ImageNodeType>) {
 
           {/* Image Display */}
           {nodeData.generatedImage ? (
-            <div className="relative rounded-lg overflow-hidden">
+            <div className="relative rounded-lg overflow-hidden flex-1 flex items-center justify-center bg-surface-secondary">
               <img
                 src={nodeData.generatedImage}
                 alt="Generated"
-                className="w-full aspect-square object-cover"
+                className="max-w-full max-h-full object-contain"
                 draggable={false}
               />
             </div>
           ) : nodeData.sourceImage ? (
-            <div className="relative rounded-lg overflow-hidden opacity-50">
+            <div className="relative rounded-lg overflow-hidden opacity-50 flex-1 flex items-center justify-center bg-surface-secondary">
               <img
                 src={nodeData.sourceImage}
                 alt="Source"
-                className="w-full aspect-square object-cover"
+                className="max-w-full max-h-full object-contain"
                 draggable={false}
               />
               <span className="absolute inset-0 flex items-center justify-center text-xs text-zinc-500 dark:text-zinc-400 bg-white/50 dark:bg-zinc-900/50">
@@ -97,14 +98,14 @@ function ImageNodeComponent({ data, id, selected }: NodeProps<ImageNodeType>) {
               </span>
             </div>
           ) : (
-            <div className="aspect-square bg-zinc-100 dark:bg-zinc-950 rounded-lg flex items-center justify-center">
+            <div className="flex-1 bg-surface-secondary rounded-lg flex items-center justify-center">
               <span className="text-zinc-500 dark:text-zinc-600 text-xs">No image connected</span>
             </div>
           )}
 
           {/* Error Display */}
           {nodeData.error && (
-            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 text-sm text-red-400">
+            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 text-sm text-red-400 flex-shrink-0 mt-2">
               {nodeData.error}
             </div>
           )}

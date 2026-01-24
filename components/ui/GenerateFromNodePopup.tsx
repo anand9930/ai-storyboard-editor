@@ -87,7 +87,7 @@ export function GenerateFromNodePopup({
 
       {/* Popup - position based on which side was clicked */}
       <div className={cn(
-        "absolute z-50 bg-card border border-border rounded-xl p-2 w-56 shadow-xl top-0",
+        "absolute z-50 bg-card border border-border rounded-xl p-2 w-56 shadow-xl top-1/2 -translate-y-1/2",
         side === 'right' ? 'left-full ml-2' : 'right-full mr-2'
       )}>
         <div className="text-xs text-muted-foreground px-2 py-1 mb-1">

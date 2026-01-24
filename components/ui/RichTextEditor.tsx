@@ -25,7 +25,7 @@ export function RichTextEditor({ content, onChange, onEditorReady, className }: 
     immediatelyRender: false,
     editorProps: {
       attributes: {
-        class: 'prose prose-sm prose-invert max-w-none focus:outline-none p-3 text-zinc-300',
+        class: 'prose prose-sm prose-invert max-w-none focus:outline-none p-2 text-xs text-zinc-300',
       },
     },
     onUpdate: ({ editor }) => {
@@ -52,7 +52,7 @@ export function RichTextEditor({ content, onChange, onEditorReady, className }: 
   }
 
   return (
-    <div className={cn('bg-zinc-950 rounded-lg border border-zinc-800 max-h-[150px] overflow-y-auto', className)}>
+    <div className={cn('h-full bg-surface-secondary rounded-lg overflow-y-auto', className)}>
       <EditorContent editor={editor} />
     </div>
   );

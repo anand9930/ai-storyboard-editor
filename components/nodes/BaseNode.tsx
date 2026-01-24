@@ -30,6 +30,8 @@ interface BaseNodeProps {
   toolbarContent?: ReactNode;
   nodeName?: string;
   onNameChange?: (newName: string) => void;
+  noPadding?: boolean;
+  autoHeight?: boolean;
 }
 
 export function BaseNode({
@@ -41,13 +43,15 @@ export function BaseNode({
   status = 'idle',
   resizable = false,
   minWidth = 240,
-  minHeight = 100,
+  minHeight = 240,
   showToolbar = true,
   onPlusClick,
   plusDisabled = false,
   toolbarContent,
   nodeName,
   onNameChange,
+  noPadding = false,
+  autoHeight = false,
 }: BaseNodeProps) {
   const { inputs = [], outputs = [] } = handles;
   const { deleteNode, addNode, nodes } = useWorkflowStore();
@@ -198,6 +202,7 @@ export function BaseNode({
         <NodeResizer
           minWidth={minWidth}
           minHeight={minHeight}
+          aspectRatio={1}
           isVisible={selected}
           lineClassName="!border-blue-500"
           handleClassName="!w-2 !h-2 !bg-blue-500 !border-blue-500"
@@ -235,8 +240,9 @@ export function BaseNode({
         onMouseLeave={handleMouseLeave}
         onMouseEnter={handleMouseEnter}
         className={cn(
-          'group relative bg-surface-primary rounded-xl p-4 shadow-lg',
-          resizable ? 'w-full h-full' : 'w-[240px]',
+          'group relative bg-surface-primary rounded-xl shadow-lg',
+          !noPadding && 'p-4',
+          resizable ? 'w-full h-full' : autoHeight ? 'w-[240px]' : 'w-[240px] h-[240px]',
           'transition-all duration-200',
           status === 'processing' && 'node-status-processing',
           status === 'completed' && 'node-status-completed',
