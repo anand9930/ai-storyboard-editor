@@ -13,8 +13,9 @@ import {
   ConnectionLineType,
   BackgroundVariant,
   Edge,
-  useStore,
   OnSelectionChangeParams,
+  NodeToolbar,
+  Position,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
@@ -63,33 +64,6 @@ export default function FlowCanvas() {
     },
     [setSelection]
   );
-
-  // Subscribe to viewport transform for reactive positioning
-  const transform = useStore((state) => state.transform);
-
-  // Calculate panel position attached to selected node
-  const panelPosition = useMemo(() => {
-    if (!selectedNode) return null;
-
-    const { x, y } = selectedNode.position;
-    // Get node dimensions (measured or default)
-    const nodeWidth = (selectedNode.measured?.width ?? 240);
-    const nodeHeight = (selectedNode.measured?.height ?? 200);
-
-    // Convert to screen coordinates
-    const [translateX, translateY, zoom] = transform;
-    const screenX = x * zoom + translateX;
-    const screenY = y * zoom + translateY;
-    const scaledWidth = nodeWidth * zoom;
-    const scaledHeight = nodeHeight * zoom;
-
-    const panelWidth = 500; // NodeInputPanel width
-
-    return {
-      left: screenX + scaledWidth / 2 - panelWidth / 2,
-      top: screenY + scaledHeight + 20, // 20px gap
-    };
-  }, [selectedNode, transform]);
 
   // Handle new connections - free-form, no validation
   const onConnect = useCallback(
@@ -234,37 +208,36 @@ export default function FlowCanvas() {
         <Panel position="top-right" className="!top-4 !right-4 !m-0">
           <TopBar />
         </Panel>
-      </ReactFlow>
 
-      {/* Dynamic Input Panel - Attached to selected node */}
-      {showInputPanel && panelPosition && (
-        <div
-          className="absolute z-10 pointer-events-auto"
-          style={{
-            left: panelPosition.left,
-            top: panelPosition.top,
-          }}
-        >
-          <NodeInputPanel
+        {/* Dynamic Input Panel - Attached to selected node via NodeToolbar */}
+        {showInputPanel && (
+          <NodeToolbar
             nodeId={selectedNode.id}
-            nodeType={selectedNode.type as 'text' | 'image'}
-            onSubmit={handleGenerate}
-            isGenerating={isGenerating}
-            connectedImage={
-              selectedNode.type === 'image'
-                ? (selectedNode.data as ImageNodeData).sourceImage
-                : undefined
-            }
-            initialPrompt={
-              selectedNode.type === 'text'
-                ? (selectedNode.data as TextNodeData).prompt
-                : selectedNode.type === 'image'
-                ? (selectedNode.data as ImageNodeData).prompt
-                : ''
-            }
-          />
-        </div>
-      )}
+            isVisible={selectedNodeIds.length === 1}
+            position={Position.Bottom}
+            offset={20}
+          >
+            <NodeInputPanel
+              nodeId={selectedNode.id}
+              nodeType={selectedNode.type as 'text' | 'image'}
+              onSubmit={handleGenerate}
+              isGenerating={isGenerating}
+              connectedImage={
+                selectedNode.type === 'image'
+                  ? (selectedNode.data as ImageNodeData).sourceImage
+                  : undefined
+              }
+              initialPrompt={
+                selectedNode.type === 'text'
+                  ? (selectedNode.data as TextNodeData).prompt
+                  : selectedNode.type === 'image'
+                  ? (selectedNode.data as ImageNodeData).prompt
+                  : ''
+              }
+            />
+          </NodeToolbar>
+        )}
+      </ReactFlow>
     </div>
   );
 }

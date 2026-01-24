@@ -82,8 +82,8 @@ export function isSourceNode(node: AppNode): node is SourceNode {
   return node.type === 'source';
 }
 
-// Default data creators with proper return types
-export function getDefaultTextNodeData(): TextNodeData {
+// Default data creators (internal helpers for getDefaultNodeData)
+function getDefaultTextNodeData(): TextNodeData {
   return {
     name: 'Text',
     content: '',
@@ -93,7 +93,7 @@ export function getDefaultTextNodeData(): TextNodeData {
   };
 }
 
-export function getDefaultImageNodeData(): ImageNodeData {
+function getDefaultImageNodeData(): ImageNodeData {
   return {
     name: 'Image',
     sourceImage: undefined,
@@ -104,7 +104,7 @@ export function getDefaultImageNodeData(): ImageNodeData {
   };
 }
 
-export function getDefaultSourceNodeData(): SourceNodeData {
+function getDefaultSourceNodeData(): SourceNodeData {
   return {
     name: 'Source',
     image: null,

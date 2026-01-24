@@ -22,7 +22,7 @@ export const defaultEdgeOptions = {
 } as const;
 
 // Valid connection rules: which node types can connect to which
-export const connectionRules: Record<string, string[]> = {
+const connectionRules: Record<string, string[]> = {
   source: ['image', 'text'],
   text: ['image', 'text'],
   image: ['image', 'text'],

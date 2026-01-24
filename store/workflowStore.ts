@@ -8,7 +8,7 @@ import {
   NodeChange,
   EdgeChange,
 } from '@xyflow/react';
-import type { AppNode, AppNodeData } from '@/types/nodes';
+import type { AppNodeData } from '@/types/nodes';
 
 export type ColorMode = 'dark' | 'light';
 
@@ -51,17 +51,6 @@ interface WorkflowState {
   clearWorkflow: () => void;
 }
 
-// Typed selector for getting a node by ID
-export const selectNodeById = (nodes: Node[], nodeId: string): AppNode | undefined => {
-  return nodes.find((n) => n.id === nodeId) as AppNode | undefined;
-};
-
-// Selector for getting first selected node
-export const selectFirstSelectedNode = (state: WorkflowState): AppNode | undefined => {
-  if (state.selectedNodeIds.length === 0) return undefined;
-  return state.nodes.find((n) => n.id === state.selectedNodeIds[0]) as AppNode | undefined;
-};
-
 export const useWorkflowStore = create<WorkflowState>()(
   persist(
     (set, get) => ({
@@ -90,7 +79,11 @@ export const useWorkflowStore = create<WorkflowState>()(
 
       addNode: (node) =>
         set((state) => ({
-          nodes: [...state.nodes, node],
+          nodes: [
+            ...state.nodes.map((n) => ({ ...n, selected: false })),
+            { ...node, selected: true },
+          ],
+          selectedNodeIds: [node.id],
         })),
 
       addEdge: (edge) =>
