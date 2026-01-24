@@ -1,31 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { fal } from '@fal-ai/client';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Configure FAL client
-fal.config({
-  credentials: process.env.FAL_KEY,
-});
-
-// Helper to convert base64 data URL to a FAL-compatible URL
-async function prepareImageUrl(imageData: string): Promise<string> {
-  // If it's already a URL, return as-is
-  if (imageData.startsWith('http://') || imageData.startsWith('https://')) {
-    return imageData;
-  }
-
-  // If it's a base64 data URL, upload to FAL storage
-  if (imageData.startsWith('data:')) {
-    // Convert base64 to blob
-    const response = await fetch(imageData);
-    const blob = await response.blob();
-
-    // Upload to FAL storage
-    const uploadedUrl = await fal.storage.upload(blob);
-    return uploadedUrl;
-  }
-
-  throw new Error('Invalid image format');
-}
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
 export async function POST(req: NextRequest) {
   try {
@@ -38,46 +14,74 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!process.env.FAL_KEY) {
+    if (!process.env.GEMINI_API_KEY) {
       return NextResponse.json(
-        { error: 'FAL_KEY is not configured' },
+        { error: 'GEMINI_API_KEY is not configured' },
         { status: 500 }
       );
     }
 
+    // Initialize Gemini model with image generation capability
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-2.0-flash-exp',
+      generationConfig: {
+        // @ts-expect-error - responseModalities is supported but not in types yet
+        responseModalities: ['Text', 'Image'],
+      },
+    });
+
     let result;
 
     if (sourceImage) {
-      // Convert base64 to FAL storage URL if needed
-      const imageUrl = await prepareImageUrl(sourceImage);
+      // Image-to-image: include source image as inline data
+      // Extract base64 data from data URL
+      const base64Match = sourceImage.match(/^data:image\/(\w+);base64,(.+)$/);
+      if (!base64Match) {
+        throw new Error('Invalid source image format');
+      }
+      const mimeType = `image/${base64Match[1]}`;
+      const base64Data = base64Match[2];
 
-      // Image-to-image transformation using FLUX Redux
-      result = await fal.subscribe('fal-ai/flux/dev/image-to-image', {
-        input: {
-          prompt,
-          image_url: imageUrl,
-          strength: 0.75,
-          num_images: 1,
+      result = await model.generateContent([
+        prompt,
+        {
+          inlineData: {
+            mimeType,
+            data: base64Data,
+          },
         },
-      });
+      ]);
     } else {
-      // Text-to-image generation using FLUX
-      result = await fal.subscribe('fal-ai/flux/dev', {
-        input: {
-          prompt,
-          image_size: 'square_hd',
-          num_images: 1,
-        },
-      });
+      // Text-to-image generation
+      result = await model.generateContent(prompt);
     }
 
-    const generatedImageUrl = result.data?.images?.[0]?.url;
+    // Extract image from response
+    const response = result.response;
+    const candidates = response.candidates;
 
-    if (!generatedImageUrl) {
-      throw new Error('No image URL in response');
+    if (!candidates || candidates.length === 0) {
+      throw new Error('No response from model');
     }
 
-    return NextResponse.json({ imageUrl: generatedImageUrl });
+    const parts = candidates[0].content.parts;
+    const imagePart = parts.find(
+      (part: any) => part.inlineData?.mimeType?.startsWith('image/')
+    );
+
+    if (!imagePart || !imagePart.inlineData) {
+      // Check if there's a text response explaining why no image was generated
+      const textPart = parts.find((part: any) => part.text);
+      if (textPart) {
+        throw new Error(`Model response: ${textPart.text}`);
+      }
+      throw new Error('No image in response');
+    }
+
+    // Convert to data URL
+    const imageUrl = `data:${imagePart.inlineData.mimeType};base64,${imagePart.inlineData.data}`;
+
+    return NextResponse.json({ imageUrl });
   } catch (error: any) {
     console.error('Image generation failed:', error);
     return NextResponse.json(

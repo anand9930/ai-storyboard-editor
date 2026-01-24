@@ -5,7 +5,7 @@ export type NodeStatus = 'idle' | 'processing' | 'completed' | 'error';
 // Fixed models for MVP (no user selection)
 export const FIXED_MODELS = {
   text: { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash', provider: 'google' },
-  image: { id: 'flux-dev', name: 'FLUX', provider: 'fal' },
+  image: { id: 'gemini-2.0-flash-exp', name: 'Gemini 2.0 Flash', provider: 'google' },
 } as const;
 
 // Actions available for each node type
