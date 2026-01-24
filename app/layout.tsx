@@ -22,13 +22,10 @@ export default function RootLayout({
         <Providers>
           {children}
           <Toaster
-            theme="dark"
             position="bottom-right"
             toastOptions={{
-              style: {
-                background: '#18181b',
-                border: '1px solid #27272a',
-                color: '#e4e4e7',
+              classNames: {
+                toast: 'bg-card border-border text-card-foreground',
               },
             }}
           />

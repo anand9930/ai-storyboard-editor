@@ -188,16 +188,11 @@ export default function FlowCanvas() {
       >
         <Background
           variant={BackgroundVariant.Dots}
-          color="#27272a"
           gap={20}
           size={1}
         />
-        <Controls className="!bg-zinc-900 !border-zinc-800 !rounded-lg" />
-        <MiniMap
-          className="!bg-zinc-900 !border-zinc-800 !rounded-lg"
-          nodeColor="#3f3f46"
-          maskColor="rgba(0,0,0,0.8)"
-        />
+        <Controls />
+        <MiniMap />
 
         {/* Left Sidebar */}
         <Panel position="top-left" className="!top-4 !left-4 !m-0">

@@ -60,10 +60,6 @@ export function GenerateFromNodePopup({
         sourceHandle,
         targetHandle: 'any',
         type: 'default',
-        style: {
-          stroke: '#3f3f46',
-          strokeWidth: 2,
-        },
       });
     } else {
       // Left side: new node is the source, current node is the target
@@ -74,10 +70,6 @@ export function GenerateFromNodePopup({
         sourceHandle: newNodeHandle,
         targetHandle: 'any',
         type: 'default',
-        style: {
-          stroke: '#3f3f46',
-          strokeWidth: 2,
-        },
       });
     }
 
@@ -94,10 +86,10 @@ export function GenerateFromNodePopup({
 
       {/* Popup - position based on which side was clicked */}
       <div className={cn(
-        "absolute z-50 bg-zinc-900 border border-zinc-800 rounded-xl p-2 w-56 shadow-xl top-0",
+        "absolute z-50 bg-card border border-border rounded-xl p-2 w-56 shadow-xl top-0",
         side === 'right' ? 'left-full ml-2' : 'right-full mr-2'
       )}>
-        <div className="text-xs text-zinc-500 px-2 py-1 mb-1">
+        <div className="text-xs text-muted-foreground px-2 py-1 mb-1">
           Generate from this node
         </div>
 
@@ -107,12 +99,12 @@ export function GenerateFromNodePopup({
             <button
               key={option.id}
               onClick={() => handleSelect(option.id as 'text' | 'image')}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left hover:bg-zinc-800 text-zinc-200 transition-colors"
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left hover:bg-accent text-card-foreground transition-colors"
             >
-              <Icon className="w-5 h-5 text-zinc-400" />
+              <Icon className="w-5 h-5 text-muted-foreground" />
               <div>
                 <div className="text-sm font-medium">{option.label}</div>
-                <div className="text-xs text-zinc-500">{option.description}</div>
+                <div className="text-xs text-muted-foreground">{option.description}</div>
               </div>
             </button>
           );

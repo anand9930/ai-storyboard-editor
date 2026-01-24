@@ -43,6 +43,19 @@ const config: Config = {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
+        /* Flow-specific colors for ReactFlow canvas */
+        flow: {
+          canvas: 'hsl(var(--flow-canvas-bg))',
+          dots: 'hsl(var(--flow-canvas-dots))',
+          edge: 'hsl(var(--flow-edge-stroke))',
+          minimap: 'hsl(var(--flow-minimap-bg))',
+          controls: 'hsl(var(--flow-controls-bg))',
+        },
+        /* Scrollbar colors */
+        scrollbar: {
+          track: 'hsl(var(--scrollbar-track))',
+          thumb: 'hsl(var(--scrollbar-thumb))',
+        },
       },
       borderRadius: {
         lg: 'var(--radius)',

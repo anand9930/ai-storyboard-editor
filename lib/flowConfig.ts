@@ -12,12 +12,9 @@ export const nodeTypes: NodeTypes = {
 };
 
 // Default edge styling options
+// Note: Edge colors are handled via CSS variables in flow.css
 export const defaultEdgeOptions = {
   type: 'default',
-  style: {
-    stroke: '#3f3f46',
-    strokeWidth: 2,
-  },
   animated: false,
 } as const;
 
