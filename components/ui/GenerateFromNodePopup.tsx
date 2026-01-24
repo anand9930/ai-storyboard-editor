@@ -4,6 +4,7 @@ import { Type, Image as ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useWorkflowStore } from '@/store/workflowStore';
 import { getDefaultNodeData, GENERATE_OPTIONS } from '@/types/nodes';
+import { defaultEdgeOptions } from '@/lib/flowConfig';
 
 interface GenerateFromNodePopupProps {
   sourceNodeId: string;
@@ -59,7 +60,7 @@ export function GenerateFromNodePopup({
         target: newNodeId,
         sourceHandle,
         targetHandle: 'any',
-        type: 'default',
+        ...defaultEdgeOptions,
       });
     } else {
       // Left side: new node is the source, current node is the target
@@ -69,7 +70,7 @@ export function GenerateFromNodePopup({
         target: sourceNodeId,
         sourceHandle: newNodeHandle,
         targetHandle: 'any',
-        type: 'default',
+        ...defaultEdgeOptions,
       });
     }
 

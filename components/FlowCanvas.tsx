@@ -74,6 +74,7 @@ export default function FlowCanvas() {
         target: connection.target!,
         sourceHandle: connection.sourceHandle,
         targetHandle: connection.targetHandle,
+        ...defaultEdgeOptions,
       };
       setEdges(addEdge(newEdge, edges));
     },
