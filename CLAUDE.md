@@ -32,3 +32,22 @@ This contains the full xyflow/xyflow source code for reference. Key areas to exp
 
 ### State Management
 - `store/workflowStore.ts` - Zustand store with typed selectors
+
+### Styling
+
+**File Structure:**
+- `app/globals.css` - Entry point (imports all style modules)
+- `app/styles/base.css` - CSS variables, Tailwind, light/dark theming
+- `app/styles/flow.css` - React Flow component overrides
+- `app/styles/editor.css` - TipTap editor styles
+- `app/styles/scrollbar.css` - Scrollbar styling
+
+**CSS Variable Patterns:**
+- Variables use HSL values without wrapper: `--background: 0 0% 100%`
+- Usage: `hsl(var(--variable-name))`
+- Prefixes by category: `--flow-*`, `--node-*`, `--surface-*`, `--text-*`, `--scrollbar-*`
+- Light mode in `:root`, dark mode in `.dark`
+
+**React Flow Styling:**
+- Override React Flow classes in `flow.css` using project CSS variables
+- Reference: `react-flow-references/packages/system/src/styles/` for xyflow patterns
