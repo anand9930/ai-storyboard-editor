@@ -52,7 +52,7 @@ function ImageNodeComponent({ data, id, selected }: NodeProps<ImageNodeType>) {
         onNameChange={handleNameChange}
         noPadding={true}
       >
-        <div className={cn("h-full flex flex-col p-2", !nodeData.generatedImage && !nodeData.sourceImage && "justify-center")}>
+        <div className={cn("h-full flex flex-col p-2", !nodeData.generatedImage && "justify-center")}>
           {/* Action Options - only show when no generated image */}
           {!nodeData.generatedImage && (
             <div className="space-y-2 flex-shrink-0">
@@ -76,7 +76,7 @@ function ImageNodeComponent({ data, id, selected }: NodeProps<ImageNodeType>) {
           )}
 
           {/* Image Display */}
-          {nodeData.generatedImage ? (
+          {nodeData.generatedImage && (
             <div className="relative rounded-lg overflow-hidden flex-1 flex items-center justify-center bg-surface-secondary">
               <img
                 src={nodeData.generatedImage}
@@ -85,19 +85,7 @@ function ImageNodeComponent({ data, id, selected }: NodeProps<ImageNodeType>) {
                 draggable={false}
               />
             </div>
-          ) : nodeData.sourceImage ? (
-            <div className="relative rounded-lg overflow-hidden opacity-50 flex-1 flex items-center justify-center bg-surface-secondary">
-              <img
-                src={nodeData.sourceImage}
-                alt="Source"
-                className="max-w-full max-h-full object-contain"
-                draggable={false}
-              />
-              <span className="absolute inset-0 flex items-center justify-center text-xs text-zinc-500 dark:text-zinc-400 bg-white/50 dark:bg-zinc-900/50">
-                Waiting for generation...
-              </span>
-            </div>
-          ) : null}
+          )}
 
           {/* Error Display */}
           {nodeData.error && (
