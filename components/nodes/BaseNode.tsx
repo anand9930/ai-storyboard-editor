@@ -238,108 +238,115 @@ export function BaseNode({
         </div>
       )}
 
+      {/* Outer wrapper for positioning context (buttons need to be outside overflow-hidden) */}
       <div
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         onMouseEnter={handleMouseEnter}
-        className={cn(
-          'group relative bg-surface-primary rounded-xl shadow-lg overflow-hidden',
-          !noPadding && 'p-4',
-          resizable && 'w-full h-full',
-          // Only use default Tailwind classes when no custom width/height provided
-          !resizable && !width && !autoHeight && 'w-[240px]',
-          !resizable && !height && !autoHeight && 'h-[240px]',
-          'transition-all duration-200',
-          status === 'processing' && 'node-status-processing',
-          status === 'completed' && 'node-status-completed',
-          status === 'error' && 'node-status-error',
-          className
-        )}
+        className="group relative"
         style={{
-          border: `1px solid hsl(var(${selected ? '--node-border-selected' : '--node-border'}))`,
           ...(width && { width: `${width}px` }),
           ...(height && { height: `${height}px` }),
+          ...(!width && !resizable && !autoHeight && { width: '240px' }),
+          ...(!height && !resizable && !autoHeight && { height: '240px' }),
         }}
       >
-      {/* Input Handles - Invisible but functional */}
-      {inputs.map((input, i) => (
-        <Handle
-          key={`input-${input}`}
-          type="target"
-          position={Position.Left}
-          id={input}
-          style={{
-            top: `${((i + 1) / (inputs.length + 1)) * 100}%`,
-          }}
-        />
-      ))}
-
-      {children}
-
-      {/* Output Handles - Invisible but functional */}
-      {outputs.map((output, i) => (
-        <Handle
-          key={`output-${output}`}
-          type="source"
-          position={Position.Right}
-          id={output}
-          style={{
-            top: `${((i + 1) / (outputs.length + 1)) * 100}%`,
-          }}
-        />
-      ))}
-
-      {/* Floating Plus Button - Left Edge with Magnetic Effect */}
-      {onPlusClick && (
-        <button
-          ref={plusButtonLeftRef}
-          onClick={(e) => {
-            e.stopPropagation();
-            if (!plusDisabled) onPlusClick('left');
-          }}
-          style={{
-            transform: `translate(${magneticOffsetLeft.x}px, calc(-50% + ${magneticOffsetLeft.y}px))`,
-            transition: 'transform 0.15s ease-out, opacity 0.2s ease-out, left 0.25s ease-out',
-          }}
+        {/* Inner container with overflow-hidden for image clipping */}
+        <div
           className={cn(
-            'absolute top-1/2 p-1.5 rounded-full',
-            'bg-surface-primary border border-node shadow-md',
-            // Pop-in animation: start from outside, animate further outside when visible
-            isHovered ? 'opacity-100 -left-10' : 'opacity-0 -left-8',
-            plusDisabled
-              ? 'text-theme-text-muted cursor-not-allowed'
-              : 'text-theme-text-secondary hover:bg-interactive-hover hover:text-theme-text-primary hover:scale-110'
+            'relative bg-surface-primary rounded-xl shadow-lg overflow-hidden',
+            !noPadding && 'p-4',
+            'w-full h-full',
+            'transition-all duration-200',
+            status === 'processing' && 'node-status-processing',
+            status === 'completed' && 'node-status-completed',
+            status === 'error' && 'node-status-error',
+            className
           )}
-        >
-          <Plus className="w-4 h-4" />
-        </button>
-      )}
-
-      {/* Floating Plus Button - Right Edge with Magnetic Effect */}
-      {onPlusClick && (
-        <button
-          ref={plusButtonRightRef}
-          onClick={(e) => {
-            e.stopPropagation();
-            if (!plusDisabled) onPlusClick('right');
-          }}
           style={{
-            transform: `translate(${magneticOffsetRight.x}px, calc(-50% + ${magneticOffsetRight.y}px))`,
-            transition: 'transform 0.15s ease-out, opacity 0.2s ease-out, right 0.25s ease-out',
+            border: `1px solid hsl(var(${selected ? '--node-border-selected' : '--node-border'}))`,
           }}
-          className={cn(
-            'absolute top-1/2 p-1.5 rounded-full',
-            'bg-surface-primary border border-node shadow-md',
-            // Pop-in animation: start from outside, animate further outside when visible
-            isHovered ? 'opacity-100 -right-10' : 'opacity-0 -right-8',
-            plusDisabled
-              ? 'text-theme-text-muted cursor-not-allowed'
-              : 'text-theme-text-secondary hover:bg-interactive-hover hover:text-theme-text-primary hover:scale-110'
-          )}
         >
-          <Plus className="w-4 h-4" />
-        </button>
-      )}
+          {/* Input Handles - Invisible but functional */}
+          {inputs.map((input, i) => (
+            <Handle
+              key={`input-${input}`}
+              type="target"
+              position={Position.Left}
+              id={input}
+              style={{
+                top: `${((i + 1) / (inputs.length + 1)) * 100}%`,
+              }}
+            />
+          ))}
+
+          {children}
+
+          {/* Output Handles - Invisible but functional */}
+          {outputs.map((output, i) => (
+            <Handle
+              key={`output-${output}`}
+              type="source"
+              position={Position.Right}
+              id={output}
+              style={{
+                top: `${((i + 1) / (outputs.length + 1)) * 100}%`,
+              }}
+            />
+          ))}
+        </div>
+
+        {/* Floating Plus Button - Left Edge with Magnetic Effect (outside overflow-hidden) */}
+        {onPlusClick && (
+          <button
+            ref={plusButtonLeftRef}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (!plusDisabled) onPlusClick('left');
+            }}
+            style={{
+              transform: `translate(${magneticOffsetLeft.x}px, calc(-50% + ${magneticOffsetLeft.y}px))`,
+              transition: 'transform 0.15s ease-out, opacity 0.2s ease-out, left 0.25s ease-out',
+            }}
+            className={cn(
+              'absolute top-1/2 p-1.5 rounded-full',
+              'bg-surface-primary border border-node shadow-md',
+              // Pop-in animation: start from outside, animate further outside when visible
+              isHovered ? 'opacity-100 -left-10' : 'opacity-0 -left-8',
+              plusDisabled
+                ? 'text-theme-text-muted cursor-not-allowed'
+                : 'text-theme-text-secondary hover:bg-interactive-hover hover:text-theme-text-primary hover:scale-110'
+            )}
+          >
+            <Plus className="w-4 h-4" />
+          </button>
+        )}
+
+        {/* Floating Plus Button - Right Edge with Magnetic Effect (outside overflow-hidden) */}
+        {onPlusClick && (
+          <button
+            ref={plusButtonRightRef}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (!plusDisabled) onPlusClick('right');
+            }}
+            style={{
+              transform: `translate(${magneticOffsetRight.x}px, calc(-50% + ${magneticOffsetRight.y}px))`,
+              transition: 'transform 0.15s ease-out, opacity 0.2s ease-out, right 0.25s ease-out',
+            }}
+            className={cn(
+              'absolute top-1/2 p-1.5 rounded-full',
+              'bg-surface-primary border border-node shadow-md',
+              // Pop-in animation: start from outside, animate further outside when visible
+              isHovered ? 'opacity-100 -right-10' : 'opacity-0 -right-8',
+              plusDisabled
+                ? 'text-theme-text-muted cursor-not-allowed'
+                : 'text-theme-text-secondary hover:bg-interactive-hover hover:text-theme-text-primary hover:scale-110'
+            )}
+          >
+            <Plus className="w-4 h-4" />
+          </button>
+        )}
       </div>
     </>
   );
