@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
 
     // Initialize Gemini model with image generation capability
     const model = genAI.getGenerativeModel({
-      model: 'gemini-2.0-flash-exp',
+      model: 'gemini-2.5-flash-image',
       generationConfig: {
         // @ts-expect-error - responseModalities is supported but not in types yet
         responseModalities: ['Text', 'Image'],
