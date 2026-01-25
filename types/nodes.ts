@@ -54,6 +54,10 @@ export interface ImageNodeData extends Record<string, unknown> {
   sourceImage?: string;
   connectedSourceImages?: ConnectedImage[];
   generatedImage?: string;
+  generatedImageMetadata?: {
+    width: number;
+    height: number;
+  };
   prompt: string;
   selectedAction: 'image_to_image' | null;
   status: NodeStatus;

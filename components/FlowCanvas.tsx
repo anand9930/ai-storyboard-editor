@@ -158,11 +158,28 @@ export default function FlowCanvas() {
             throw new Error(result.error);
           }
 
-          updateNodeData(selectedNode.id, {
-            generatedImage: result.imageUrl,
-            prompt,
-            status: 'completed',
-          });
+          // Load image to get dimensions for aspect ratio calculation
+          const img = new window.Image();
+          img.onload = () => {
+            updateNodeData(selectedNode.id, {
+              generatedImage: result.imageUrl,
+              generatedImageMetadata: {
+                width: img.width,
+                height: img.height,
+              },
+              prompt,
+              status: 'completed',
+            });
+          };
+          img.onerror = () => {
+            // Fallback if image fails to load dimensions
+            updateNodeData(selectedNode.id, {
+              generatedImage: result.imageUrl,
+              prompt,
+              status: 'completed',
+            });
+          };
+          img.src = result.imageUrl;
         }
       } catch (error: any) {
         console.error('Generation failed:', error);

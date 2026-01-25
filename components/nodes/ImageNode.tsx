@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, memo, useEffect, useCallback } from 'react';
+import { useState, memo, useEffect, useCallback, useMemo } from 'react';
 import { NodeProps } from '@xyflow/react';
 import { RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -12,6 +12,9 @@ import { useWorkflowStore } from '@/store/workflowStore';
 import { GenerateFromNodePopup } from '../ui/GenerateFromNodePopup';
 import { useSourceConnection } from '@/hooks/useSourceConnection';
 
+// Minimum node dimension constant
+const MIN_SIZE = 240;
+
 function ImageNodeComponent({ data, id, selected }: NodeProps<ImageNodeType>) {
   // data is now properly typed as ImageNodeData
   const nodeData = data as ImageNodeData;
@@ -22,6 +25,22 @@ function ImageNodeComponent({ data, id, selected }: NodeProps<ImageNodeType>) {
   const { sourceImages } = useSourceConnection({
     nodeId: id,
   });
+
+  // Calculate node dimensions based on generated image aspect ratio
+  // Portrait: width=240, height expands | Landscape: height=240, width expands
+  const { calculatedWidth, calculatedHeight } = useMemo(() => {
+    if (!nodeData.generatedImageMetadata) return { calculatedWidth: MIN_SIZE, calculatedHeight: MIN_SIZE };
+    const { width, height } = nodeData.generatedImageMetadata;
+    const aspectRatio = width / height;
+
+    if (aspectRatio >= 1) {
+      // Landscape or square: height is 240, width expands
+      return { calculatedWidth: Math.round(MIN_SIZE * aspectRatio), calculatedHeight: MIN_SIZE };
+    } else {
+      // Portrait: width is 240, height expands
+      return { calculatedWidth: MIN_SIZE, calculatedHeight: Math.round(MIN_SIZE / aspectRatio) };
+    }
+  }, [nodeData.generatedImageMetadata]);
 
   // Update source images when connections change
   useEffect(() => {
@@ -105,6 +124,8 @@ function ImageNodeComponent({ data, id, selected }: NodeProps<ImageNodeType>) {
         nodeName={nodeData.name}
         onNameChange={handleNameChange}
         noPadding={true}
+        width={calculatedWidth}
+        height={calculatedHeight}
       >
         <div className={cn("h-full flex flex-col", !nodeData.generatedImage && "p-2", !nodeData.generatedImage && !nodeData.selectedAction && "justify-center")}>
           {/* Initial state - Action Options - only show when no action selected and no generated image */}

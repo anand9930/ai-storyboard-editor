@@ -8,8 +8,8 @@ import type { SourceNode as SourceNodeType, SourceNodeData } from '@/types/nodes
 import { useWorkflowStore } from '@/store/workflowStore';
 import { GenerateFromNodePopup } from '../ui/GenerateFromNodePopup';
 
-// Node width constant
-const NODE_WIDTH = 240;
+// Minimum node dimension constant
+const MIN_SIZE = 240;
 
 function SourceNodeComponent({ data, id, selected }: NodeProps<SourceNodeType>) {
   // data is now properly typed as SourceNodeData
@@ -18,12 +18,20 @@ function SourceNodeComponent({ data, id, selected }: NodeProps<SourceNodeType>) 
   const [popupSide, setPopupSide] = useState<'left' | 'right' | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Calculate node height based on image aspect ratio
-  const calculatedHeight = useMemo(() => {
-    if (!nodeData.image?.metadata) return NODE_WIDTH; // Default square if no image
+  // Calculate node dimensions based on image aspect ratio
+  // Portrait: width=240, height expands | Landscape: height=240, width expands
+  const { calculatedWidth, calculatedHeight } = useMemo(() => {
+    if (!nodeData.image?.metadata) return { calculatedWidth: MIN_SIZE, calculatedHeight: MIN_SIZE };
     const { width, height } = nodeData.image.metadata;
     const aspectRatio = width / height;
-    return Math.round(NODE_WIDTH / aspectRatio);
+
+    if (aspectRatio >= 1) {
+      // Landscape or square: height is 240, width expands
+      return { calculatedWidth: Math.round(MIN_SIZE * aspectRatio), calculatedHeight: MIN_SIZE };
+    } else {
+      // Portrait: width is 240, height expands
+      return { calculatedWidth: MIN_SIZE, calculatedHeight: Math.round(MIN_SIZE / aspectRatio) };
+    }
   }, [nodeData.image?.metadata]);
 
   // Handle file upload
@@ -67,13 +75,13 @@ function SourceNodeComponent({ data, id, selected }: NodeProps<SourceNodeType>) 
         nodeName={nodeData.name}
         onNameChange={handleNameChange}
         noPadding={true}
-        autoHeight={true}
+        width={calculatedWidth}
+        height={calculatedHeight}
       >
         {/* Image Display or Upload Zone */}
         {nodeData.image ? (
           <div
-            className="relative w-full overflow-hidden"
-            style={{ height: `${calculatedHeight}px` }}
+            className="relative w-full h-full overflow-hidden"
           >
             <img
               src={nodeData.image.url}
@@ -93,7 +101,7 @@ function SourceNodeComponent({ data, id, selected }: NodeProps<SourceNodeType>) 
         ) : (
           <div
             onClick={() => fileInputRef.current?.click()}
-            className="w-full h-[240px] bg-surface-secondary border-2 border-dashed border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 rounded-xl flex flex-col items-center justify-center cursor-pointer transition-colors"
+            className="w-full h-full bg-surface-secondary border-2 border-dashed border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 rounded-xl flex flex-col items-center justify-center cursor-pointer transition-colors"
           >
             <Upload className="w-8 h-8 text-zinc-400 dark:text-zinc-600 mb-2" />
             <span className="text-xs text-zinc-500">Click to upload</span>

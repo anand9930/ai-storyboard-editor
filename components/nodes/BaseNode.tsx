@@ -32,6 +32,8 @@ interface BaseNodeProps {
   onNameChange?: (newName: string) => void;
   noPadding?: boolean;
   autoHeight?: boolean;
+  width?: number;
+  height?: number;
 }
 
 export function BaseNode({
@@ -52,6 +54,8 @@ export function BaseNode({
   onNameChange,
   noPadding = false,
   autoHeight = false,
+  width,
+  height,
 }: BaseNodeProps) {
   const { inputs = [], outputs = [] } = handles;
   const { deleteNode, addNode, nodes } = useWorkflowStore();
@@ -202,7 +206,6 @@ export function BaseNode({
         <NodeResizer
           minWidth={minWidth}
           minHeight={minHeight}
-          aspectRatio={1}
           isVisible={selected}
           lineClassName="!border-blue-500"
           handleClassName="!w-2 !h-2 !bg-blue-500 !border-blue-500"
@@ -240,9 +243,12 @@ export function BaseNode({
         onMouseLeave={handleMouseLeave}
         onMouseEnter={handleMouseEnter}
         className={cn(
-          'group relative bg-surface-primary rounded-xl shadow-lg',
+          'group relative bg-surface-primary rounded-xl shadow-lg overflow-hidden',
           !noPadding && 'p-4',
-          resizable ? 'w-full h-full' : autoHeight ? 'w-[240px]' : 'w-[240px] h-[240px]',
+          resizable && 'w-full h-full',
+          // Only use default Tailwind classes when no custom width/height provided
+          !resizable && !width && !autoHeight && 'w-[240px]',
+          !resizable && !height && !autoHeight && 'h-[240px]',
           'transition-all duration-200',
           status === 'processing' && 'node-status-processing',
           status === 'completed' && 'node-status-completed',
@@ -251,6 +257,8 @@ export function BaseNode({
         )}
         style={{
           border: `1px solid hsl(var(${selected ? '--node-border-selected' : '--node-border'}))`,
+          ...(width && { width: `${width}px` }),
+          ...(height && { height: `${height}px` }),
         }}
       >
       {/* Input Handles - Invisible but functional */}
