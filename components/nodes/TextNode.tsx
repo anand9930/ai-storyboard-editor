@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, memo, useCallback } from 'react';
+import { useState, memo, useCallback, useEffect } from 'react';
 import { NodeProps } from '@xyflow/react';
 import { Editor } from '@tiptap/react';
 import { Pencil, ImageIcon, LucideIcon } from 'lucide-react';
@@ -10,6 +10,7 @@ import { NODE_ACTIONS, PLACEHOLDER_IMAGE } from '@/types/nodes';
 import type { TextNode as TextNodeType, TextNodeData } from '@/types/nodes';
 import { defaultEdgeOptions } from '@/lib/flowConfig';
 import { useWorkflowStore } from '@/store/workflowStore';
+import { useSourceConnection } from '@/hooks/useSourceConnection';
 import { GenerateFromNodePopup } from '../ui/GenerateFromNodePopup';
 import { RichTextEditor } from '../ui/RichTextEditor';
 import { TextFormattingToolbar } from '../ui/TextFormattingToolbar';
@@ -27,6 +28,33 @@ function TextNodeComponent({ data, id, selected }: NodeProps<TextNodeType>) {
   const [popupSide, setPopupSide] = useState<'left' | 'right' | null>(null);
   const [editor, setEditor] = useState<Editor | null>(null);
   const [showFullScreen, setShowFullScreen] = useState(false);
+
+  // Use custom hook for source image tracking (returns array of all connected images)
+  const { sourceImages } = useSourceConnection({
+    nodeId: id,
+  });
+
+  // Update connected source images when connections change
+  useEffect(() => {
+    const currentLength = nodeData.connectedSourceImages?.length ?? 0;
+    const currentFirstUrl = nodeData.connectedSourceImages?.[0]?.url;
+    const newFirstUrl = sourceImages[0]?.url;
+
+    // Only update if the images actually changed
+    if (sourceImages.length !== currentLength || newFirstUrl !== currentFirstUrl) {
+      // Check if we should auto-transition to 'prompt_from_image' state
+      // This ensures manual edge connections behave same as + button creation
+      const shouldAutoTransition =
+        nodeData.selectedAction === null &&
+        !nodeData.content &&
+        sourceImages.length > 0;
+
+      updateNodeData(id, {
+        connectedSourceImages: sourceImages,
+        ...(shouldAutoTransition && { selectedAction: 'prompt_from_image' }),
+      });
+    }
+  }, [sourceImages, id, nodeData.connectedSourceImages, nodeData.selectedAction, nodeData.content, updateNodeData]);
 
   // Create a source node with placeholder image and connect it to this text node
   const createSourceNodeWithConnection = useCallback(() => {

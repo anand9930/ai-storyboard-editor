@@ -118,12 +118,14 @@ export default function FlowCanvas() {
 
       try {
         if (selectedNode.type === 'text') {
+          const textData = selectedNode.data as TextNodeData;
           const response = await fetch('/api/generate-text', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               prompt,
               model: FIXED_MODELS.text.id,
+              images: textData.connectedSourceImages || [],
             }),
           });
 
@@ -232,9 +234,11 @@ export default function FlowCanvas() {
               nodeType={selectedNode.type as 'text' | 'image'}
               onSubmit={handleGenerate}
               isGenerating={isGenerating}
-              connectedImage={
-                selectedNode.type === 'image'
-                  ? (selectedNode.data as ImageNodeData).sourceImage
+              connectedImages={
+                selectedNode.type === 'text'
+                  ? (selectedNode.data as TextNodeData).connectedSourceImages
+                  : selectedNode.type === 'image'
+                  ? (selectedNode.data as ImageNodeData).connectedSourceImages
                   : undefined
               }
               initialPrompt={

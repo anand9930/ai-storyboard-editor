@@ -1,9 +1,10 @@
 'use client';
 
-import { Type, Image as ImageIcon } from 'lucide-react';
+import { Type, Image as ImageIcon, LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useWorkflowStore } from '@/store/workflowStore';
 import { getDefaultNodeData, GENERATE_OPTIONS } from '@/types/nodes';
+import type { SourceNodeData, ImageNodeData, TextNodeData } from '@/types/nodes';
 import { defaultEdgeOptions } from '@/lib/flowConfig';
 
 interface GenerateFromNodePopupProps {
@@ -12,7 +13,7 @@ interface GenerateFromNodePopupProps {
   onClose: () => void;
 }
 
-const iconMap: Record<string, any> = {
+const iconMap: Record<string, LucideIcon> = {
   Type,
   ImageIcon,
 };
@@ -36,13 +37,35 @@ export function GenerateFromNodePopup({
       y: sourceNode.position.y,
     };
 
+    // Check if source node has an image (for auto-transitioning TextNode)
+    let sourceHasImage = false;
+    if (sourceNode.type === 'source') {
+      const sourceData = sourceNode.data as SourceNodeData;
+      sourceHasImage = !!sourceData?.image?.url;
+    } else if (sourceNode.type === 'image') {
+      const imageData = sourceNode.data as ImageNodeData;
+      sourceHasImage = !!imageData?.generatedImage;
+    }
+
     // Create new node
     const newNodeId = `${type}-${Date.now()}`;
+    const defaultData = getDefaultNodeData(type);
+
+    // If creating TextNode or ImageNode from source with image, set selectedAction to skip initial state
+    let nodeData = defaultData;
+    if (sourceHasImage && side === 'right') {
+      if (type === 'text') {
+        nodeData = { ...(defaultData as TextNodeData), selectedAction: 'prompt_from_image' };
+      } else if (type === 'image') {
+        nodeData = { ...(defaultData as ImageNodeData), selectedAction: 'image_to_image' };
+      }
+    }
+
     const newNode = {
       id: newNodeId,
       type,
       position: newPosition,
-      data: getDefaultNodeData(type),
+      data: nodeData,
     };
 
     addNode(newNode);

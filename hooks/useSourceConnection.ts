@@ -2,34 +2,34 @@
 
 import { useEffect, useMemo } from 'react';
 import { useNodeConnections, useNodesData } from '@xyflow/react';
-import type { AppNode, SourceNodeData, ImageNodeData } from '@/types/nodes';
+import type { AppNode, SourceNodeData, ImageNodeData, ConnectedImage } from '@/types/nodes';
 
 interface UseSourceConnectionOptions {
   nodeId: string;
-  onSourceImageChange?: (sourceImage: string | undefined) => void;
+  onSourceImagesChange?: (sourceImages: ConnectedImage[]) => void;
 }
 
 interface UseSourceConnectionResult {
-  sourceImage: string | undefined;
+  sourceImages: ConnectedImage[];
   isConnected: boolean;
-  connectedNodeId: string | undefined;
+  connectedNodeIds: string[];
 }
 
 /**
- * Custom hook for tracking source image connections on image nodes.
- * Replaces the deprecated useHandleConnections with useNodeConnections.
+ * Custom hook for tracking source image connections on nodes.
+ * Returns all connected images from SourceNode and ImageNode sources.
  *
  * @example
  * ```tsx
- * const { sourceImage, isConnected } = useSourceConnection({
+ * const { sourceImages, isConnected } = useSourceConnection({
  *   nodeId: id,
- *   onSourceImageChange: (image) => updateNodeData(id, { sourceImage: image }),
+ *   onSourceImagesChange: (images) => updateNodeData(id, { connectedSourceImages: images }),
  * });
  * ```
  */
 export function useSourceConnection({
   nodeId,
-  onSourceImageChange,
+  onSourceImagesChange,
 }: UseSourceConnectionOptions): UseSourceConnectionResult {
   // Use the new useNodeConnections hook (replaces deprecated useHandleConnections)
   const connections = useNodeConnections({
@@ -47,46 +47,44 @@ export function useSourceConnection({
   // Get data from connected nodes
   const connectedNodesData = useNodesData<AppNode>(connectedNodeIds);
 
-  // Extract source image from the first connected node
-  const { sourceImage, connectedNodeId } = useMemo(() => {
-    if (connectedNodesData.length === 0) {
-      return { sourceImage: undefined, connectedNodeId: undefined };
+  // Extract all source images from connected nodes
+  const sourceImages = useMemo(() => {
+    const images: ConnectedImage[] = [];
+
+    for (const node of connectedNodesData) {
+      if (!node) continue;
+
+      let imageUrl: string | undefined;
+
+      // Check if it's a source node with an image
+      if (node.type === 'source') {
+        const sourceData = node.data as SourceNodeData;
+        imageUrl = sourceData?.image?.url;
+      }
+      // Check if it's an image node with a generated image
+      else if (node.type === 'image') {
+        const imageData = node.data as ImageNodeData;
+        imageUrl = imageData?.generatedImage;
+      }
+
+      if (imageUrl) {
+        images.push({ id: node.id, url: imageUrl });
+      }
     }
 
-    const firstNode = connectedNodesData[0];
-    if (!firstNode) {
-      return { sourceImage: undefined, connectedNodeId: undefined };
-    }
-
-    let image: string | undefined;
-
-    // Check if it's a source node with an image
-    if (firstNode.type === 'source') {
-      const sourceData = firstNode.data as SourceNodeData;
-      image = sourceData?.image?.url;
-    }
-    // Check if it's an image node with a generated image
-    else if (firstNode.type === 'image') {
-      const imageData = firstNode.data as ImageNodeData;
-      image = imageData?.generatedImage;
-    }
-
-    return {
-      sourceImage: image,
-      connectedNodeId: firstNode.id
-    };
+    return images;
   }, [connectedNodesData]);
 
-  // Notify parent when source image changes
+  // Notify parent when source images change
   useEffect(() => {
-    if (onSourceImageChange) {
-      onSourceImageChange(sourceImage);
+    if (onSourceImagesChange) {
+      onSourceImagesChange(sourceImages);
     }
-  }, [sourceImage, onSourceImageChange]);
+  }, [sourceImages, onSourceImagesChange]);
 
   return {
-    sourceImage,
+    sourceImages,
     isConnected: connectedNodeIds.length > 0,
-    connectedNodeId,
+    connectedNodeIds,
   };
 }

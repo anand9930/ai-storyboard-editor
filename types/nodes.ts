@@ -2,6 +2,12 @@ import { Node } from '@xyflow/react';
 
 export type NodeStatus = 'idle' | 'processing' | 'completed' | 'error';
 
+// Shared type for connected source images
+export interface ConnectedImage {
+  id: string;
+  url: string;
+}
+
 // Fixed models for MVP (no user selection)
 export const FIXED_MODELS = {
   text: { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash', provider: 'google' },
@@ -38,7 +44,7 @@ export interface TextNodeData extends Record<string, unknown> {
   content: string;
   prompt: string;
   selectedAction: 'write' | 'prompt_from_image' | null;
-  connectedSourceImage?: string;
+  connectedSourceImages?: ConnectedImage[];
   status: NodeStatus;
   error?: string;
 }
@@ -46,6 +52,7 @@ export interface TextNodeData extends Record<string, unknown> {
 export interface ImageNodeData extends Record<string, unknown> {
   name: string;
   sourceImage?: string;
+  connectedSourceImages?: ConnectedImage[];
   generatedImage?: string;
   prompt: string;
   selectedAction: 'image_to_image' | null;

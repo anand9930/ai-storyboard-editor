@@ -4,13 +4,14 @@ import { useState, useCallback, useEffect } from 'react';
 import { ArrowUp, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FIXED_MODELS } from '@/types/nodes';
+import type { ConnectedImage } from '@/types/nodes';
 
 interface NodeInputPanelProps {
   nodeId: string;
   nodeType: 'text' | 'image';
   onSubmit: (prompt: string) => void;
   isGenerating: boolean;
-  connectedImage?: string;
+  connectedImages?: ConnectedImage[];
   initialPrompt?: string;
 }
 
@@ -19,7 +20,7 @@ export function NodeInputPanel({
   nodeType,
   onSubmit,
   isGenerating,
-  connectedImage,
+  connectedImages,
   initialPrompt = '',
 }: NodeInputPanelProps) {
   const [prompt, setPrompt] = useState(initialPrompt);
@@ -53,19 +54,24 @@ export function NodeInputPanel({
 
   return (
     <div className="bg-surface-primary/95 backdrop-blur border border-node rounded-xl p-4 shadow-xl w-[500px]">
-      {/* Connected Image Preview */}
-      {connectedImage && (
-        <div className="flex gap-2 mb-3">
-          <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-node">
-            <img
-              src={connectedImage}
-              alt="Connected"
-              className="w-full h-full object-cover"
-            />
-            <span className="absolute top-0 right-0 bg-interactive-active text-[10px] text-theme-text-secondary px-1 rounded-bl">
-              1
-            </span>
-          </div>
+      {/* Connected Images Preview */}
+      {connectedImages && connectedImages.length > 0 && (
+        <div className="flex gap-2 mb-3 flex-wrap">
+          {connectedImages.map((img, idx) => (
+            <div
+              key={img.id}
+              className="relative w-12 h-12 rounded-lg overflow-hidden border border-node"
+            >
+              <img
+                src={img.url}
+                alt={`Connected ${idx + 1}`}
+                className="w-full h-full object-cover"
+              />
+              <span className="absolute top-0 right-0 bg-interactive-active text-[10px] text-theme-text-secondary px-1 rounded-bl">
+                {idx + 1}
+              </span>
+            </div>
+          ))}
         </div>
       )}
 

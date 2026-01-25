@@ -5,8 +5,9 @@ import { NodeProps } from '@xyflow/react';
 import { RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { BaseNode } from './BaseNode';
-import { NODE_ACTIONS } from '@/types/nodes';
+import { NODE_ACTIONS, PLACEHOLDER_IMAGE } from '@/types/nodes';
 import type { ImageNode as ImageNodeType, ImageNodeData } from '@/types/nodes';
+import { defaultEdgeOptions } from '@/lib/flowConfig';
 import { useWorkflowStore } from '@/store/workflowStore';
 import { GenerateFromNodePopup } from '../ui/GenerateFromNodePopup';
 import { useSourceConnection } from '@/hooks/useSourceConnection';
@@ -14,26 +15,79 @@ import { useSourceConnection } from '@/hooks/useSourceConnection';
 function ImageNodeComponent({ data, id, selected }: NodeProps<ImageNodeType>) {
   // data is now properly typed as ImageNodeData
   const nodeData = data as ImageNodeData;
-  const { updateNodeData, setSelectedNodeIds } = useWorkflowStore();
+  const { updateNodeData, setSelectedNodeIds, addNode, addEdge, nodes } = useWorkflowStore();
   const [popupSide, setPopupSide] = useState<'left' | 'right' | null>(null);
 
-  // Use custom hook for source image tracking (replaces deprecated useHandleConnections)
-  const { sourceImage: connectedSourceImage } = useSourceConnection({
+  // Use custom hook for source image tracking (returns array of all connected images)
+  const { sourceImages } = useSourceConnection({
     nodeId: id,
   });
 
-  // Update source image when connection changes
+  // Update source images when connections change
   useEffect(() => {
-    if (connectedSourceImage !== nodeData.sourceImage) {
-      updateNodeData(id, { sourceImage: connectedSourceImage });
-    }
-  }, [connectedSourceImage, id, nodeData.sourceImage, updateNodeData]);
+    const firstImageUrl = sourceImages[0]?.url;
+    const currentFirstUrl = nodeData.connectedSourceImages?.[0]?.url;
 
-  // Handle action click
-  const handleActionClick = (action: 'image_to_image') => {
+    if (firstImageUrl !== currentFirstUrl || sourceImages.length !== (nodeData.connectedSourceImages?.length ?? 0)) {
+      // Check if we should auto-transition to 'image_to_image' state
+      // This ensures manual edge connections behave same as + button creation
+      const shouldAutoTransition =
+        nodeData.selectedAction === null &&
+        !nodeData.generatedImage &&
+        sourceImages.length > 0;
+
+      updateNodeData(id, {
+        sourceImage: firstImageUrl,
+        connectedSourceImages: sourceImages,
+        ...(shouldAutoTransition && { selectedAction: 'image_to_image' }),
+      });
+    }
+  }, [sourceImages, id, nodeData.connectedSourceImages, nodeData.selectedAction, nodeData.generatedImage, updateNodeData]);
+
+  // Create a source node with placeholder image and connect it to this image node
+  const createSourceNodeWithConnection = useCallback(() => {
+    const currentNode = nodes.find((n) => n.id === id);
+    if (!currentNode) return;
+
+    const sourceNodeId = `source-${Date.now()}`;
+    const newPosition = {
+      x: currentNode.position.x - 400,
+      y: currentNode.position.y,
+    };
+
+    // Create SourceNode with placeholder image
+    addNode({
+      id: sourceNodeId,
+      type: 'source',
+      position: newPosition,
+      data: {
+        name: 'Source',
+        image: {
+          id: `placeholder-${Date.now()}`,
+          url: PLACEHOLDER_IMAGE.url,
+          metadata: PLACEHOLDER_IMAGE.metadata,
+        },
+      },
+    });
+
+    // Create edge: SourceNode → ImageNode
+    addEdge({
+      id: `edge-${sourceNodeId}-${id}`,
+      source: sourceNodeId,
+      target: id,
+      sourceHandle: 'image',
+      targetHandle: 'any',
+      ...defaultEdgeOptions,
+    });
+  }, [id, nodes, addNode, addEdge]);
+
+  // Handle action click - creates source node and sets action
+  const handleActionClick = useCallback((action: 'image_to_image') => {
+    // Create SourceNode with placeholder image
+    createSourceNodeWithConnection();
     updateNodeData(id, { selectedAction: action });
     setSelectedNodeIds([id]);
-  };
+  }, [createSourceNodeWithConnection, updateNodeData, setSelectedNodeIds, id]);
 
   // Handle name change
   const handleNameChange = useCallback((newName: string) => {
@@ -52,9 +106,9 @@ function ImageNodeComponent({ data, id, selected }: NodeProps<ImageNodeType>) {
         onNameChange={handleNameChange}
         noPadding={true}
       >
-        <div className={cn("h-full flex flex-col p-2", !nodeData.generatedImage && "justify-center")}>
-          {/* Action Options - only show when no generated image */}
-          {!nodeData.generatedImage && (
+        <div className={cn("h-full flex flex-col", !nodeData.generatedImage && "p-2", !nodeData.generatedImage && !nodeData.selectedAction && "justify-center")}>
+          {/* Initial state - Action Options - only show when no action selected and no generated image */}
+          {!nodeData.generatedImage && !nodeData.selectedAction && (
             <div className="space-y-2 flex-shrink-0">
               <span className="text-xs text-zinc-500">Try to:</span>
               {NODE_ACTIONS.image.map((action) => (
@@ -63,9 +117,7 @@ function ImageNodeComponent({ data, id, selected }: NodeProps<ImageNodeType>) {
                   onClick={() => handleActionClick(action.id as 'image_to_image')}
                   className={cn(
                     'w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-left transition-colors',
-                    nodeData.selectedAction === action.id
-                      ? 'bg-zinc-200 dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100'
-                      : 'hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400'
+                    'hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400'
                   )}
                 >
                   <RefreshCw className="w-4 h-4" />
@@ -75,7 +127,14 @@ function ImageNodeComponent({ data, id, selected }: NodeProps<ImageNodeType>) {
             </div>
           )}
 
-          {/* Image Display */}
+          {/* Active/Ready state - empty dark area waiting for prompt */}
+          {!nodeData.generatedImage && nodeData.selectedAction && (
+            <div className="h-full flex items-center justify-center bg-surface-secondary rounded-lg min-h-[120px]">
+              {/* Empty state - user enters prompt in NodeInputPanel below */}
+            </div>
+          )}
+
+          {/* Generated state - Image Display */}
           {nodeData.generatedImage && (
             <div className="relative rounded-lg overflow-hidden flex-1 flex items-center justify-center bg-surface-secondary">
               <img
