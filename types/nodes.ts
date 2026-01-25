@@ -49,6 +49,29 @@ export interface TextNodeData extends Record<string, unknown> {
   error?: string;
 }
 
+// Supported aspect ratios for image generation
+export type AspectRatio = '1:1' | '9:16' | '16:9' | '3:4' | '4:3' | '3:2' | '2:3' | '5:4' | '4:5' | '21:9';
+export type ImageQuality = '1K' | '2K' | '4K';
+
+export const ASPECT_RATIOS: { value: AspectRatio; label: string }[] = [
+  { value: '1:1', label: '1:1' },
+  { value: '9:16', label: '9:16' },
+  { value: '16:9', label: '16:9' },
+  { value: '3:4', label: '3:4' },
+  { value: '4:3', label: '4:3' },
+  { value: '3:2', label: '3:2' },
+  { value: '2:3', label: '2:3' },
+  { value: '5:4', label: '5:4' },
+  { value: '4:5', label: '4:5' },
+  { value: '21:9', label: '21:9' },
+];
+
+export const IMAGE_QUALITIES: { value: ImageQuality; label: string }[] = [
+  { value: '1K', label: '1K' },
+  { value: '2K', label: '2K' },
+  { value: '4K', label: '4K' },
+];
+
 export interface ImageNodeData extends Record<string, unknown> {
   name: string;
   sourceImage?: string;
@@ -60,6 +83,8 @@ export interface ImageNodeData extends Record<string, unknown> {
   };
   prompt: string;
   selectedAction: 'image_to_image' | null;
+  aspectRatio: AspectRatio | null; // null = Auto
+  quality: ImageQuality | null; // null = Auto
   status: NodeStatus;
   error?: string;
 }
@@ -117,6 +142,8 @@ function getDefaultImageNodeData(): ImageNodeData {
     generatedImage: undefined,
     prompt: '',
     selectedAction: null,
+    aspectRatio: null,
+    quality: null,
     status: 'idle',
   };
 }

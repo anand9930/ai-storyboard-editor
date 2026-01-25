@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { ArrowUp, Sparkles } from 'lucide-react';
+import { ArrowUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FIXED_MODELS } from '@/types/nodes';
-import type { ConnectedImage } from '@/types/nodes';
+import type { ConnectedImage, AspectRatio, ImageQuality } from '@/types/nodes';
+import { AspectRatioPopover } from './AspectRatioPopover';
 
 interface NodeInputPanelProps {
   nodeId: string;
@@ -13,6 +14,10 @@ interface NodeInputPanelProps {
   isGenerating: boolean;
   connectedImages?: ConnectedImage[];
   initialPrompt?: string;
+  aspectRatio?: AspectRatio | null;
+  quality?: ImageQuality | null;
+  onAspectRatioChange?: (value: AspectRatio | null) => void;
+  onQualityChange?: (value: ImageQuality | null) => void;
 }
 
 export function NodeInputPanel({
@@ -22,6 +27,10 @@ export function NodeInputPanel({
   isGenerating,
   connectedImages,
   initialPrompt = '',
+  aspectRatio,
+  quality,
+  onAspectRatioChange,
+  onQualityChange,
 }: NodeInputPanelProps) {
   const [prompt, setPrompt] = useState(initialPrompt);
 
@@ -95,12 +104,15 @@ export function NodeInputPanel({
             <span className="text-sm text-theme-text-primary">{model.name}</span>
           </div>
 
-          {/* Aspect Ratio (for image only) */}
-          {nodeType === 'image' && (
-            <div className="flex items-center gap-1 bg-surface-secondary px-2 py-1 rounded-lg">
-              <Sparkles className="w-3 h-3 text-theme-text-secondary" />
-              <span className="text-sm text-theme-text-primary">Auto</span>
-            </div>
+          {/* Aspect Ratio Popover (for image only) */}
+          {nodeType === 'image' && onAspectRatioChange && onQualityChange && (
+            <AspectRatioPopover
+              aspectRatio={aspectRatio ?? null}
+              quality={quality ?? null}
+              onAspectRatioChange={onAspectRatioChange}
+              onQualityChange={onQualityChange}
+              supportedQualities={[]} // Gemini 2.5 Flash only supports 1K (Auto)
+            />
           )}
         </div>
 

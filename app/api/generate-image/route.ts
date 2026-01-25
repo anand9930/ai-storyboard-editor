@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+import { GoogleGenAI } from '@google/genai';
 
 export async function POST(req: NextRequest) {
   try {
-    const { prompt, sourceImage } = await req.json();
+    const { prompt, sourceImage, aspectRatio } = await req.json();
 
     if (!prompt) {
       return NextResponse.json(
@@ -21,20 +19,25 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Initialize Gemini model with image generation capability
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-2.5-flash-image',
-      generationConfig: {
-        // @ts-expect-error - responseModalities is supported but not in types yet
-        responseModalities: ['Text', 'Image'],
-      },
-    });
+    // Initialize the new Google GenAI client
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
+    // Build config with responseModalities and optional aspectRatio
+    const config: Record<string, unknown> = {
+      responseModalities: ['Text', 'Image'],
+    };
+
+    // Add imageConfig with aspectRatio if specified (not auto/null)
+    if (aspectRatio) {
+      config.imageConfig = {
+        aspectRatio: aspectRatio,
+      };
+    }
 
     let result;
 
     if (sourceImage) {
       // Image-to-image: include source image as inline data
-      // Extract base64 data from data URL
       const base64Match = sourceImage.match(/^data:image\/(\w+);base64,(.+)$/);
       if (!base64Match) {
         throw new Error('Invalid source image format');
@@ -42,29 +45,45 @@ export async function POST(req: NextRequest) {
       const mimeType = `image/${base64Match[1]}`;
       const base64Data = base64Match[2];
 
-      result = await model.generateContent([
-        prompt,
-        {
-          inlineData: {
-            mimeType,
-            data: base64Data,
+      result = await ai.models.generateContent({
+        model: 'gemini-2.5-flash-image',
+        contents: [
+          {
+            role: 'user',
+            parts: [
+              { text: prompt },
+              {
+                inlineData: {
+                  mimeType,
+                  data: base64Data,
+                },
+              },
+            ],
           },
-        },
-      ]);
+        ],
+        config,
+      });
     } else {
       // Text-to-image generation
-      result = await model.generateContent(prompt);
+      result = await ai.models.generateContent({
+        model: 'gemini-2.5-flash-image',
+        contents: prompt,
+        config,
+      });
     }
 
     // Extract image from response
-    const response = result.response;
-    const candidates = response.candidates;
+    const candidates = result.candidates;
 
     if (!candidates || candidates.length === 0) {
       throw new Error('No response from model');
     }
 
-    const parts = candidates[0].content.parts;
+    const parts = candidates[0].content?.parts;
+    if (!parts) {
+      throw new Error('No content parts in response');
+    }
+
     const imagePart = parts.find(
       (part: any) => part.inlineData?.mimeType?.startsWith('image/')
     );

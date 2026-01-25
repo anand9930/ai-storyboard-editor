@@ -24,7 +24,7 @@ import { LeftSidebar } from './LeftSidebar';
 import { TopBar } from './TopBar';
 import { NodeInputPanel } from './ui/NodeInputPanel';
 import { FIXED_MODELS } from '@/types/nodes';
-import type { AppNode, ImageNodeData, TextNodeData } from '@/types/nodes';
+import type { AppNode, ImageNodeData, TextNodeData, AspectRatio, ImageQuality } from '@/types/nodes';
 import { nodeTypes, defaultEdgeOptions, isValidNodeConnection } from '@/lib/flowConfig';
 
 export default function FlowCanvas() {
@@ -149,6 +149,8 @@ export default function FlowCanvas() {
               prompt,
               model: FIXED_MODELS.image.id,
               sourceImage: imageData.sourceImage,
+              aspectRatio: imageData.aspectRatio, // null = Auto (let API decide)
+              quality: imageData.quality, // null = Auto
             }),
           });
 
@@ -190,6 +192,23 @@ export default function FlowCanvas() {
       } finally {
         setIsGenerating(false);
       }
+    },
+    [selectedNode, updateNodeData]
+  );
+
+  // Handlers for aspect ratio and quality changes
+  const handleAspectRatioChange = useCallback(
+    (value: AspectRatio | null) => {
+      if (!selectedNode || selectedNode.type !== 'image') return;
+      updateNodeData(selectedNode.id, { aspectRatio: value });
+    },
+    [selectedNode, updateNodeData]
+  );
+
+  const handleQualityChange = useCallback(
+    (value: ImageQuality | null) => {
+      if (!selectedNode || selectedNode.type !== 'image') return;
+      updateNodeData(selectedNode.id, { quality: value });
     },
     [selectedNode, updateNodeData]
   );
@@ -265,6 +284,18 @@ export default function FlowCanvas() {
                   ? (selectedNode.data as ImageNodeData).prompt
                   : ''
               }
+              aspectRatio={
+                selectedNode.type === 'image'
+                  ? (selectedNode.data as ImageNodeData).aspectRatio
+                  : undefined
+              }
+              quality={
+                selectedNode.type === 'image'
+                  ? (selectedNode.data as ImageNodeData).quality
+                  : undefined
+              }
+              onAspectRatioChange={handleAspectRatioChange}
+              onQualityChange={handleQualityChange}
             />
           </NodeToolbar>
         )}

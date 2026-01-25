@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI, Part } from '@google/generative-ai';
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+import { GoogleGenAI } from '@google/genai';
 
 // Helper to extract base64 data and MIME type from data URL
 function parseDataUrl(dataUrl: string): { mimeType: string; data: string } | null {
@@ -28,11 +26,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Use Gemini 2.5 Flash for text generation
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    // Initialize the new Google GenAI client
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
     // Build content parts for multimodal request
-    const parts: Part[] = [];
+    const parts: Array<{ text?: string; inlineData?: { mimeType: string; data: string } }> = [];
 
     // Add images if provided
     if (images && Array.isArray(images) && images.length > 0) {
@@ -54,8 +52,18 @@ export async function POST(req: NextRequest) {
     // Add text prompt
     parts.push({ text: prompt });
 
-    const result = await model.generateContent(parts);
-    const text = result.response.text();
+    const result = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: [
+        {
+          role: 'user',
+          parts,
+        },
+      ],
+    });
+
+    // Extract text from response
+    const text = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
     return NextResponse.json({ text });
   } catch (error: any) {

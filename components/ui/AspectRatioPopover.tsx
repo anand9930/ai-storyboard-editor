@@ -1,0 +1,201 @@
+'use client';
+
+import { useState } from 'react';
+import * as Popover from '@radix-ui/react-popover';
+import { ChevronDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import type { AspectRatio, ImageQuality } from '@/types/nodes';
+import { ASPECT_RATIOS, IMAGE_QUALITIES } from '@/types/nodes';
+
+interface AspectRatioPopoverProps {
+  aspectRatio: AspectRatio | null;
+  quality: ImageQuality | null;
+  onAspectRatioChange: (value: AspectRatio | null) => void;
+  onQualityChange: (value: ImageQuality | null) => void;
+  supportedQualities?: ImageQuality[]; // If empty or undefined, show only "Auto"
+}
+
+// SVG icons for aspect ratios - colors inherit from text via currentColor
+function AspectRatioIcon({ ratio, className }: { ratio: AspectRatio | 'auto'; className?: string }) {
+  const getIconDimensions = (r: AspectRatio | 'auto'): { width: number; height: number } => {
+    switch (r) {
+      case 'auto':
+        return { width: 12, height: 12 };
+      case '1:1':
+        return { width: 12, height: 12 };
+      case '9:16':
+        return { width: 9, height: 14 };
+      case '16:9':
+        return { width: 14, height: 9 };
+      case '3:4':
+        return { width: 10, height: 13 };
+      case '4:3':
+        return { width: 13, height: 10 };
+      case '3:2':
+        return { width: 12, height: 8 };
+      case '2:3':
+        return { width: 8, height: 12 };
+      case '5:4':
+        return { width: 12, height: 10 };
+      case '4:5':
+        return { width: 10, height: 12 };
+      case '21:9':
+        return { width: 16, height: 7 };
+      default:
+        return { width: 12, height: 12 };
+    }
+  };
+
+  if (ratio === 'auto') {
+    // Scan/crop icon with corner brackets (like viewfinder)
+    return (
+      <svg className={className} width="16" height="16" viewBox="0 0 16 16" fill="none">
+        {/* Top-left corner */}
+        <path d="M1 5V2.5C1 1.67 1.67 1 2.5 1H5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        {/* Top-right corner */}
+        <path d="M11 1H13.5C14.33 1 15 1.67 15 2.5V5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        {/* Bottom-left corner */}
+        <path d="M1 11V13.5C1 14.33 1.67 15 2.5 15H5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        {/* Bottom-right corner */}
+        <path d="M11 15H13.5C14.33 15 15 14.33 15 13.5V11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        {/* Center square */}
+        <rect x="5.5" y="5.5" width="5" height="5" rx="0.5" stroke="currentColor" strokeWidth="1.5" />
+      </svg>
+    );
+  }
+
+  const { width, height } = getIconDimensions(ratio);
+  const x = (16 - width) / 2;
+  const y = (16 - height) / 2;
+
+  return (
+    <svg className={className} width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <rect x={x} y={y} width={width} height={height} rx="1" stroke="currentColor" strokeWidth="1.5" />
+    </svg>
+  );
+}
+
+export function AspectRatioPopover({
+  aspectRatio,
+  quality,
+  onAspectRatioChange,
+  onQualityChange,
+  supportedQualities = [],
+}: AspectRatioPopoverProps) {
+  const [open, setOpen] = useState(false);
+
+  const displayAspectRatio = aspectRatio || 'Auto';
+  const displayQuality = quality || 'Auto';
+  const showQualityOptions = supportedQualities.length > 0;
+
+  return (
+    <Popover.Root open={open} onOpenChange={setOpen}>
+      <Popover.Trigger asChild>
+        <button
+          className={cn(
+            'flex items-center gap-1.5 bg-surface-secondary px-2 py-1 rounded-lg',
+            'hover:bg-interactive-hover transition-colors',
+            'text-sm text-theme-text-primary'
+          )}
+        >
+          <AspectRatioIcon ratio={aspectRatio || 'auto'} className="w-4 h-4" />
+          <span>{displayAspectRatio}</span>
+          <span className="text-theme-text-muted">·</span>
+          <span>{displayQuality}</span>
+          <ChevronDown
+            className={cn(
+              'w-3 h-3 transition-transform duration-200',
+              open && 'rotate-180'
+            )}
+          />
+        </button>
+      </Popover.Trigger>
+
+      <Popover.Portal>
+        <Popover.Content
+          className={cn(
+            'z-50 bg-surface-primary border border-node rounded-xl p-4 shadow-xl',
+            'w-[280px]',
+            'animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
+            'data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2'
+          )}
+          side="top"
+          align="start"
+          sideOffset={8}
+        >
+          {/* Quality Section */}
+          <div className="mb-4">
+            <h4 className="text-xs text-theme-text-muted mb-2 font-medium">Quality</h4>
+            {showQualityOptions ? (
+              <div className="flex gap-1">
+                {IMAGE_QUALITIES.filter(q => supportedQualities.includes(q.value)).map((q) => (
+                  <button
+                    key={q.value}
+                    onClick={() => onQualityChange(quality === q.value ? null : q.value)}
+                    className={cn(
+                      'flex-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
+                      quality === q.value
+                        ? 'bg-interactive-active text-theme-text-primary'
+                        : 'bg-surface-secondary text-theme-text-primary hover:bg-interactive-hover'
+                    )}
+                  >
+                    {q.label}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <button
+                className={cn(
+                  'w-full flex items-center justify-center px-3 py-2 rounded-lg text-sm',
+                  'bg-surface-secondary text-theme-text-primary'
+                )}
+                disabled
+              >
+                <span>Auto</span>
+              </button>
+            )}
+          </div>
+
+          {/* Aspect Ratio Section */}
+          <div>
+            <h4 className="text-xs text-theme-text-muted mb-2 font-medium">Aspect Ratio</h4>
+            <div className="grid grid-cols-6 gap-1" style={{ gridTemplateRows: 'auto auto' }}>
+              {/* Auto option - spans 2 rows */}
+              <button
+                onClick={() => onAspectRatioChange(null)}
+                className={cn(
+                  'row-span-2 flex flex-col items-center justify-center p-2 rounded-lg transition-colors',
+                  aspectRatio === null
+                    ? 'bg-interactive-active text-theme-text-primary'
+                    : 'bg-surface-secondary text-theme-text-primary hover:bg-interactive-hover'
+                )}
+              >
+                <AspectRatioIcon ratio="auto" className="w-5 h-5 mb-1" />
+                <span className="text-[10px]">Auto</span>
+              </button>
+
+              {/* All aspect ratios - arranged in 2 rows of 5 */}
+              {ASPECT_RATIOS.map((ar) => (
+                <button
+                  key={ar.value}
+                  onClick={() => onAspectRatioChange(ar.value)}
+                  className={cn(
+                    'flex flex-col items-center justify-center p-2 rounded-lg transition-colors',
+                    aspectRatio === ar.value
+                      ? 'bg-interactive-active text-theme-text-primary'
+                      : 'bg-surface-secondary text-theme-text-primary hover:bg-interactive-hover'
+                  )}
+                >
+                  <AspectRatioIcon ratio={ar.value} className="w-4 h-4 mb-0.5" />
+                  <span className="text-[10px]">{ar.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <Popover.Arrow className="fill-surface-primary" />
+        </Popover.Content>
+      </Popover.Portal>
+    </Popover.Root>
+  );
+}

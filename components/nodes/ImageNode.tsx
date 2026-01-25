@@ -157,11 +157,11 @@ function ImageNodeComponent({ data, id, selected }: NodeProps<ImageNodeType>) {
 
           {/* Generated state - Image Display */}
           {nodeData.generatedImage && (
-            <div className="relative rounded-lg overflow-hidden flex-1 flex items-center justify-center bg-surface-secondary">
+            <div className="relative h-full w-full overflow-hidden">
               <img
                 src={nodeData.generatedImage}
                 alt="Generated"
-                className="max-w-full max-h-full object-contain"
+                className="w-full h-full object-cover"
                 draggable={false}
               />
             </div>
