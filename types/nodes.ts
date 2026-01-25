@@ -26,6 +26,12 @@ export const GENERATE_OPTIONS = [
   { id: 'image', label: 'Image Generation', icon: 'ImageIcon', description: 'Generate or transform images' },
 ] as const;
 
+// Placeholder image for SourceNode when auto-created
+export const PLACEHOLDER_IMAGE = {
+  url: `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#667eea"/><stop offset="100%" stop-color="#764ba2"/></linearGradient></defs><rect fill="url(#g)" width="400" height="400"/><text x="200" y="200" text-anchor="middle" dy=".3em" fill="white" font-family="system-ui" font-size="14">Upload your image</text></svg>`)}`,
+  metadata: { width: 400, height: 400, format: 'svg' }
+};
+
 // Node data interfaces - properly typed without index signatures
 export interface TextNodeData extends Record<string, unknown> {
   name: string;

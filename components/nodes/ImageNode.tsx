@@ -52,7 +52,7 @@ function ImageNodeComponent({ data, id, selected }: NodeProps<ImageNodeType>) {
         onNameChange={handleNameChange}
         noPadding={true}
       >
-        <div className="h-full flex flex-col p-2">
+        <div className={cn("h-full flex flex-col p-2", !nodeData.generatedImage && !nodeData.sourceImage && "justify-center")}>
           {/* Action Options - only show when no generated image */}
           {!nodeData.generatedImage && (
             <div className="space-y-2 flex-shrink-0">
@@ -97,11 +97,7 @@ function ImageNodeComponent({ data, id, selected }: NodeProps<ImageNodeType>) {
                 Waiting for generation...
               </span>
             </div>
-          ) : (
-            <div className="flex-1 bg-surface-secondary rounded-lg flex items-center justify-center">
-              <span className="text-zinc-500 dark:text-zinc-600 text-xs">No image connected</span>
-            </div>
-          )}
+          ) : null}
 
           {/* Error Display */}
           {nodeData.error && (

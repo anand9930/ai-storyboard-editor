@@ -4,6 +4,7 @@ import { useEditor, EditorContent, Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { TextStyle } from '@tiptap/extension-text-style';
 import { Color } from '@tiptap/extension-color';
+import Placeholder from '@tiptap/extension-placeholder';
 import { useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -20,12 +21,15 @@ export function RichTextEditor({ content, onChange, onEditorReady, className }: 
       StarterKit,
       TextStyle,
       Color,
+      Placeholder.configure({
+        placeholder: 'Start typing...',
+      }),
     ],
     content,
     immediatelyRender: false,
     editorProps: {
       attributes: {
-        class: 'prose prose-sm prose-invert max-w-none focus:outline-none p-2 text-xs text-zinc-300',
+        class: 'prose prose-sm prose-invert max-w-none focus:outline-none text-xs text-zinc-300',
       },
     },
     onUpdate: ({ editor }) => {
@@ -52,7 +56,7 @@ export function RichTextEditor({ content, onChange, onEditorReady, className }: 
   }
 
   return (
-    <div className={cn('h-full bg-surface-secondary rounded-lg overflow-y-auto', className)}>
+    <div className={cn('h-full overflow-y-auto', className)}>
       <EditorContent editor={editor} />
     </div>
   );

@@ -48,3 +48,12 @@
   border-top: 1px solid hsl(var(--border));
   margin: 1rem 0;
 }
+
+/* Placeholder text for empty editor */
+.ProseMirror p.is-editor-empty:first-child::before {
+  color: hsl(var(--text-muted, 240 5% 50%));
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
