@@ -91,3 +91,9 @@
   background-color: transparent !important;
   transform: translate(0%, -50%) !important;
 }
+
+/* Vertically centered left sidebar panel */
+.left-sidebar-centered {
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+}

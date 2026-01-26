@@ -27,12 +27,16 @@ interface WorkflowState {
   selectedNodeIds: string[];
   selectedEdgeIds: string[];
 
+  // Project metadata
+  projectName: string;
+
   // Theme
   colorMode: ColorMode;
 
   // Actions
   setNodes: (nodes: Node[]) => void;
   setEdges: (edges: Edge[]) => void;
+  setProjectName: (name: string) => void;
   setColorMode: (mode: ColorMode) => void;
   onNodesChange: (changes: NodeChange[]) => void;
   onEdgesChange: (changes: EdgeChange[]) => void;
@@ -59,10 +63,12 @@ export const useWorkflowStore = create<WorkflowState>()(
       edges: [],
       selectedNodeIds: [],
       selectedEdgeIds: [],
+      projectName: 'Untitled',
       colorMode: 'dark' as ColorMode,
 
       setNodes: (nodes) => set({ nodes }),
       setEdges: (edges) => set({ edges }),
+      setProjectName: (name) => set({ projectName: name }),
       setColorMode: (mode) => set({ colorMode: mode }),
 
       onNodesChange: (changes) => {
@@ -167,8 +173,10 @@ export const useWorkflowStore = create<WorkflowState>()(
       partialize: (state) => ({
         nodes: state.nodes,
         edges: state.edges,
+        projectName: state.projectName,
         colorMode: state.colorMode,
       }),
     }
   )
 );
+

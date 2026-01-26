@@ -21,7 +21,7 @@ import '@xyflow/react/dist/style.css';
 
 import { useWorkflowStore } from '@/store/workflowStore';
 import { LeftSidebar } from './LeftSidebar';
-import { TopBar } from './TopBar';
+import { ProjectHeader } from './ProjectHeader';
 import { NodeInputPanel } from './ui/NodeInputPanel';
 import { FIXED_MODELS } from '@/types/nodes';
 import type { AppNode, ImageNodeData, TextNodeData, AspectRatio, ImageQuality } from '@/types/nodes';
@@ -254,17 +254,23 @@ export default function FlowCanvas() {
           gap={20}
           size={1}
         />
-        <Controls />
-        <MiniMap />
 
-        {/* Left Sidebar */}
+        {/* Project Header - Top Left */}
         <Panel position="top-left" className="!top-4 !left-4 !m-0">
+          <ProjectHeader />
+        </Panel>
+
+        {/* Left Sidebar - Vertically Centered */}
+        <Panel position="top-left" className="left-sidebar-centered !left-4 !m-0">
           <LeftSidebar />
         </Panel>
 
-        {/* Top Bar */}
-        <Panel position="top-right" className="!top-4 !right-4 !m-0">
-          <TopBar />
+        {/* Bottom Right - Controls stacked above MiniMap */}
+        <Panel position="bottom-right" className="!bottom-4 !right-4 !m-0">
+          <div className="flex flex-col gap-2 items-end">
+            <Controls className="!static !transform-none" />
+            <MiniMap className="!static !transform-none" />
+          </div>
         </Panel>
 
         {/* Dynamic Input Panel - Attached to selected node via NodeToolbar */}
