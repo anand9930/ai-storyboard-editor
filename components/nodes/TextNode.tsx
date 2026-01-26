@@ -30,11 +30,28 @@ function TextNodeComponent({ data, id, selected }: NodeProps<TextNodeType>) {
   const [showFullScreen, setShowFullScreen] = useState(false);
 
   // Use custom hook for source image tracking (returns array of all connected images)
-  const { sourceImages } = useSourceConnection({
+  const { sourceImages, isConnected, connectedNodeTypes } = useSourceConnection({
     nodeId: id,
   });
 
-  // Update connected source images when connections change
+  // Auto-transition when ANY connection exists (even if source has no output yet)
+  useEffect(() => {
+    const shouldAutoTransition =
+      nodeData.selectedAction === null &&
+      !nodeData.content &&
+      isConnected;
+
+    if (shouldAutoTransition) {
+      // Determine action based on what type of node is connected
+      // If connected to SourceNode or ImageNode -> will receive images -> 'prompt_from_image'
+      // If connected to TextNode -> will receive text -> 'write'
+      const hasImageSource = connectedNodeTypes.some(t => t === 'source' || t === 'image');
+      const action = hasImageSource ? 'prompt_from_image' : 'write';
+      updateNodeData(id, { selectedAction: action });
+    }
+  }, [isConnected, connectedNodeTypes, id, nodeData.selectedAction, nodeData.content, updateNodeData]);
+
+  // Update connected source images when connections change (separate from auto-transition)
   useEffect(() => {
     const currentLength = nodeData.connectedSourceImages?.length ?? 0;
     const currentFirstUrl = nodeData.connectedSourceImages?.[0]?.url;
@@ -42,19 +59,11 @@ function TextNodeComponent({ data, id, selected }: NodeProps<TextNodeType>) {
 
     // Only update if the images actually changed
     if (sourceImages.length !== currentLength || newFirstUrl !== currentFirstUrl) {
-      // Check if we should auto-transition to 'prompt_from_image' state
-      // This ensures manual edge connections behave same as + button creation
-      const shouldAutoTransition =
-        nodeData.selectedAction === null &&
-        !nodeData.content &&
-        sourceImages.length > 0;
-
       updateNodeData(id, {
         connectedSourceImages: sourceImages,
-        ...(shouldAutoTransition && { selectedAction: 'prompt_from_image' }),
       });
     }
-  }, [sourceImages, id, nodeData.connectedSourceImages, nodeData.selectedAction, nodeData.content, updateNodeData]);
+  }, [sourceImages, id, nodeData.connectedSourceImages, updateNodeData]);
 
   // Create a source node with placeholder image and connect it to this text node
   const createSourceNodeWithConnection = useCallback(() => {

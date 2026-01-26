@@ -1,35 +1,34 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useNodeConnections, useNodesData } from '@xyflow/react';
 import type { AppNode, SourceNodeData, ImageNodeData, ConnectedImage } from '@/types/nodes';
 
 interface UseSourceConnectionOptions {
   nodeId: string;
-  onSourceImagesChange?: (sourceImages: ConnectedImage[]) => void;
 }
 
 interface UseSourceConnectionResult {
   sourceImages: ConnectedImage[];
   isConnected: boolean;
   connectedNodeIds: string[];
+  connectedNodeTypes: string[];
 }
 
 /**
  * Custom hook for tracking source image connections on nodes.
- * Returns all connected images from SourceNode and ImageNode sources.
+ * Returns all connected images from SourceNode and ImageNode sources,
+ * plus connection info for auto-transition logic.
  *
  * @example
  * ```tsx
- * const { sourceImages, isConnected } = useSourceConnection({
+ * const { sourceImages, isConnected, connectedNodeTypes } = useSourceConnection({
  *   nodeId: id,
- *   onSourceImagesChange: (images) => updateNodeData(id, { connectedSourceImages: images }),
  * });
  * ```
  */
 export function useSourceConnection({
   nodeId,
-  onSourceImagesChange,
 }: UseSourceConnectionOptions): UseSourceConnectionResult {
   // Use the new useNodeConnections hook (replaces deprecated useHandleConnections)
   const connections = useNodeConnections({
@@ -46,6 +45,12 @@ export function useSourceConnection({
 
   // Get data from connected nodes
   const connectedNodesData = useNodesData<AppNode>(connectedNodeIds);
+
+  // Extract node types from connected nodes (for auto-transition logic)
+  const connectedNodeTypes = useMemo(
+    () => connectedNodesData.map((n) => n?.type).filter(Boolean) as string[],
+    [connectedNodesData]
+  );
 
   // Extract all source images from connected nodes
   const sourceImages = useMemo(() => {
@@ -75,16 +80,10 @@ export function useSourceConnection({
     return images;
   }, [connectedNodesData]);
 
-  // Notify parent when source images change
-  useEffect(() => {
-    if (onSourceImagesChange) {
-      onSourceImagesChange(sourceImages);
-    }
-  }, [sourceImages, onSourceImagesChange]);
-
   return {
     sourceImages,
     isConnected: connectedNodeIds.length > 0,
     connectedNodeIds,
+    connectedNodeTypes,
   };
 }

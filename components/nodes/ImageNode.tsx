@@ -22,7 +22,7 @@ function ImageNodeComponent({ data, id, selected }: NodeProps<ImageNodeType>) {
   const [popupSide, setPopupSide] = useState<'left' | 'right' | null>(null);
 
   // Use custom hook for source image tracking (returns array of all connected images)
-  const { sourceImages } = useSourceConnection({
+  const { sourceImages, isConnected } = useSourceConnection({
     nodeId: id,
   });
 
@@ -42,26 +42,30 @@ function ImageNodeComponent({ data, id, selected }: NodeProps<ImageNodeType>) {
     }
   }, [nodeData.generatedImageMetadata]);
 
-  // Update source images when connections change
+  // Auto-transition to 'image_to_image' when ANY connection exists (even if source has no image yet)
+  useEffect(() => {
+    const shouldAutoTransition =
+      nodeData.selectedAction === null &&
+      !nodeData.generatedImage &&
+      isConnected;
+
+    if (shouldAutoTransition) {
+      updateNodeData(id, { selectedAction: 'image_to_image' });
+    }
+  }, [isConnected, id, nodeData.selectedAction, nodeData.generatedImage, updateNodeData]);
+
+  // Update source images when connections change (separate from auto-transition)
   useEffect(() => {
     const firstImageUrl = sourceImages[0]?.url;
     const currentFirstUrl = nodeData.connectedSourceImages?.[0]?.url;
 
     if (firstImageUrl !== currentFirstUrl || sourceImages.length !== (nodeData.connectedSourceImages?.length ?? 0)) {
-      // Check if we should auto-transition to 'image_to_image' state
-      // This ensures manual edge connections behave same as + button creation
-      const shouldAutoTransition =
-        nodeData.selectedAction === null &&
-        !nodeData.generatedImage &&
-        sourceImages.length > 0;
-
       updateNodeData(id, {
         sourceImage: firstImageUrl,
         connectedSourceImages: sourceImages,
-        ...(shouldAutoTransition && { selectedAction: 'image_to_image' }),
       });
     }
-  }, [sourceImages, id, nodeData.connectedSourceImages, nodeData.selectedAction, nodeData.generatedImage, updateNodeData]);
+  }, [sourceImages, id, nodeData.connectedSourceImages, updateNodeData]);
 
   // Create a source node with placeholder image and connect it to this image node
   const createSourceNodeWithConnection = useCallback(() => {

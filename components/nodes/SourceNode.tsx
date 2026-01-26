@@ -72,6 +72,7 @@ function SourceNodeComponent({ data, id, selected }: NodeProps<SourceNodeType>) 
         selected={selected}
         onPlusClick={(side) => setPopupSide(side)}
         plusDisabled={!nodeData.image}
+        plusButtonSide="right"
         nodeName={nodeData.name}
         onNameChange={handleNameChange}
         noPadding={true}

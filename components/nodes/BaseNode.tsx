@@ -27,6 +27,7 @@ interface BaseNodeProps {
   showToolbar?: boolean;
   onPlusClick?: (side: 'left' | 'right') => void;
   plusDisabled?: boolean;
+  plusButtonSide?: 'left' | 'right' | 'both';
   toolbarContent?: ReactNode;
   nodeName?: string;
   onNameChange?: (newName: string) => void;
@@ -49,6 +50,7 @@ export function BaseNode({
   showToolbar = true,
   onPlusClick,
   plusDisabled = false,
+  plusButtonSide = 'both',
   toolbarContent,
   nodeName,
   onNameChange,
@@ -297,7 +299,7 @@ export function BaseNode({
         </div>
 
         {/* Floating Plus Button - Left Edge with Magnetic Effect (outside overflow-hidden) */}
-        {onPlusClick && (
+        {onPlusClick && (plusButtonSide === 'left' || plusButtonSide === 'both') && (
           <button
             ref={plusButtonLeftRef}
             onClick={(e) => {
@@ -323,7 +325,7 @@ export function BaseNode({
         )}
 
         {/* Floating Plus Button - Right Edge with Magnetic Effect (outside overflow-hidden) */}
-        {onPlusClick && (
+        {onPlusClick && (plusButtonSide === 'right' || plusButtonSide === 'both') && (
           <button
             ref={plusButtonRightRef}
             onClick={(e) => {

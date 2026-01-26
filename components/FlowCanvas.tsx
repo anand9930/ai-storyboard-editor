@@ -79,20 +79,30 @@ export default function FlowCanvas() {
     [setSelection]
   );
 
-  // Handle new connections - free-form, no validation
+  // Handle new connections - normalize targetHandle for ImageNode and TextNode
   const onConnect = useCallback(
     (connection: Connection) => {
+      // Normalize targetHandle for ImageNode and TextNode
+      // These nodes use 'any' as their input handle, but users might connect to the output side
+      // This ensures incoming connections always go to the input handle
+      let normalizedTargetHandle = connection.targetHandle;
+
+      const targetNode = nodes.find((n) => n.id === connection.target);
+      if (targetNode?.type === 'image' || targetNode?.type === 'text') {
+        normalizedTargetHandle = 'any';
+      }
+
       const newEdge: Edge = {
         id: `edge-${connection.source}-${connection.target}-${Date.now()}`,
         source: connection.source!,
         target: connection.target!,
         sourceHandle: connection.sourceHandle,
-        targetHandle: connection.targetHandle,
+        targetHandle: normalizedTargetHandle,
         ...defaultEdgeOptions,
       };
       setEdges(addEdge(newEdge, edges));
     },
-    [edges, setEdges]
+    [edges, setEdges, nodes]
   );
 
   // Handle node click - select node
