@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { ArrowUp } from 'lucide-react';
+import { ArrowUp, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FIXED_MODELS } from '@/types/nodes';
 import type { ConnectedImage, AspectRatio, ImageQuality } from '@/types/nodes';
@@ -19,6 +19,8 @@ interface NodeInputPanelProps {
   onAspectRatioChange?: (value: AspectRatio | null) => void;
   onQualityChange?: (value: ImageQuality | null) => void;
   onPromptChange?: (prompt: string) => void;
+  error?: string;
+  onErrorDismiss?: () => void;
 }
 
 export function NodeInputPanel({
@@ -33,6 +35,8 @@ export function NodeInputPanel({
   onAspectRatioChange,
   onQualityChange,
   onPromptChange,
+  error,
+  onErrorDismiss,
 }: NodeInputPanelProps) {
   const [prompt, setPrompt] = useState(initialPrompt);
 
@@ -74,6 +78,21 @@ export function NodeInputPanel({
 
   return (
     <div className="bg-surface-primary/95 backdrop-blur border border-node rounded-xl p-4 shadow-xl w-[500px]">
+      {/* Error Display */}
+      {error && (
+        <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 text-sm text-red-400 mb-3 flex items-start gap-2">
+          <span className="flex-1">{error}</span>
+          {onErrorDismiss && (
+            <button
+              onClick={onErrorDismiss}
+              className="p-0.5 hover:bg-red-500/20 rounded transition-colors flex-shrink-0"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Connected Images Preview */}
       {connectedImages && connectedImages.length > 0 && (
         <div className="flex gap-2 mb-3 flex-wrap">

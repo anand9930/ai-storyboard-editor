@@ -216,13 +216,6 @@ function TextNodeComponent({ data, id, selected }: NodeProps<TextNodeType>) {
               />
             </div>
           )}
-
-          {/* Error Display */}
-          {nodeData.error && (
-            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 text-sm text-red-400 flex-shrink-0 mt-2">
-              {nodeData.error}
-            </div>
-          )}
         </div>
       </BaseNode>
 

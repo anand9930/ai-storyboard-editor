@@ -227,6 +227,12 @@ export default function FlowCanvas() {
     [selectedNode, updateNodeData]
   );
 
+  // Handler to dismiss error
+  const handleErrorDismiss = useCallback(() => {
+    if (!selectedNode) return;
+    updateNodeData(selectedNode.id, { error: undefined, status: 'idle' });
+  }, [selectedNode, updateNodeData]);
+
   // Check if we should show input panel
   const showInputPanel =
     selectedNode &&
@@ -324,6 +330,14 @@ export default function FlowCanvas() {
               }
               onAspectRatioChange={handleAspectRatioChange}
               onQualityChange={handleQualityChange}
+              error={
+                selectedNode.type === 'text'
+                  ? (selectedNode.data as TextNodeData).error
+                  : selectedNode.type === 'image'
+                  ? (selectedNode.data as ImageNodeData).error
+                  : undefined
+              }
+              onErrorDismiss={handleErrorDismiss}
             />
           </NodeToolbar>
         )}
