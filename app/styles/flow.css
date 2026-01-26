@@ -102,10 +102,17 @@
 .react-flow__node-group {
   /* Group nodes should be behind their children */
   z-index: -1 !important;
+  /* Remove React Flow default styling - we use custom colored borders */
+  border: none !important;
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
 .react-flow__node-group.selected {
   z-index: 0 !important;
+  /* Override selection box-shadow */
+  box-shadow: none !important;
 }
 
 /* Ensure child nodes render above group background */
@@ -122,4 +129,14 @@
 .react-flow__node-group:hover .react-flow__handle,
 .react-flow__node-group.selected .react-flow__handle {
   opacity: 1;
+}
+
+/* Group node resize handles - white border for contrast */
+.react-flow__node-group .react-flow__resize-control.handle {
+  border: 1px solid white !important;
+}
+
+/* Group node resize lines - slightly transparent */
+.react-flow__node-group .react-flow__resize-control.line {
+  opacity: 0.7;
 }
