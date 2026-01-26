@@ -2,6 +2,7 @@ import { NodeTypes, Edge, Connection } from '@xyflow/react';
 import { TextNode } from '@/components/nodes/TextNode';
 import { ImageNode } from '@/components/nodes/ImageNode';
 import { SourceNode } from '@/components/nodes/SourceNode';
+import { GroupNode } from '@/components/nodes/GroupNode';
 import type { AppNode } from '@/types/nodes';
 
 // Node types registration - defined outside components to prevent re-renders
@@ -9,6 +10,7 @@ export const nodeTypes: NodeTypes = {
   text: TextNode,
   image: ImageNode,
   source: SourceNode,
+  group: GroupNode,
 };
 
 // Default edge styling options
@@ -20,9 +22,10 @@ export const defaultEdgeOptions = {
 
 // Valid connection rules: which node types can connect to which
 const connectionRules: Record<string, string[]> = {
-  source: ['image', 'text'],
-  text: ['image', 'text'],
-  image: ['image', 'text'],
+  source: ['image', 'text', 'group'],
+  text: ['image', 'text', 'group'],
+  image: ['image', 'text', 'group'],
+  group: ['image', 'text', 'group'],
 };
 
 // Connection validation helper - uses nodes array for consistent store reads

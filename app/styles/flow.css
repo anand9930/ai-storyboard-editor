@@ -97,3 +97,29 @@
   top: 50% !important;
   transform: translateY(-50%) !important;
 }
+
+/* Group Node Styles */
+.react-flow__node-group {
+  /* Group nodes should be behind their children */
+  z-index: -1 !important;
+}
+
+.react-flow__node-group.selected {
+  z-index: 0 !important;
+}
+
+/* Ensure child nodes render above group background */
+.react-flow__node-group ~ .react-flow__node {
+  z-index: 1;
+}
+
+/* Group node selection - override default selection styling */
+.react-flow__node-group .react-flow__handle {
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.react-flow__node-group:hover .react-flow__handle,
+.react-flow__node-group.selected .react-flow__handle {
+  opacity: 1;
+}

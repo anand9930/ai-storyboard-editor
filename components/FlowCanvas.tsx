@@ -13,6 +13,7 @@ import {
   ConnectionLineType,
   BackgroundVariant,
   Edge,
+  Node,
   OnSelectionChangeParams,
   NodeToolbar,
   Position,
@@ -24,6 +25,7 @@ import { LeftSidebar } from './LeftSidebar';
 import { ProjectHeader } from './ProjectHeader';
 import { CreditsDisplay } from './CreditsDisplay';
 import { NodeInputPanel } from './ui/NodeInputPanel';
+import { MultiSelectionToolbar } from './ui/MultiSelectionToolbar';
 import { FIXED_MODELS } from '@/types/nodes';
 import type { AppNode, ImageNodeData, TextNodeData, AspectRatio, ImageQuality } from '@/types/nodes';
 import { nodeTypes, defaultEdgeOptions, isValidNodeConnection } from '@/lib/flowConfig';
@@ -108,7 +110,7 @@ export default function FlowCanvas() {
 
   // Handle node click - select node
   const onNodeClick = useCallback(
-    (_: React.MouseEvent, node: any) => {
+    (_: React.MouseEvent, node: Node) => {
       setSelectedNodeIds([node.id]);
     },
     [setSelectedNodeIds]
@@ -194,11 +196,12 @@ export default function FlowCanvas() {
           };
           img.src = result.imageUrl;
         }
-      } catch (error: any) {
+      } catch (error) {
         console.error('Generation failed:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Generation failed';
         updateNodeData(selectedNode.id, {
           status: 'error',
-          error: error.message,
+          error: errorMessage,
         });
       } finally {
         setIsGenerating(false);
@@ -255,6 +258,9 @@ export default function FlowCanvas() {
           gap={20}
           size={1}
         />
+
+        {/* Multi-Selection Toolbar - Shows when 2+ nodes selected */}
+        <MultiSelectionToolbar />
 
         {/* Project Header - Top Left */}
         <Panel position="top-left" className="!top-4 !left-4 !m-0">

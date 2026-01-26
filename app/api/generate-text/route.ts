@@ -1,5 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
+import { z } from 'zod';
+
+// Zod schema for connected images
+const connectedImageSchema = z.object({
+  id: z.string(),
+  url: z.string(),
+});
+
+// Zod schema for request validation
+const generateTextSchema = z.object({
+  prompt: z.string().min(1, 'Prompt is required'),
+  images: z.array(connectedImageSchema).optional(),
+});
 
 // Helper to extract base64 data and MIME type from data URL
 function parseDataUrl(dataUrl: string): { mimeType: string; data: string } | null {
@@ -10,14 +23,18 @@ function parseDataUrl(dataUrl: string): { mimeType: string; data: string } | nul
 
 export async function POST(req: NextRequest) {
   try {
-    const { prompt, images } = await req.json();
+    const body = await req.json();
 
-    if (!prompt) {
+    // Validate input with Zod
+    const parseResult = generateTextSchema.safeParse(body);
+    if (!parseResult.success) {
       return NextResponse.json(
-        { error: 'Prompt is required' },
+        { error: parseResult.error.issues[0]?.message || 'Invalid input' },
         { status: 400 }
       );
     }
+
+    const { prompt, images } = parseResult.data;
 
     if (!process.env.GEMINI_API_KEY) {
       return NextResponse.json(
@@ -66,11 +83,9 @@ export async function POST(req: NextRequest) {
     const text = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
     return NextResponse.json({ text });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Text generation failed:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to generate text' },
-      { status: 500 }
-    );
+    const message = error instanceof Error ? error.message : 'Failed to generate text';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

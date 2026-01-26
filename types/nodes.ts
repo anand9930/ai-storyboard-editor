@@ -102,14 +102,21 @@ export interface SourceNodeData extends Record<string, unknown> {
   } | null;
 }
 
+// Group node data - container for grouping multiple nodes
+export interface GroupNodeData extends Record<string, unknown> {
+  name: string;
+  backgroundColor: string;
+}
+
 // Type aliases for nodes with proper generic typing
 export type TextNode = Node<TextNodeData, 'text'>;
 export type ImageNode = Node<ImageNodeData, 'image'>;
 export type SourceNode = Node<SourceNodeData, 'source'>;
+export type GroupNode = Node<GroupNodeData, 'group'>;
 
 // Union type for all app nodes
-export type AppNode = TextNode | ImageNode | SourceNode;
-export type AppNodeData = TextNodeData | ImageNodeData | SourceNodeData;
+export type AppNode = TextNode | ImageNode | SourceNode | GroupNode;
+export type AppNodeData = TextNodeData | ImageNodeData | SourceNodeData | GroupNodeData;
 
 // Type guard functions
 export function isTextNode(node: AppNode): node is TextNode {
@@ -122,6 +129,10 @@ export function isImageNode(node: AppNode): node is ImageNode {
 
 export function isSourceNode(node: AppNode): node is SourceNode {
   return node.type === 'source';
+}
+
+export function isGroupNode(node: AppNode): node is GroupNode {
+  return node.type === 'group';
 }
 
 // Default data creators (internal helpers for getDefaultNodeData)
@@ -155,10 +166,18 @@ function getDefaultSourceNodeData(): SourceNodeData {
   };
 }
 
+function getDefaultGroupNodeData(): GroupNodeData {
+  return {
+    name: 'New Group',
+    backgroundColor: '#3b82f6', // Default blue color
+  };
+}
+
 // Overloaded function for type-safe node data creation
 export function getDefaultNodeData(type: 'text'): TextNodeData;
 export function getDefaultNodeData(type: 'image'): ImageNodeData;
 export function getDefaultNodeData(type: 'source'): SourceNodeData;
+export function getDefaultNodeData(type: 'group'): GroupNodeData;
 export function getDefaultNodeData(type: string): AppNodeData;
 export function getDefaultNodeData(type: string): AppNodeData {
   switch (type) {
@@ -168,6 +187,8 @@ export function getDefaultNodeData(type: string): AppNodeData {
       return getDefaultImageNodeData();
     case 'source':
       return getDefaultSourceNodeData();
+    case 'group':
+      return getDefaultGroupNodeData();
     default:
       return getDefaultTextNodeData();
   }

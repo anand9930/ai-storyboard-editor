@@ -1,16 +1,40 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
+import { z } from 'zod';
+
+// Zod schema for request validation
+const generateImageSchema = z.object({
+  prompt: z.string().min(1, 'Prompt is required'),
+  sourceImage: z.string().optional(),
+  aspectRatio: z
+    .enum(['1:1', '9:16', '16:9', '3:4', '4:3', '3:2', '2:3', '5:4', '4:5', '21:9'])
+    .optional()
+    .nullable(),
+});
+
+// Type for Gemini response parts
+interface GeminiPart {
+  text?: string;
+  inlineData?: {
+    mimeType: string;
+    data: string;
+  };
+}
 
 export async function POST(req: NextRequest) {
   try {
-    const { prompt, sourceImage, aspectRatio } = await req.json();
+    const body = await req.json();
 
-    if (!prompt) {
+    // Validate input with Zod
+    const parseResult = generateImageSchema.safeParse(body);
+    if (!parseResult.success) {
       return NextResponse.json(
-        { error: 'Prompt is required' },
+        { error: parseResult.error.issues[0]?.message || 'Invalid input' },
         { status: 400 }
       );
     }
+
+    const { prompt, sourceImage, aspectRatio } = parseResult.data;
 
     if (!process.env.GEMINI_API_KEY) {
       return NextResponse.json(
@@ -79,18 +103,18 @@ export async function POST(req: NextRequest) {
       throw new Error('No response from model');
     }
 
-    const parts = candidates[0].content?.parts;
+    const parts = candidates[0].content?.parts as GeminiPart[] | undefined;
     if (!parts) {
       throw new Error('No content parts in response');
     }
 
     const imagePart = parts.find(
-      (part: any) => part.inlineData?.mimeType?.startsWith('image/')
+      (part: GeminiPart) => part.inlineData?.mimeType?.startsWith('image/')
     );
 
     if (!imagePart || !imagePart.inlineData) {
       // Check if there's a text response explaining why no image was generated
-      const textPart = parts.find((part: any) => part.text);
+      const textPart = parts.find((part: GeminiPart) => part.text);
       if (textPart) {
         throw new Error(`Model response: ${textPart.text}`);
       }
@@ -101,11 +125,9 @@ export async function POST(req: NextRequest) {
     const imageUrl = `data:${imagePart.inlineData.mimeType};base64,${imagePart.inlineData.data}`;
 
     return NextResponse.json({ imageUrl });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Image generation failed:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to generate image' },
-      { status: 500 }
-    );
+    const message = error instanceof Error ? error.message : 'Failed to generate image';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

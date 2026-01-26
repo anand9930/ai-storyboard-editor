@@ -18,6 +18,7 @@ interface NodeInputPanelProps {
   quality?: ImageQuality | null;
   onAspectRatioChange?: (value: AspectRatio | null) => void;
   onQualityChange?: (value: ImageQuality | null) => void;
+  onPromptChange?: (prompt: string) => void;
 }
 
 export function NodeInputPanel({
@@ -31,8 +32,18 @@ export function NodeInputPanel({
   quality,
   onAspectRatioChange,
   onQualityChange,
+  onPromptChange,
 }: NodeInputPanelProps) {
   const [prompt, setPrompt] = useState(initialPrompt);
+
+  // Handle prompt change - update local state and persist to node data
+  const handlePromptChange = useCallback(
+    (value: string) => {
+      setPrompt(value);
+      onPromptChange?.(value);
+    },
+    [onPromptChange]
+  );
 
   // Sync prompt when node changes or initialPrompt updates
   useEffect(() => {
@@ -87,7 +98,7 @@ export function NodeInputPanel({
       {/* Prompt Input */}
       <textarea
         value={prompt}
-        onChange={(e) => setPrompt(e.target.value)}
+        onChange={(e) => handlePromptChange(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
         className="w-full bg-transparent text-sm text-theme-text-primary placeholder:text-theme-text-muted resize-none focus:outline-none min-h-[60px]"
