@@ -30,6 +30,9 @@ interface WorkflowState {
   // Project metadata
   projectName: string;
 
+  // Credits
+  credits: number;
+
   // Theme
   colorMode: ColorMode;
 
@@ -37,6 +40,7 @@ interface WorkflowState {
   setNodes: (nodes: Node[]) => void;
   setEdges: (edges: Edge[]) => void;
   setProjectName: (name: string) => void;
+  setCredits: (credits: number) => void;
   setColorMode: (mode: ColorMode) => void;
   onNodesChange: (changes: NodeChange[]) => void;
   onEdgesChange: (changes: EdgeChange[]) => void;
@@ -64,11 +68,13 @@ export const useWorkflowStore = create<WorkflowState>()(
       selectedNodeIds: [],
       selectedEdgeIds: [],
       projectName: 'Untitled',
+      credits: 1000,
       colorMode: 'dark' as ColorMode,
 
       setNodes: (nodes) => set({ nodes }),
       setEdges: (edges) => set({ edges }),
       setProjectName: (name) => set({ projectName: name }),
+      setCredits: (credits) => set({ credits }),
       setColorMode: (mode) => set({ colorMode: mode }),
 
       onNodesChange: (changes) => {
@@ -174,6 +180,7 @@ export const useWorkflowStore = create<WorkflowState>()(
         nodes: state.nodes,
         edges: state.edges,
         projectName: state.projectName,
+        credits: state.credits,
         colorMode: state.colorMode,
       }),
     }

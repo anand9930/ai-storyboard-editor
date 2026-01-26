@@ -42,3 +42,6 @@ next-env.d.ts
 
 # React Flow reference repository
 react-flow-references/
+
+# Claude Code local settings
+.claude/

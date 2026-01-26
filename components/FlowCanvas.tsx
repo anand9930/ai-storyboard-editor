@@ -22,6 +22,7 @@ import '@xyflow/react/dist/style.css';
 import { useWorkflowStore } from '@/store/workflowStore';
 import { LeftSidebar } from './LeftSidebar';
 import { ProjectHeader } from './ProjectHeader';
+import { CreditsDisplay } from './CreditsDisplay';
 import { NodeInputPanel } from './ui/NodeInputPanel';
 import { FIXED_MODELS } from '@/types/nodes';
 import type { AppNode, ImageNodeData, TextNodeData, AspectRatio, ImageQuality } from '@/types/nodes';
@@ -258,6 +259,11 @@ export default function FlowCanvas() {
         {/* Project Header - Top Left */}
         <Panel position="top-left" className="!top-4 !left-4 !m-0">
           <ProjectHeader />
+        </Panel>
+
+        {/* Credits Display - Top Right */}
+        <Panel position="top-right" className="!top-4 !right-4 !m-0">
+          <CreditsDisplay />
         </Panel>
 
         {/* Left Sidebar - Vertically Centered */}
