@@ -12,6 +12,37 @@ import type { AppNodeData, GroupNodeData } from '@/types/nodes';
 
 export type ColorMode = 'dark' | 'light';
 
+/**
+ * Sorts nodes to ensure parent nodes always appear before their children.
+ * This is required by React Flow for proper parent-child relationships.
+ */
+function sortNodesWithParentsFirst(nodes: Node[]): Node[] {
+  const nodeMap = new Map(nodes.map((n) => [n.id, n]));
+  const sorted: Node[] = [];
+  const visited = new Set<string>();
+
+  function visit(nodeId: string) {
+    if (visited.has(nodeId)) return;
+    const node = nodeMap.get(nodeId);
+    if (!node) return;
+
+    // Visit parent first to ensure it appears before this node
+    if (node.parentId && nodeMap.has(node.parentId)) {
+      visit(node.parentId);
+    }
+
+    visited.add(nodeId);
+    sorted.push(node);
+  }
+
+  // Visit all nodes
+  for (const node of nodes) {
+    visit(node.id);
+  }
+
+  return sorted;
+}
+
 // Selection change params (matches React Flow's OnSelectionChangeParams)
 interface SelectionChangeParams {
   nodes: Node[];
@@ -27,8 +58,8 @@ interface WorkflowState {
   selectedNodeIds: string[];
   selectedEdgeIds: string[];
 
-  // Clipboard for copy/paste
-  clipboard: Node | null;
+  // Clipboard for copy/paste (includes children for group nodes)
+  clipboard: { node: Node; children: Node[] } | null;
 
   // Project metadata
   projectName: string;
@@ -69,6 +100,7 @@ interface WorkflowState {
   // Grouping actions
   groupNodes: (nodeIds: string[]) => string | null; // Returns group ID or null if failed
   ungroupNode: (groupId: string) => void;
+  addNodesToGroup: (groupId: string, nodeIds: string[]) => void; // Add nodes to existing group
   updateGroupData: (groupId: string, data: Partial<GroupNodeData>) => void;
   layoutGroupChildren: (groupId: string, layout: 'grid' | 'horizontal') => void;
 }
@@ -86,7 +118,7 @@ export const useWorkflowStore = create<WorkflowState>()(
       credits: 1000,
       colorMode: 'dark' as ColorMode,
 
-      setNodes: (nodes) => set({ nodes }),
+      setNodes: (nodes) => set({ nodes: sortNodesWithParentsFirst(nodes) }),
       setEdges: (edges) => set({ edges }),
       setProjectName: (name) => set({ projectName: name }),
       setCredits: (credits) => set({ credits }),
@@ -128,41 +160,115 @@ export const useWorkflowStore = create<WorkflowState>()(
         })),
 
       deleteNode: (nodeId) =>
-        set((state) => ({
-          nodes: state.nodes.filter((node) => node.id !== nodeId),
-          edges: state.edges.filter(
-            (edge) => edge.source !== nodeId && edge.target !== nodeId
-          ),
-          selectedNodeIds: state.selectedNodeIds.filter((id) => id !== nodeId),
-          selectedEdgeIds: state.selectedEdgeIds.filter((id) => {
-            const edge = state.edges.find((e) => e.id === id);
-            return edge && edge.source !== nodeId && edge.target !== nodeId;
-          }),
-        })),
+        set((state) => {
+          // Collect all node IDs to delete (the node itself + any children if it's a group)
+          const idsToDelete = new Set<string>([nodeId]);
 
-      // Copy node to clipboard
+          // If deleting a group, also delete all its children
+          state.nodes.forEach((node) => {
+            if (node.parentId === nodeId) {
+              idsToDelete.add(node.id);
+            }
+          });
+
+          return {
+            nodes: state.nodes.filter((node) => !idsToDelete.has(node.id)),
+            edges: state.edges.filter(
+              (edge) => !idsToDelete.has(edge.source) && !idsToDelete.has(edge.target)
+            ),
+            selectedNodeIds: state.selectedNodeIds.filter((id) => !idsToDelete.has(id)),
+            selectedEdgeIds: state.selectedEdgeIds.filter((id) => {
+              const edge = state.edges.find((e) => e.id === id);
+              return edge && !idsToDelete.has(edge.source) && !idsToDelete.has(edge.target);
+            }),
+          };
+        }),
+
+      // Copy node to clipboard (includes children for group nodes)
       copyNode: (nodeId: string) => {
         const { nodes } = get();
         const node = nodes.find((n) => n.id === nodeId);
         if (!node) return;
 
         // Deep copy the node
-        const copiedNode = JSON.parse(JSON.stringify(node));
-        set({ clipboard: copiedNode });
+        const copiedNode: Node = JSON.parse(JSON.stringify(node));
+
+        // If it's a group, also copy all children
+        const children: Node[] =
+          node.type === 'group'
+            ? nodes
+                .filter((n) => n.parentId === nodeId)
+                .map((child) => JSON.parse(JSON.stringify(child)))
+            : [];
+
+        set({ clipboard: { node: copiedNode, children } });
       },
 
       // Duplicate node - creates a copy with offset position
+      // For group nodes, also duplicates all children (deep copy)
       duplicateNode: (nodeId: string) => {
         const { nodes } = get();
         const node = nodes.find((n) => n.id === nodeId);
         if (!node) return;
 
-        // Deep copy the node
-        const duplicatedNode: Node = JSON.parse(JSON.stringify(node));
-
-        // Generate new ID
         const nodeType = node.type || 'node';
-        duplicatedNode.id = `${nodeType}-${Date.now()}`;
+        const timestamp = Date.now();
+
+        // Handle group nodes - deep copy with all children
+        if (nodeType === 'group') {
+          const children = nodes.filter((n) => n.parentId === nodeId);
+          const newGroupId = `group-${timestamp}`;
+
+          // Create new group node
+          const newGroup: Node = JSON.parse(JSON.stringify(node));
+          newGroup.id = newGroupId;
+          newGroup.position = {
+            x: node.position.x + 40,
+            y: node.position.y + 40,
+          };
+          newGroup.selected = true;
+
+          // Create new children with updated parentId
+          const newChildren: Node[] = children.map((child, index) => {
+            const newChild: Node = JSON.parse(JSON.stringify(child));
+            newChild.id = `${child.type}-${timestamp}-${index}`;
+            newChild.parentId = newGroupId;
+            newChild.selected = false;
+
+            // Reset generation state for children
+            if (newChild.data) {
+              newChild.data = {
+                ...newChild.data,
+                status: 'idle',
+                error: undefined,
+              };
+              if (child.type === 'image') {
+                newChild.data.generatedImage = undefined;
+                newChild.data.generatedImageMetadata = undefined;
+              } else if (child.type === 'text') {
+                newChild.data.content = '';
+              }
+            }
+
+            return newChild;
+          });
+
+          // Add group first, then children (required order for React Flow)
+          set((state) => ({
+            nodes: [
+              ...state.nodes.map((n) => ({ ...n, selected: false })),
+              newGroup,
+              ...newChildren,
+            ],
+            selectedNodeIds: [newGroupId],
+          }));
+
+          return;
+        }
+
+        // Handle non-group nodes (original logic)
+        const duplicatedNode: Node = JSON.parse(JSON.stringify(node));
+        duplicatedNode.id = `${nodeType}-${timestamp}`;
 
         // Offset position
         duplicatedNode.position = {
@@ -201,25 +307,83 @@ export const useWorkflowStore = create<WorkflowState>()(
         }));
       },
 
-      // Paste node from clipboard
+      // Paste node from clipboard (includes children for group nodes)
       pasteNode: (position?: { x: number; y: number }) => {
         const { clipboard } = get();
         if (!clipboard) return;
 
-        // Deep copy the clipboard node
-        const pastedNode: Node = JSON.parse(JSON.stringify(clipboard));
+        const { node: clipboardNode, children: clipboardChildren } = clipboard;
+        const nodeType = clipboardNode.type || 'node';
+        const timestamp = Date.now();
 
-        // Generate new ID
-        const nodeType = clipboard.type || 'node';
-        pastedNode.id = `${nodeType}-${Date.now()}`;
+        // Handle group nodes - paste with all children
+        if (nodeType === 'group' && clipboardChildren.length > 0) {
+          const newGroupId = `group-${timestamp}`;
+
+          // Create new group node
+          const pastedGroup: Node = JSON.parse(JSON.stringify(clipboardNode));
+          pastedGroup.id = newGroupId;
+          pastedGroup.selected = true;
+
+          // Set position
+          if (position) {
+            pastedGroup.position = position;
+          } else {
+            pastedGroup.position = {
+              x: clipboardNode.position.x + 40,
+              y: clipboardNode.position.y + 40,
+            };
+          }
+
+          // Create new children with updated parentId
+          const pastedChildren: Node[] = clipboardChildren.map((child, index) => {
+            const newChild: Node = JSON.parse(JSON.stringify(child));
+            newChild.id = `${child.type}-${timestamp}-${index}`;
+            newChild.parentId = newGroupId;
+            newChild.selected = false;
+
+            // Reset generation state
+            if (newChild.data) {
+              newChild.data = {
+                ...newChild.data,
+                status: 'idle',
+                error: undefined,
+              };
+              if (child.type === 'image') {
+                newChild.data.generatedImage = undefined;
+                newChild.data.generatedImageMetadata = undefined;
+              } else if (child.type === 'text') {
+                newChild.data.content = '';
+              }
+            }
+
+            return newChild;
+          });
+
+          // Add group first, then children (required order for React Flow)
+          set((state) => ({
+            nodes: [
+              ...state.nodes.map((n) => ({ ...n, selected: false })),
+              pastedGroup,
+              ...pastedChildren,
+            ],
+            selectedNodeIds: [newGroupId],
+          }));
+
+          return;
+        }
+
+        // Handle non-group nodes (original logic)
+        const pastedNode: Node = JSON.parse(JSON.stringify(clipboardNode));
+        pastedNode.id = `${nodeType}-${timestamp}`;
 
         // Set position (use provided position or offset from original)
         if (position) {
           pastedNode.position = position;
         } else {
           pastedNode.position = {
-            x: clipboard.position.x + 40,
-            y: clipboard.position.y + 40,
+            x: clipboardNode.position.x + 40,
+            y: clipboardNode.position.y + 40,
           };
         }
 
@@ -282,7 +446,8 @@ export const useWorkflowStore = create<WorkflowState>()(
         try {
           const data = JSON.parse(json);
           set({
-            nodes: data.nodes || [],
+            // Sort nodes to ensure parents appear before children
+            nodes: sortNodesWithParentsFirst(data.nodes || []),
             edges: data.edges || [],
             selectedNodeIds: [],
             selectedEdgeIds: [],
@@ -409,6 +574,98 @@ export const useWorkflowStore = create<WorkflowState>()(
         set({
           nodes: updatedNodes,
           selectedNodeIds: childIds, // Select the ungrouped nodes
+        });
+      },
+
+      // Add ungrouped nodes to an existing group (expands group to fit)
+      addNodesToGroup: (groupId: string, nodeIds: string[]) => {
+        const { nodes } = get();
+        const groupNode = nodes.find((n) => n.id === groupId && n.type === 'group');
+
+        if (!groupNode) return;
+
+        // Get nodes to add (only ungrouped nodes, not group nodes)
+        const nodesToAdd = nodes.filter(
+          (n) => nodeIds.includes(n.id) && !n.parentId && n.type !== 'group'
+        );
+
+        if (nodesToAdd.length === 0) return;
+
+        // Get current group bounds
+        const groupX = groupNode.position.x;
+        const groupY = groupNode.position.y;
+        const groupWidth = (groupNode.style?.width as number) || 400;
+        const groupHeight = (groupNode.style?.height as number) || 300;
+
+        const PADDING = 40;
+        const HEADER_HEIGHT = 40;
+
+        // Calculate new bounding box including new nodes
+        let minX = groupX;
+        let minY = groupY;
+        let maxX = groupX + groupWidth;
+        let maxY = groupY + groupHeight;
+
+        // Expand bounds to include new nodes
+        nodesToAdd.forEach((node) => {
+          const width = node.measured?.width ?? node.width ?? 240;
+          const height = node.measured?.height ?? node.height ?? 240;
+
+          minX = Math.min(minX, node.position.x - PADDING);
+          minY = Math.min(minY, node.position.y - PADDING - HEADER_HEIGHT);
+          maxX = Math.max(maxX, node.position.x + width + PADDING);
+          maxY = Math.max(maxY, node.position.y + height + PADDING);
+        });
+
+        // Calculate position offset if group origin moved
+        const offsetX = groupX - minX;
+        const offsetY = groupY - minY;
+
+        // Update nodes
+        const updatedNodes = nodes.map((node) => {
+          // Update the group node dimensions and position
+          if (node.id === groupId) {
+            return {
+              ...node,
+              position: { x: minX, y: minY },
+              style: {
+                ...node.style,
+                width: maxX - minX,
+                height: maxY - minY,
+              },
+            };
+          }
+
+          // Update existing children positions if group moved
+          if (node.parentId === groupId && (offsetX !== 0 || offsetY !== 0)) {
+            return {
+              ...node,
+              position: {
+                x: node.position.x + offsetX,
+                y: node.position.y + offsetY,
+              },
+            };
+          }
+
+          // Add new nodes to group
+          if (nodesToAdd.find((n) => n.id === node.id)) {
+            return {
+              ...node,
+              parentId: groupId,
+              extent: 'parent' as const,
+              position: {
+                x: node.position.x - minX,
+                y: node.position.y - minY,
+              },
+            };
+          }
+
+          return node;
+        });
+
+        set({
+          nodes: sortNodesWithParentsFirst(updatedNodes),
+          selectedNodeIds: [groupId],
         });
       },
 
