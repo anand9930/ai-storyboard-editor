@@ -235,6 +235,7 @@ export function BaseNode({
           )}
           style={{
             border: `1px solid hsl(var(${selected ? '--node-border-selected' : '--node-border'}))`,
+            boxShadow: selected ? `0 0 0 1px hsl(var(--node-border-selected))` : undefined,
           }}
         >
           {/* Input Handles - Invisible but functional */}
