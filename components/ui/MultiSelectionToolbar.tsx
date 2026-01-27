@@ -10,13 +10,26 @@ const selectedNodesDataSelector = (state: ReactFlowState) =>
     .filter((node) => node.selected && node.type !== 'group')
     .map((node) => ({ id: node.id, parentId: node.parentId }));
 
-// Check if a group node is selected
-const selectedGroupSelector = (state: ReactFlowState) =>
-  state.nodes.find((node) => node.selected && node.type === 'group');
+// Custom equality function for selected nodes data
+const selectedNodesDataEqual = (
+  a: { id: string; parentId?: string }[],
+  b: { id: string; parentId?: string }[]
+) => {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) {
+    if (a[i].id !== b[i].id || a[i].parentId !== b[i].parentId) return false;
+  }
+  return true;
+};
+
+// Check if a group node is selected - returns just the id for stable comparison
+const selectedGroupIdSelector = (state: ReactFlowState) =>
+  state.nodes.find((node) => node.selected && node.type === 'group')?.id ?? null;
 
 export function MultiSelectionToolbar() {
-  const selectedNodesData = useStore(selectedNodesDataSelector);
-  const selectedGroup = useStore(selectedGroupSelector);
+  // Use custom equality to prevent re-renders when selected nodes haven't changed
+  const selectedNodesData = useStore(selectedNodesDataSelector, selectedNodesDataEqual);
+  const selectedGroupId = useStore(selectedGroupIdSelector);
   const { groupNodes, addNodesToGroup } = useWorkflowStore();
 
   const selectedNodeIds = selectedNodesData.map((n) => n.id);
@@ -35,7 +48,7 @@ export function MultiSelectionToolbar() {
 
   // Determine which group to expand (if any)
   // Priority: selected group node > parent of selected children
-  const existingGroupId = selectedGroup?.id || (parentIds.size === 1 ? [...parentIds][0] : null);
+  const existingGroupId = selectedGroupId || (parentIds.size === 1 ? [...parentIds][0] : null);
 
   // Determine button state:
   // - Hide if nodes from multiple different groups (ambiguous)

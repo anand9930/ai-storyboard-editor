@@ -18,6 +18,9 @@ const MIN_SIZE = 240;
 function ImageNodeComponent({ data, id, selected }: NodeProps<ImageNodeType>) {
   // data is now properly typed as ImageNodeData
   const nodeData = data as ImageNodeData;
+
+  // Get store values and actions
+  // Note: nodes is only used inside callbacks, so it doesn't cause render issues
   const { updateNodeData, setSelectedNodeIds, addNode, addEdge, nodes } = useWorkflowStore();
   const [popupSide, setPopupSide] = useState<'left' | 'right' | null>(null);
 

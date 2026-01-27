@@ -21,6 +21,7 @@ import {
   ReactFlowInstance,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
+import { useShallow } from 'zustand/shallow';
 
 import { useWorkflowStore } from '@/store/workflowStore';
 import { useUndoRedoShortcuts } from '@/hooks/useUndoRedoShortcuts';
@@ -55,11 +56,18 @@ export default function FlowCanvas() {
   // Enable undo/redo keyboard shortcuts (Ctrl+Z / Ctrl+Y)
   useUndoRedoShortcuts();
 
+  // Use shallow selectors to prevent re-renders when unrelated state changes
+  const { nodes, edges, selectedNodeIds, colorMode } = useWorkflowStore(
+    useShallow((state) => ({
+      nodes: state.nodes,
+      edges: state.edges,
+      selectedNodeIds: state.selectedNodeIds,
+      colorMode: state.colorMode,
+    }))
+  );
+
+  // Get actions separately - these don't cause re-renders
   const {
-    nodes,
-    edges,
-    selectedNodeIds,
-    colorMode,
     onNodesChange,
     onEdgesChange,
     setEdges,
@@ -115,17 +123,28 @@ export default function FlowCanvas() {
   }, [nodes, selectedNodeIds]);
 
   // Compute highlighted edges based on selected nodes
+  // Optimized: only create new edge objects when className actually needs to change
   const highlightedEdges = useMemo(() => {
     if (selectedNodeIds.length === 0) return edges;
 
     const selectedSet = new Set(selectedNodeIds);
+    let hasChanges = false;
 
-    return edges.map((edge) => {
+    const result = edges.map((edge) => {
       const isConnected = selectedSet.has(edge.source) || selectedSet.has(edge.target);
-      return isConnected
-        ? { ...edge, className: edge.className ? `${edge.className} highlighted` : 'highlighted' }
-        : edge;
+      const hasHighlight = edge.className?.includes('highlighted');
+
+      // Only create new object if highlight state needs to change
+      if (isConnected && !hasHighlight) {
+        hasChanges = true;
+        return { ...edge, className: edge.className ? `${edge.className} highlighted` : 'highlighted' };
+      }
+      // Return original edge reference to preserve memoization downstream
+      return edge;
     });
+
+    // Return original edges array if no changes needed (preserves reference)
+    return hasChanges ? result : edges;
   }, [edges, selectedNodeIds]);
 
   // Handle selection change - syncs React Flow selection to our store
@@ -387,6 +406,8 @@ export default function FlowCanvas() {
         panOnDrag={[1, 2]}
         // Allow scroll to zoom
         panOnScroll={false}
+        // Performance: only render nodes/edges within the viewport
+        onlyRenderVisibleElements={true}
         fitView
         fitViewOptions={{ padding: 0.2 }}
         colorMode={colorMode}

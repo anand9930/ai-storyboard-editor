@@ -7,6 +7,9 @@ import { cn } from '@/lib/utils';
 import { NodeStatus } from '@/types/nodes';
 import { useWorkflowStore } from '@/store/workflowStore';
 
+// Selector for getting selected node count (stable reference)
+const selectSelectedNodeCount = (state: { selectedNodeIds: string[] }) => state.selectedNodeIds.length;
+
 // Magnetic button constants
 const MAGNETIC_RADIUS = 80;
 const MAGNETIC_STRENGTH = 0.3;
@@ -60,7 +63,8 @@ export function BaseNode({
   height,
 }: BaseNodeProps) {
   const { inputs = [], outputs = [] } = handles;
-  const { selectedNodeIds } = useWorkflowStore();
+  // Only subscribe to the count, not the full array - prevents re-renders on selection changes
+  const selectedNodeCount = useWorkflowStore(selectSelectedNodeCount);
 
   // Editable name state
   const [isEditingName, setIsEditingName] = useState(false);
@@ -160,7 +164,7 @@ export function BaseNode({
     <>
       {showToolbar && toolbarContent && (
         <NodeToolbar
-          isVisible={selected && selectedNodeIds.length === 1}
+          isVisible={selected && selectedNodeCount === 1}
           position={Position.Top}
           offset={20}
           className="flex gap-1 bg-surface-primary border border-node rounded-lg p-1 shadow-lg"

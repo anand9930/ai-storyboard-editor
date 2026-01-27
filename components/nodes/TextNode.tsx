@@ -24,6 +24,9 @@ const iconMap: Record<string, LucideIcon> = {
 function TextNodeComponent({ data, id, selected }: NodeProps<TextNodeType>) {
   // data is now properly typed as TextNodeData
   const nodeData = data as TextNodeData;
+
+  // Get store values and actions
+  // Note: nodes is only used inside callbacks, so it doesn't cause render issues
   const { updateNodeData, setSelectedNodeIds, addNode, addEdge, nodes } = useWorkflowStore();
   const [popupSide, setPopupSide] = useState<'left' | 'right' | null>(null);
   const [editor, setEditor] = useState<Editor | null>(null);

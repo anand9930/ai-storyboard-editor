@@ -20,6 +20,10 @@ interface UseSourceConnectionResult {
  * Returns all connected images from SourceNode and ImageNode sources,
  * plus connection info for auto-transition logic.
  *
+ * Note: React Flow's useNodeConnections and useNodesData hooks already have
+ * built-in equality checks (areConnectionMapsEqual and shallowNodeData),
+ * so we don't need additional ref-based stability patterns.
+ *
  * @example
  * ```tsx
  * const { sourceImages, isConnected, connectedNodeTypes } = useSourceConnection({
@@ -30,7 +34,7 @@ interface UseSourceConnectionResult {
 export function useSourceConnection({
   nodeId,
 }: UseSourceConnectionOptions): UseSourceConnectionResult {
-  // Use the new useNodeConnections hook (replaces deprecated useHandleConnections)
+  // useNodeConnections has built-in areConnectionMapsEqual for stability
   const connections = useNodeConnections({
     id: nodeId,
     handleType: 'target',
@@ -43,7 +47,7 @@ export function useSourceConnection({
     [connections]
   );
 
-  // Get data from connected nodes
+  // useNodesData has built-in shallowNodeData equality for stability
   const connectedNodesData = useNodesData<AppNode>(connectedNodeIds);
 
   // Extract node types from connected nodes (for auto-transition logic)

@@ -40,9 +40,17 @@ interface CanvasContextMenuProps {
   onClose: () => void;
 }
 
+// Selector for clipboard existence (stable boolean)
+const selectHasClipboard = (state: { clipboard: unknown }) => state.clipboard !== null;
+
 export function CanvasContextMenu({ x, y, canvasPosition, onClose }: CanvasContextMenuProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { addNode, pasteNode, clipboard } = useWorkflowStore();
+
+  // Only subscribe to whether clipboard exists, not the full clipboard object
+  const hasClipboard = useWorkflowStore(selectHasClipboard);
+
+  // Get actions separately
+  const { addNode, pasteNode } = useWorkflowStore();
 
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
   const [submenuPosition, setSubmenuPosition] = useState({ x: 0, y: 0 });
@@ -227,7 +235,7 @@ export function CanvasContextMenu({ x, y, canvasPosition, onClose }: CanvasConte
             pasteNode(canvasPosition);
             onClose();
           }}
-          disabled={!clipboard}
+          disabled={!hasClipboard}
         />
       </div>
 

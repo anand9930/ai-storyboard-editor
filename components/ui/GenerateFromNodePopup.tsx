@@ -1,11 +1,14 @@
 'use client';
 
+import { useCallback, useMemo } from 'react';
 import { Type, Image as ImageIcon, LucideIcon } from 'lucide-react';
+import { useShallow } from 'zustand/shallow';
 import { cn } from '@/lib/utils';
 import { useWorkflowStore } from '@/store/workflowStore';
 import { getDefaultNodeData, GENERATE_OPTIONS } from '@/types/nodes';
-import type { SourceNodeData, ImageNodeData, TextNodeData } from '@/types/nodes';
+import type { SourceNodeData, ImageNodeData, TextNodeData, AppNode } from '@/types/nodes';
 import { defaultEdgeOptions } from '@/lib/flowConfig';
+import type { Node } from '@xyflow/react';
 
 interface GenerateFromNodePopupProps {
   sourceNodeId: string;
@@ -23,8 +26,16 @@ export function GenerateFromNodePopup({
   side,
   onClose,
 }: GenerateFromNodePopupProps) {
-  const { addNode, addEdge, nodes, setSelectedNodeIds } = useWorkflowStore();
-  const sourceNode = nodes.find((n) => n.id === sourceNodeId);
+  // Only get the source node we need, not the entire nodes array
+  const sourceNode = useWorkflowStore(
+    useCallback(
+      (state) => state.nodes.find((n: Node) => n.id === sourceNodeId),
+      [sourceNodeId]
+    )
+  );
+
+  // Get actions separately
+  const { addNode, addEdge, setSelectedNodeIds } = useWorkflowStore();
 
   const handleSelect = (type: 'text' | 'image') => {
     if (!sourceNode) return;

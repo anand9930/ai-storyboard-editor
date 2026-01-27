@@ -36,15 +36,23 @@ const ADD_NODE_ITEMS = [
   },
 ];
 
+// Selector for node count (stable reference, only changes when nodes are added/removed)
+const selectNodeCount = (state: { nodes: unknown[] }) => state.nodes.length;
+
 export function LeftSidebar() {
   const [showNodeMenu, setShowNodeMenu] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { addNode, nodes } = useWorkflowStore();
+
+  // Only subscribe to node count for positioning, not full nodes array
+  const nodeCount = useWorkflowStore(selectNodeCount);
+
+  // Get addNode action separately
+  const { addNode } = useWorkflowStore();
 
   // Calculate new node position
   const getNewNodePosition = () => {
-    const offsetX = nodes.length * 20;
-    const offsetY = nodes.length * 20;
+    const offsetX = nodeCount * 20;
+    const offsetY = nodeCount * 20;
     return {
       x: 250 + offsetX,
       y: 150 + offsetY,
