@@ -27,6 +27,9 @@ interface WorkflowState {
   selectedNodeIds: string[];
   selectedEdgeIds: string[];
 
+  // Clipboard for copy/paste
+  clipboard: Node | null;
+
   // Project metadata
   projectName: string;
 
@@ -48,6 +51,11 @@ interface WorkflowState {
   addEdge: (edge: Edge) => void;
   updateNodeData: (nodeId: string, data: Partial<AppNodeData>) => void;
   deleteNode: (nodeId: string) => void;
+
+  // Node operations (copy/duplicate/paste)
+  copyNode: (nodeId: string) => void;
+  duplicateNode: (nodeId: string) => void;
+  pasteNode: (position?: { x: number; y: number }) => void;
 
   // Selection actions
   setSelection: (params: SelectionChangeParams) => void;
@@ -73,6 +81,7 @@ export const useWorkflowStore = create<WorkflowState>()(
       edges: [],
       selectedNodeIds: [],
       selectedEdgeIds: [],
+      clipboard: null,
       projectName: 'Untitled',
       credits: 1000,
       colorMode: 'dark' as ColorMode,
@@ -130,6 +139,119 @@ export const useWorkflowStore = create<WorkflowState>()(
             return edge && edge.source !== nodeId && edge.target !== nodeId;
           }),
         })),
+
+      // Copy node to clipboard
+      copyNode: (nodeId: string) => {
+        const { nodes } = get();
+        const node = nodes.find((n) => n.id === nodeId);
+        if (!node) return;
+
+        // Deep copy the node
+        const copiedNode = JSON.parse(JSON.stringify(node));
+        set({ clipboard: copiedNode });
+      },
+
+      // Duplicate node - creates a copy with offset position
+      duplicateNode: (nodeId: string) => {
+        const { nodes } = get();
+        const node = nodes.find((n) => n.id === nodeId);
+        if (!node) return;
+
+        // Deep copy the node
+        const duplicatedNode: Node = JSON.parse(JSON.stringify(node));
+
+        // Generate new ID
+        const nodeType = node.type || 'node';
+        duplicatedNode.id = `${nodeType}-${Date.now()}`;
+
+        // Offset position
+        duplicatedNode.position = {
+          x: node.position.x + 20,
+          y: node.position.y + 20,
+        };
+
+        // Reset generation state for text/image nodes
+        if (duplicatedNode.data) {
+          duplicatedNode.data = {
+            ...duplicatedNode.data,
+            status: 'idle',
+            error: undefined,
+          };
+
+          // Reset generated content based on node type
+          if (nodeType === 'image') {
+            duplicatedNode.data.generatedImage = undefined;
+            duplicatedNode.data.generatedImageMetadata = undefined;
+          } else if (nodeType === 'text') {
+            duplicatedNode.data.content = '';
+          }
+        }
+
+        // Remove parent constraints if it was in a group
+        duplicatedNode.parentId = undefined;
+        duplicatedNode.extent = undefined;
+
+        // Add the duplicated node and select it
+        set((state) => ({
+          nodes: [
+            ...state.nodes.map((n) => ({ ...n, selected: false })),
+            { ...duplicatedNode, selected: true },
+          ],
+          selectedNodeIds: [duplicatedNode.id],
+        }));
+      },
+
+      // Paste node from clipboard
+      pasteNode: (position?: { x: number; y: number }) => {
+        const { clipboard } = get();
+        if (!clipboard) return;
+
+        // Deep copy the clipboard node
+        const pastedNode: Node = JSON.parse(JSON.stringify(clipboard));
+
+        // Generate new ID
+        const nodeType = clipboard.type || 'node';
+        pastedNode.id = `${nodeType}-${Date.now()}`;
+
+        // Set position (use provided position or offset from original)
+        if (position) {
+          pastedNode.position = position;
+        } else {
+          pastedNode.position = {
+            x: clipboard.position.x + 40,
+            y: clipboard.position.y + 40,
+          };
+        }
+
+        // Reset generation state
+        if (pastedNode.data) {
+          pastedNode.data = {
+            ...pastedNode.data,
+            status: 'idle',
+            error: undefined,
+          };
+
+          if (nodeType === 'image') {
+            pastedNode.data.generatedImage = undefined;
+            pastedNode.data.generatedImageMetadata = undefined;
+          } else if (nodeType === 'text') {
+            pastedNode.data.content = '';
+          }
+        }
+
+        // Remove parent constraints
+        pastedNode.parentId = undefined;
+        pastedNode.extent = undefined;
+
+        // Add the pasted node and select it
+        set((state) => ({
+          nodes: [
+            ...state.nodes.map((n) => ({ ...n, selected: false })),
+            { ...pastedNode, selected: true },
+          ],
+          selectedNodeIds: [pastedNode.id],
+        }));
+      },
 
       // Selection actions - synced via onSelectionChange callback
       setSelection: ({ nodes, edges }) =>

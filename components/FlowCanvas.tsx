@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, useRef } from 'react';
 import {
   ReactFlow,
   Background,
@@ -17,6 +17,8 @@ import {
   OnSelectionChangeParams,
   NodeToolbar,
   Position,
+  SelectionMode,
+  ReactFlowInstance,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
@@ -26,9 +28,27 @@ import { ProjectHeader } from './ProjectHeader';
 import { CreditsDisplay } from './CreditsDisplay';
 import { NodeInputPanel } from './ui/NodeInputPanel';
 import { MultiSelectionToolbar } from './ui/MultiSelectionToolbar';
+import { CanvasContextMenu } from './ui/CanvasContextMenu';
+import { NodeContextMenu } from './ui/NodeContextMenu';
 import { FIXED_MODELS } from '@/types/nodes';
 import type { AppNode, ImageNodeData, TextNodeData, AspectRatio, ImageQuality } from '@/types/nodes';
 import { nodeTypes, defaultEdgeOptions, isValidNodeConnection } from '@/lib/flowConfig';
+
+// Canvas context menu state interface
+interface ContextMenuState {
+  show: boolean;
+  x: number;
+  y: number;
+  flowPosition: { x: number; y: number };
+}
+
+// Node context menu state interface
+interface NodeContextMenuState {
+  show: boolean;
+  nodeId: string | null;
+  x: number;
+  y: number;
+}
 
 export default function FlowCanvas() {
   const {
@@ -45,6 +65,26 @@ export default function FlowCanvas() {
   } = useWorkflowStore();
 
   const [isGenerating, setIsGenerating] = useState(false);
+  const [contextMenu, setContextMenu] = useState<ContextMenuState>({
+    show: false,
+    x: 0,
+    y: 0,
+    flowPosition: { x: 0, y: 0 },
+  });
+  const [nodeContextMenu, setNodeContextMenu] = useState<NodeContextMenuState>({
+    show: false,
+    nodeId: null,
+    x: 0,
+    y: 0,
+  });
+
+  // Store React Flow instance for coordinate conversion
+  const reactFlowInstance = useRef<ReactFlowInstance | null>(null);
+
+  // Handle React Flow initialization
+  const onInit = useCallback((instance: ReactFlowInstance) => {
+    reactFlowInstance.current = instance;
+  }, []);
 
   // Connection validation - uses nodes from store for consistent reads
   const isValidConnection = useCallback(
@@ -116,10 +156,76 @@ export default function FlowCanvas() {
     [setSelectedNodeIds]
   );
 
-  // Handle pane click - deselect
+  // Handle pane click - deselect and close context menus
   const onPaneClick = useCallback(() => {
     setSelectedNodeIds([]);
+    setContextMenu((prev) => ({ ...prev, show: false }));
+    setNodeContextMenu((prev) => ({ ...prev, show: false }));
   }, [setSelectedNodeIds]);
+
+  // Handle right-click on canvas - show context menu
+  const onPaneContextMenu = useCallback(
+    (event: React.MouseEvent | MouseEvent) => {
+      event.preventDefault();
+
+      if (!reactFlowInstance.current) return;
+
+      // Close node context menu if open
+      setNodeContextMenu((prev) => ({ ...prev, show: false }));
+
+      // Convert screen coordinates to flow coordinates
+      const flowPosition = reactFlowInstance.current.screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
+      });
+
+      setContextMenu({
+        show: true,
+        x: event.clientX,
+        y: event.clientY,
+        flowPosition,
+      });
+    },
+    []
+  );
+
+  // Close canvas context menu
+  const closeContextMenu = useCallback(() => {
+    setContextMenu((prev) => ({ ...prev, show: false }));
+  }, []);
+
+  // Handle right-click on node - show node context menu
+  const onNodeContextMenu = useCallback(
+    (event: React.MouseEvent, node: Node) => {
+      event.preventDefault();
+      // Close canvas context menu if open
+      setContextMenu((prev) => ({ ...prev, show: false }));
+      // Open node context menu
+      setNodeContextMenu({
+        show: true,
+        nodeId: node.id,
+        x: event.clientX,
+        y: event.clientY,
+      });
+    },
+    []
+  );
+
+  // Close node context menu
+  const closeNodeContextMenu = useCallback(() => {
+    setNodeContextMenu((prev) => ({ ...prev, show: false }));
+  }, []);
+
+  // Handle right-click on selection - prevent default browser context menu
+  const onSelectionContextMenu = useCallback(
+    (event: React.MouseEvent, _nodes: Node[]) => {
+      event.preventDefault();
+      // Close any open menus
+      setContextMenu((prev) => ({ ...prev, show: false }));
+      setNodeContextMenu((prev) => ({ ...prev, show: false }));
+    },
+    []
+  );
 
   // Handle generation from input panel
   const handleGenerate = useCallback(
@@ -247,13 +353,24 @@ export default function FlowCanvas() {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onNodeClick={onNodeClick}
+        onNodeContextMenu={onNodeContextMenu}
         onPaneClick={onPaneClick}
+        onPaneContextMenu={onPaneContextMenu}
+        onSelectionContextMenu={onSelectionContextMenu}
         onSelectionChange={onSelectionChange}
+        onInit={onInit}
         nodeTypes={nodeTypes}
         connectionMode={ConnectionMode.Loose}
         connectionLineType={ConnectionLineType.Bezier}
         defaultEdgeOptions={defaultEdgeOptions}
         isValidConnection={isValidConnection}
+        // Selection behavior: left-click drag creates selection box
+        selectionOnDrag={true}
+        selectionMode={SelectionMode.Partial}
+        // Pan behavior: right-click (2) and middle-click (1) for panning
+        panOnDrag={[1, 2]}
+        // Allow scroll to zoom
+        panOnScroll={false}
         fitView
         fitViewOptions={{ padding: 0.2 }}
         colorMode={colorMode}
@@ -342,6 +459,26 @@ export default function FlowCanvas() {
           </NodeToolbar>
         )}
       </ReactFlow>
+
+      {/* Canvas Context Menu - Shows on right-click on empty canvas */}
+      {contextMenu.show && (
+        <CanvasContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          canvasPosition={contextMenu.flowPosition}
+          onClose={closeContextMenu}
+        />
+      )}
+
+      {/* Node Context Menu - Shows on right-click on a node */}
+      {nodeContextMenu.show && nodeContextMenu.nodeId && (
+        <NodeContextMenu
+          nodeId={nodeContextMenu.nodeId}
+          x={nodeContextMenu.x}
+          y={nodeContextMenu.y}
+          onClose={closeNodeContextMenu}
+        />
+      )}
     </div>
   );
 }
