@@ -2,7 +2,7 @@
 
 import { ReactNode, useState, useRef, useEffect, useCallback, MouseEvent as ReactMouseEvent } from 'react';
 import { Handle, Position, NodeResizer, NodeToolbar } from '@xyflow/react';
-import { Trash2, Copy, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { NodeStatus } from '@/types/nodes';
 import { useWorkflowStore } from '@/store/workflowStore';
@@ -60,7 +60,7 @@ export function BaseNode({
   height,
 }: BaseNodeProps) {
   const { inputs = [], outputs = [] } = handles;
-  const { deleteNode, addNode, nodes } = useWorkflowStore();
+  const { selectedNodeIds } = useWorkflowStore();
 
   // Editable name state
   const [isEditingName, setIsEditingName] = useState(false);
@@ -156,52 +156,16 @@ export function BaseNode({
     }
   }, [handleNameBlur, nodeName]);
 
-  const handleDelete = () => {
-    deleteNode(id);
-  };
-
-  const handleDuplicate = () => {
-    const currentNode = nodes.find((n) => n.id === id);
-    if (currentNode) {
-      const newNode = {
-        ...currentNode,
-        id: `${currentNode.type}-${Date.now()}`,
-        position: {
-          x: currentNode.position.x + 50,
-          y: currentNode.position.y + 50,
-        },
-        selected: false,
-      };
-      addNode(newNode);
-    }
-  };
-
   return (
     <>
-      {showToolbar && (
+      {showToolbar && toolbarContent && (
         <NodeToolbar
-          isVisible={selected}
+          isVisible={selected && selectedNodeIds.length === 1}
           position={Position.Top}
           offset={20}
           className="flex gap-1 bg-surface-primary border border-node rounded-lg p-1 shadow-lg"
         >
-          {/* Custom toolbar content (e.g., formatting buttons) */}
           {toolbarContent}
-          {toolbarContent && <div className="w-px h-5 bg-interactive-active mx-1" />}
-          <button
-            onClick={handleDuplicate}
-            className="p-1.5 hover:bg-interactive-hover rounded transition-colors text-theme-text-secondary"
-            title="Duplicate"
-          >
-            <Copy className="w-4 h-4" />
-          </button>
-          <button
-            onClick={handleDelete}
-            className="p-1.5 hover:bg-red-100 dark:hover:bg-red-500/20 rounded transition-colors text-red-500 dark:text-red-400"
-            title="Delete"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
         </NodeToolbar>
       )}
       {resizable && (

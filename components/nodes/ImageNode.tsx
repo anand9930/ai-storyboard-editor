@@ -2,7 +2,7 @@
 
 import { useState, memo, useEffect, useCallback, useMemo } from 'react';
 import { NodeProps } from '@xyflow/react';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Download } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { BaseNode } from './BaseNode';
 import { NODE_ACTIONS, PLACEHOLDER_IMAGE } from '@/types/nodes';
@@ -117,6 +117,29 @@ function ImageNodeComponent({ data, id, selected }: NodeProps<ImageNodeType>) {
     updateNodeData(id, { name: newName });
   }, [id, updateNodeData]);
 
+  // Handle download of generated image
+  const handleDownload = useCallback(() => {
+    if (!nodeData.generatedImage) return;
+
+    const link = document.createElement('a');
+    link.href = nodeData.generatedImage;
+    link.download = `generated-image-${id}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }, [nodeData.generatedImage, id]);
+
+  // Toolbar content - download button when image is generated
+  const toolbarContent = nodeData.generatedImage ? (
+    <button
+      onClick={handleDownload}
+      className="p-1.5 hover:bg-interactive-hover rounded transition-colors text-theme-text-secondary"
+      title="Download image"
+    >
+      <Download className="w-4 h-4" />
+    </button>
+  ) : null;
+
   return (
     <>
       <BaseNode
@@ -125,6 +148,7 @@ function ImageNodeComponent({ data, id, selected }: NodeProps<ImageNodeType>) {
         selected={selected}
         status={nodeData.status}
         onPlusClick={(side) => setPopupSide(side)}
+        toolbarContent={toolbarContent}
         nodeName={nodeData.name}
         onNameChange={handleNameChange}
         noPadding={true}
