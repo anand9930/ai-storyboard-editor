@@ -23,6 +23,7 @@ import {
 import '@xyflow/react/dist/style.css';
 
 import { useWorkflowStore } from '@/store/workflowStore';
+import { useUndoRedoShortcuts } from '@/hooks/useUndoRedoShortcuts';
 import { LeftSidebar } from './LeftSidebar';
 import { ProjectHeader } from './ProjectHeader';
 import { CreditsDisplay } from './CreditsDisplay';
@@ -51,6 +52,9 @@ interface NodeContextMenuState {
 }
 
 export default function FlowCanvas() {
+  // Enable undo/redo keyboard shortcuts (Ctrl+Z / Ctrl+Y)
+  useUndoRedoShortcuts();
+
   const {
     nodes,
     edges,
@@ -84,6 +88,16 @@ export default function FlowCanvas() {
   // Handle React Flow initialization
   const onInit = useCallback((instance: ReactFlowInstance) => {
     reactFlowInstance.current = instance;
+  }, []);
+
+  // Pause history tracking during drag to only record final position
+  const onNodeDragStart = useCallback(() => {
+    useWorkflowStore.temporal.getState().pause();
+  }, []);
+
+  // Resume history tracking when drag ends (records final position)
+  const onNodeDragStop = useCallback(() => {
+    useWorkflowStore.temporal.getState().resume();
   }, []);
 
   // Connection validation - uses nodes from store for consistent reads
@@ -354,6 +368,8 @@ export default function FlowCanvas() {
         onConnect={onConnect}
         onNodeClick={onNodeClick}
         onNodeContextMenu={onNodeContextMenu}
+        onNodeDragStart={onNodeDragStart}
+        onNodeDragStop={onNodeDragStop}
         onPaneClick={onPaneClick}
         onPaneContextMenu={onPaneContextMenu}
         onSelectionContextMenu={onSelectionContextMenu}

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { temporal } from 'zundo';
 import {
   Node,
   Edge,
@@ -11,6 +12,11 @@ import {
 import type { AppNodeData, GroupNodeData } from '@/types/nodes';
 
 export type ColorMode = 'dark' | 'light';
+
+// Flag to batch history entries when node+edge removals happen together
+// React Flow fires onEdgesChange and onNodesChange separately during deletion,
+// so we use microtask batching to combine them into a single history entry.
+let historyBatchScheduled = false;
 
 /**
  * Sorts nodes to ensure parent nodes always appear before their children.
@@ -106,17 +112,18 @@ interface WorkflowState {
 }
 
 export const useWorkflowStore = create<WorkflowState>()(
-  persist(
-    (set, get) => ({
-      // Initial state
-      nodes: [],
-      edges: [],
-      selectedNodeIds: [],
-      selectedEdgeIds: [],
-      clipboard: null,
-      projectName: 'Untitled',
-      credits: 1000,
-      colorMode: 'dark' as ColorMode,
+  temporal(
+    persist(
+      (set, get) => ({
+        // Initial state
+        nodes: [],
+        edges: [],
+        selectedNodeIds: [],
+        selectedEdgeIds: [],
+        clipboard: null,
+        projectName: 'Untitled',
+        credits: 1000,
+        colorMode: 'dark' as ColorMode,
 
       setNodes: (nodes) => set({ nodes: sortNodesWithParentsFirst(nodes) }),
       setEdges: (edges) => set({ edges }),
@@ -125,12 +132,38 @@ export const useWorkflowStore = create<WorkflowState>()(
       setColorMode: (mode) => set({ colorMode: mode }),
 
       onNodesChange: (changes) => {
+        // Batch removal changes with edges to create single undo entry
+        const hasRemoval = changes.some((c) => c.type === 'remove');
+
+        if (hasRemoval && !historyBatchScheduled) {
+          useWorkflowStore.temporal.getState().pause();
+          historyBatchScheduled = true;
+
+          queueMicrotask(() => {
+            useWorkflowStore.temporal.getState().resume();
+            historyBatchScheduled = false;
+          });
+        }
+
         set({
           nodes: applyNodeChanges(changes, get().nodes),
         });
       },
 
       onEdgesChange: (changes) => {
+        // Batch removal changes with nodes to create single undo entry
+        const hasRemoval = changes.some((c) => c.type === 'remove');
+
+        if (hasRemoval && !historyBatchScheduled) {
+          useWorkflowStore.temporal.getState().pause();
+          historyBatchScheduled = true;
+
+          queueMicrotask(() => {
+            useWorkflowStore.temporal.getState().resume();
+            historyBatchScheduled = false;
+          });
+        }
+
         set({
           edges: applyEdgeChanges(changes, get().edges),
         });
@@ -782,15 +815,28 @@ export const useWorkflowStore = create<WorkflowState>()(
         set({ nodes: updatedNodes });
       },
     }),
+      {
+        name: 'storyboard-workflow',
+        partialize: (state) => ({
+          nodes: state.nodes,
+          edges: state.edges,
+          projectName: state.projectName,
+          credits: state.credits,
+          colorMode: state.colorMode,
+        }),
+      }
+    ),
     {
-      name: 'storyboard-workflow',
+      // Only track nodes and edges in undo/redo history (not selection, clipboard, etc.)
       partialize: (state) => ({
         nodes: state.nodes,
         edges: state.edges,
-        projectName: state.projectName,
-        credits: state.credits,
-        colorMode: state.colorMode,
       }),
+      // Limit history to 100 states to prevent memory issues
+      limit: 100,
+      // Custom equality check to prevent duplicate history entries
+      equality: (pastState, currentState) =>
+        JSON.stringify(pastState) === JSON.stringify(currentState),
     }
   )
 );
