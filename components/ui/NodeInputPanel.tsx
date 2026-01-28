@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { FIXED_MODELS } from '@/types/nodes';
 import type { ConnectedImage, AspectRatio, ImageQuality } from '@/types/nodes';
 import { AspectRatioPopover } from './AspectRatioPopover';
+import { ModelSelector } from './ModelSelector';
 
 interface NodeInputPanelProps {
   nodeId: string;
@@ -16,8 +17,10 @@ interface NodeInputPanelProps {
   initialPrompt?: string;
   aspectRatio?: AspectRatio | null;
   quality?: ImageQuality | null;
+  model?: string; // Image model ID (for image nodes)
   onAspectRatioChange?: (value: AspectRatio | null) => void;
   onQualityChange?: (value: ImageQuality | null) => void;
+  onModelChange?: (modelId: string) => void;
   onPromptChange?: (prompt: string) => void;
   error?: string;
   onErrorDismiss?: () => void;
@@ -32,8 +35,10 @@ export function NodeInputPanel({
   initialPrompt = '',
   aspectRatio,
   quality,
+  model,
   onAspectRatioChange,
   onQualityChange,
+  onModelChange,
   onPromptChange,
   error,
   onErrorDismiss,
@@ -54,7 +59,8 @@ export function NodeInputPanel({
     setPrompt(initialPrompt);
   }, [nodeId, initialPrompt]);
 
-  const model = FIXED_MODELS[nodeType];
+  // Text model is still fixed
+  const textModel = FIXED_MODELS.text;
   const placeholder =
     nodeType === 'text'
       ? 'Describe what you want to generate and adjust parameters below. (Enter to generate, Shift+Enter for new line)'
@@ -128,11 +134,23 @@ export function NodeInputPanel({
       {/* Bottom Controls */}
       <div className="flex items-center justify-between pt-3 border-t border-node mt-3">
         <div className="flex items-center gap-3">
-          {/* Model Badge */}
-          <div className="flex items-center gap-1.5 bg-surface-secondary px-2 py-1 rounded-lg">
-            <span className="text-xs text-theme-text-secondary">G</span>
-            <span className="text-sm text-theme-text-primary">{model.name}</span>
-          </div>
+          {/* Model Selection/Badge */}
+          {nodeType === 'text' ? (
+            // Text model is fixed - show badge
+            <div className="flex items-center gap-1.5 bg-surface-secondary px-2 py-1 rounded-lg">
+              <span className="text-xs text-theme-text-secondary">G</span>
+              <span className="text-sm text-theme-text-primary">{textModel.name}</span>
+            </div>
+          ) : (
+            // Image model is selectable
+            model && onModelChange && (
+              <ModelSelector
+                value={model}
+                onChange={onModelChange}
+                disabled={isGenerating}
+              />
+            )
+          )}
 
           {/* Aspect Ratio Popover (for image only) */}
           {nodeType === 'image' && onAspectRatioChange && onQualityChange && (
@@ -141,7 +159,7 @@ export function NodeInputPanel({
               quality={quality ?? null}
               onAspectRatioChange={onAspectRatioChange}
               onQualityChange={onQualityChange}
-              supportedQualities={[]} // Gemini 2.5 Flash only supports 1K (Auto)
+              supportedQualities={[]} // Currently no quality options
             />
           )}
         </div>

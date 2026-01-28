@@ -1,4 +1,5 @@
 import { Node } from '@xyflow/react';
+import { DEFAULT_IMAGE_MODEL } from '@/lib/imageModels';
 
 export type NodeStatus = 'idle' | 'processing' | 'completed' | 'error';
 
@@ -8,10 +9,9 @@ export interface ConnectedImage {
   url: string;
 }
 
-// Fixed models for MVP (no user selection)
+// Fixed model for text generation (image models are now dynamic - see lib/imageModels.ts)
 export const FIXED_MODELS = {
   text: { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash', provider: 'google' },
-  image: { id: 'gemini-2.5-flash-image', name: 'Nano Banana', provider: 'google' },
 } as const;
 
 // Actions available for each node type
@@ -85,6 +85,7 @@ export interface ImageNodeData extends Record<string, unknown> {
   selectedAction: 'image_to_image' | null;
   aspectRatio: AspectRatio | null; // null = Auto
   quality: ImageQuality | null; // null = Auto
+  model: string; // Image model ID from lib/imageModels.ts
   status: NodeStatus;
   error?: string;
 }
@@ -155,6 +156,7 @@ function getDefaultImageNodeData(): ImageNodeData {
     selectedAction: null,
     aspectRatio: null,
     quality: null,
+    model: DEFAULT_IMAGE_MODEL.id,
     status: 'idle',
   };
 }

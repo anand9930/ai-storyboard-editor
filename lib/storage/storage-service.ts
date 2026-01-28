@@ -139,6 +139,43 @@ class R2StorageService implements IStorageService {
   }
 
   /**
+   * Upload an image from a URL to R2
+   * Fetches the image and re-uploads it to R2 for consistent storage
+   */
+  async uploadFromUrl(
+    imageUrl: string,
+    options: UploadOptions = {}
+  ): Promise<UploadResult> {
+    try {
+      // Fetch the image from the URL
+      const response = await fetch(imageUrl);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch image: ${response.status} ${response.statusText}`);
+      }
+
+      // Get the content type from the response
+      const contentType = response.headers.get('content-type') || 'image/png';
+      const format = contentType.split('/')[1] || 'png';
+
+      // Read the response as a buffer
+      const arrayBuffer = await response.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+
+      // Upload to R2
+      return this.uploadBuffer(buffer, {
+        ...options,
+        contentType,
+        filename: options.filename || `image.${format}`,
+      });
+    } catch (error) {
+      if (error instanceof StorageError) {
+        throw error;
+      }
+      throw new StorageError('Failed to upload image from URL', { cause: error });
+    }
+  }
+
+  /**
    * Delete an object from R2
    */
   async delete(key: string): Promise<void> {

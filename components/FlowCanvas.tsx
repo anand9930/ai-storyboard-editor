@@ -299,7 +299,7 @@ export default function FlowCanvas() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               prompt,
-              model: FIXED_MODELS.image.id,
+              model: imageData.model, // Use selected model from node data
               sourceImage: imageData.sourceImage,
               aspectRatio: imageData.aspectRatio, // null = Auto (let API decide)
               quality: imageData.quality, // null = Auto
@@ -362,6 +362,15 @@ export default function FlowCanvas() {
     (value: ImageQuality | null) => {
       if (!selectedNode || selectedNode.type !== 'image') return;
       updateNodeData(selectedNode.id, { quality: value });
+    },
+    [selectedNode, updateNodeData]
+  );
+
+  // Handler for model changes
+  const handleModelChange = useCallback(
+    (modelId: string) => {
+      if (!selectedNode || selectedNode.type !== 'image') return;
+      updateNodeData(selectedNode.id, { model: modelId });
     },
     [selectedNode, updateNodeData]
   );
@@ -482,8 +491,14 @@ export default function FlowCanvas() {
                   ? (selectedNode.data as ImageNodeData).quality
                   : undefined
               }
+              model={
+                selectedNode.type === 'image'
+                  ? (selectedNode.data as ImageNodeData).model
+                  : undefined
+              }
               onAspectRatioChange={handleAspectRatioChange}
               onQualityChange={handleQualityChange}
+              onModelChange={handleModelChange}
               error={
                 selectedNode.type === 'text'
                   ? (selectedNode.data as TextNodeData).error

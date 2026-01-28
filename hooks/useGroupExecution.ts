@@ -99,7 +99,7 @@ export function useGroupExecution({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           prompt: nodeData.prompt,
-          model: FIXED_MODELS.image.id,
+          model: nodeData.model, // Use selected model from node data
           sourceImage: inputImages[0]?.url || nodeData.sourceImage,
           aspectRatio: nodeData.aspectRatio,
           quality: nodeData.quality,
