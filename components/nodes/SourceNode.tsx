@@ -2,11 +2,13 @@
 
 import { useRef, useState, memo, useCallback, useMemo } from 'react';
 import { NodeProps } from '@xyflow/react';
-import { Upload } from 'lucide-react';
+import { Upload, Loader2 } from 'lucide-react';
 import { BaseNode } from './BaseNode';
 import type { SourceNode as SourceNodeType, SourceNodeData } from '@/types/nodes';
 import { useWorkflowStore } from '@/store/workflowStore';
 import { GenerateFromNodePopup } from '../ui/GenerateFromNodePopup';
+import { useImageUpload } from '@/hooks/useImageUpload';
+import { cn } from '@/lib/utils';
 
 // Minimum node dimension constant
 const MIN_SIZE = 240;
@@ -17,6 +19,11 @@ function SourceNodeComponent({ data, id, selected }: NodeProps<SourceNodeType>) 
   const { updateNodeData } = useWorkflowStore();
   const [popupSide, setPopupSide] = useState<'left' | 'right' | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Use the image upload hook for R2 uploads
+  const { upload, isUploading, error } = useImageUpload({
+    folder: 'source',
+  });
 
   // Calculate node dimensions based on image aspect ratio
   // Portrait: width=240, height expands | Landscape: height=240, width expands
@@ -34,30 +41,22 @@ function SourceNodeComponent({ data, id, selected }: NodeProps<SourceNodeType>) 
     }
   }, [nodeData.image?.metadata]);
 
-  // Handle file upload
-  const handleUpload = async (file: File) => {
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      const dataUrl = e.target?.result as string;
+  // Handle file upload to R2
+  const handleUpload = useCallback(async (file: File) => {
+    const result = await upload(file);
 
-      const img = new window.Image();
-      img.onload = () => {
-        updateNodeData(id, {
-          image: {
-            id: `src-${Date.now()}`,
-            url: dataUrl,
-            metadata: {
-              width: img.width,
-              height: img.height,
-              format: file.type.split('/')[1] || 'unknown',
-            },
-          },
-        });
-      };
-      img.src = dataUrl;
-    };
-    reader.readAsDataURL(file);
-  };
+    updateNodeData(id, {
+      image: {
+        id: `src-${Date.now()}`,
+        url: result.url,
+        metadata: {
+          width: result.metadata.width,
+          height: result.metadata.height,
+          format: result.metadata.format,
+        },
+      },
+    });
+  }, [id, updateNodeData, upload]);
 
   // Handle name change
   const handleNameChange = useCallback((newName: string) => {
@@ -93,19 +92,52 @@ function SourceNodeComponent({ data, id, selected }: NodeProps<SourceNodeType>) 
             {/* Upload button - always visible, top right */}
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="absolute top-2 right-2 flex items-center gap-1.5 px-2.5 py-1.5 bg-zinc-800/80 hover:bg-zinc-700/80 text-white text-xs font-medium rounded-md backdrop-blur-sm transition-colors"
+              disabled={isUploading}
+              className={cn(
+                "absolute top-2 right-2 flex items-center gap-1.5 px-2.5 py-1.5 text-white text-xs font-medium rounded-md backdrop-blur-sm transition-colors",
+                isUploading
+                  ? "bg-zinc-600/80 cursor-not-allowed"
+                  : "bg-zinc-800/80 hover:bg-zinc-700/80"
+              )}
             >
-              <Upload className="w-3.5 h-3.5" />
-              Upload
+              {isUploading ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <>
+                  <Upload className="w-3.5 h-3.5" />
+                  Upload
+                </>
+              )}
             </button>
           </div>
         ) : (
           <div
-            onClick={() => fileInputRef.current?.click()}
-            className="w-full h-full bg-surface-secondary border-2 border-dashed border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 rounded-xl flex flex-col items-center justify-center cursor-pointer transition-colors"
+            onClick={() => !isUploading && fileInputRef.current?.click()}
+            className={cn(
+              "w-full h-full bg-surface-secondary border-2 border-dashed rounded-xl flex flex-col items-center justify-center transition-colors",
+              isUploading
+                ? "border-zinc-500 cursor-not-allowed"
+                : "border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 cursor-pointer"
+            )}
           >
-            <Upload className="w-8 h-8 text-zinc-400 dark:text-zinc-600 mb-2" />
-            <span className="text-xs text-zinc-500">Click to upload</span>
+            {isUploading ? (
+              <>
+                <Loader2 className="w-8 h-8 text-zinc-400 dark:text-zinc-600 mb-2 animate-spin" />
+                <span className="text-xs text-zinc-500">Uploading...</span>
+              </>
+            ) : (
+              <>
+                <Upload className="w-8 h-8 text-zinc-400 dark:text-zinc-600 mb-2" />
+                <span className="text-xs text-zinc-500">Click to upload</span>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Error display */}
+        {error && (
+          <div className="absolute bottom-2 left-2 right-2 bg-red-500/90 text-white text-xs px-2 py-1 rounded">
+            {error}
           </div>
         )}
 

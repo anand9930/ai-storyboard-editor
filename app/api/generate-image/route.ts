@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 import { z } from 'zod';
+import { storageService } from '@/lib/storage';
 
 // Zod schema for request validation
 const generateImageSchema = z.object({
@@ -21,6 +22,26 @@ interface GeminiPart {
   };
 }
 
+/**
+ * Fetch image from URL and convert to base64
+ * Used when source image is an R2 URL instead of base64
+ */
+async function fetchImageAsBase64(url: string): Promise<string> {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch source image: ${response.status}`);
+  }
+
+  const arrayBuffer = await response.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+  const base64 = buffer.toString('base64');
+
+  // Get content type from response headers
+  const contentType = response.headers.get('content-type') || 'image/png';
+
+  return `data:${contentType};base64,${base64}`;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -34,13 +55,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { prompt, sourceImage, aspectRatio } = parseResult.data;
+    let { prompt, sourceImage, aspectRatio } = parseResult.data;
 
     if (!process.env.GEMINI_API_KEY) {
       return NextResponse.json(
         { error: 'GEMINI_API_KEY is not configured' },
         { status: 500 }
       );
+    }
+
+    // If source image is a URL (not base64), fetch and convert it
+    if (sourceImage && !sourceImage.startsWith('data:')) {
+      sourceImage = await fetchImageAsBase64(sourceImage);
     }
 
     // Initialize the new Google GenAI client
@@ -121,10 +147,18 @@ export async function POST(req: NextRequest) {
       throw new Error('No image in response');
     }
 
-    // Convert to data URL
-    const imageUrl = `data:${imagePart.inlineData.mimeType};base64,${imagePart.inlineData.data}`;
+    // Create base64 data URL for upload
+    const base64DataUrl = `data:${imagePart.inlineData.mimeType};base64,${imagePart.inlineData.data}`;
 
-    return NextResponse.json({ imageUrl });
+    // Upload to R2
+    const uploadResult = await storageService.uploadBase64(base64DataUrl, {
+      folder: 'generated',
+    });
+
+    return NextResponse.json({
+      imageUrl: uploadResult.url,
+      key: uploadResult.key,
+    });
   } catch (error) {
     console.error('Image generation failed:', error);
     const message = error instanceof Error ? error.message : 'Failed to generate image';
