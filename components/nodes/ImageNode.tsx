@@ -58,13 +58,15 @@ function ImageNodeComponent({ data, id, selected }: NodeProps<ImageNodeType>) {
   }, [isConnected, id, nodeData.selectedAction, nodeData.generatedImage, updateNodeData]);
 
   // Update source images when connections change (separate from auto-transition)
+  // Uses JSON.stringify for deep comparison to detect changes to ANY connected image,
+  // not just the first one or count changes
   useEffect(() => {
-    const firstImageUrl = sourceImages[0]?.url;
-    const currentFirstUrl = nodeData.connectedSourceImages?.[0]?.url;
+    const currentJson = JSON.stringify(nodeData.connectedSourceImages || []);
+    const newJson = JSON.stringify(sourceImages);
 
-    if (firstImageUrl !== currentFirstUrl || sourceImages.length !== (nodeData.connectedSourceImages?.length ?? 0)) {
+    if (currentJson !== newJson) {
       updateNodeData(id, {
-        sourceImage: firstImageUrl,
+        sourceImage: sourceImages[0]?.url,
         connectedSourceImages: sourceImages,
       });
     }

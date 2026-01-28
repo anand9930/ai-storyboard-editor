@@ -9,7 +9,7 @@ import { DEFAULT_IMAGE_MODEL } from '@/lib/imageModels';
 const generateImageSchema = z.object({
   prompt: z.string().min(1, 'Prompt is required'),
   model: z.string().default(DEFAULT_IMAGE_MODEL.id),
-  sourceImage: z.string().optional(), // R2 URL for image-to-image
+  sourceImages: z.array(z.string()).optional().default([]), // Array of R2 URLs for image-to-image
   aspectRatio: z
     .enum(['1:1', '9:16', '16:9', '3:4', '4:3', '3:2', '2:3', '5:4', '4:5', '21:9'])
     .optional()
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { prompt, model, sourceImage, aspectRatio } = parseResult.data;
+    const { prompt, model, sourceImages, aspectRatio } = parseResult.data;
 
     // Verify Runware API key is configured
     if (!process.env.RUNWARE_API_KEY) {
@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
     await generateImage({
       prompt,
       model,
-      seedImage: sourceImage, // R2 URL passed directly - Runware supports URLs
+      seedImages: sourceImages, // Array of R2 URLs passed directly - Runware supports URLs
       width,
       height,
       uploadEndpoint: presignedData.uploadUrl,

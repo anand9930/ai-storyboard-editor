@@ -16,8 +16,8 @@ export interface ImageGenerationParams {
   prompt: string;
   /** Model AIR ID (e.g., 'google:4@2') */
   model: string;
-  /** Source image URL for image-to-image (R2 URL or public URL) */
-  seedImage?: string;
+  /** Source image URLs for image-to-image (R2 URLs or public URLs) */
+  seedImages?: string[];
   /** Output image width */
   width?: number;
   /** Output image height */
@@ -68,14 +68,15 @@ export function buildModelProviderRequest(
   }
 
   // Handle image-to-image based on provider mechanism
-  if (params.seedImage) {
+  if (params.seedImages && params.seedImages.length > 0) {
     if (capabilities.supportsReferenceImages) {
-      // Google: uses referenceImages array instead of seedImage
+      // Google: uses referenceImages array, supports up to 14 images
       // Note: Google auto-matches aspect ratio from reference image
-      request.referenceImages = [params.seedImage];
+      const maxImages = capabilities.maxReferenceImages ?? 14;
+      request.referenceImages = params.seedImages.slice(0, maxImages);
     } else if (capabilities.supportsSeedImage) {
-      // FLUX/SDXL: uses standard seedImage + strength
-      request.seedImage = params.seedImage;
+      // FLUX/SDXL: uses standard seedImage + strength (only supports single image)
+      request.seedImage = params.seedImages[0];
 
       if (capabilities.supportsStrength) {
         const strength = params.strength ?? 0.8;
@@ -86,7 +87,7 @@ export function buildModelProviderRequest(
         request.strength = effectiveStrength;
       }
     }
-    // If provider supports neither, seedImage is silently ignored
+    // If provider supports neither, seedImages is silently ignored
   }
 
   // Pass through uploadEndpoint for direct storage upload

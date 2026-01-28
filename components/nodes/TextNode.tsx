@@ -55,13 +55,13 @@ function TextNodeComponent({ data, id, selected }: NodeProps<TextNodeType>) {
   }, [isConnected, connectedNodeTypes, id, nodeData.selectedAction, nodeData.content, updateNodeData]);
 
   // Update connected source images when connections change (separate from auto-transition)
+  // Uses JSON.stringify for deep comparison to detect changes to ANY connected image,
+  // not just the first one or count changes
   useEffect(() => {
-    const currentLength = nodeData.connectedSourceImages?.length ?? 0;
-    const currentFirstUrl = nodeData.connectedSourceImages?.[0]?.url;
-    const newFirstUrl = sourceImages[0]?.url;
+    const currentJson = JSON.stringify(nodeData.connectedSourceImages || []);
+    const newJson = JSON.stringify(sourceImages);
 
-    // Only update if the images actually changed
-    if (sourceImages.length !== currentLength || newFirstUrl !== currentFirstUrl) {
+    if (currentJson !== newJson) {
       updateNodeData(id, {
         connectedSourceImages: sourceImages,
       });

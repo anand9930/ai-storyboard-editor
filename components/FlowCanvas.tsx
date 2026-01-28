@@ -300,7 +300,7 @@ export default function FlowCanvas() {
             body: JSON.stringify({
               prompt,
               model: imageData.model, // Use selected model from node data
-              sourceImage: imageData.sourceImage,
+              sourceImages: (imageData.connectedSourceImages || []).map(img => img.url), // Send ALL image URLs
               aspectRatio: imageData.aspectRatio, // null = Auto (let API decide)
               quality: imageData.quality, // null = Auto
             }),

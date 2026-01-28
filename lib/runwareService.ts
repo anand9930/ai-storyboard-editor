@@ -37,10 +37,10 @@ export async function getRunwareClient(): Promise<RunwareServer> {
 /**
  * Generate an image using the Runware API.
  *
- * Supports both text-to-image (no seedImage) and image-to-image (with seedImage).
+ * Supports both text-to-image (no seedImages) and image-to-image (with seedImages).
  * Automatically handles provider-specific parameters:
- * - Google: uses referenceImages instead of seedImage/strength
- * - FLUX/SDXL: uses seedImage + strength
+ * - Google: uses referenceImages (supports up to 14 images)
+ * - FLUX/SDXL: uses seedImage + strength (only first image used)
  *
  * @param params - Generation parameters
  * @returns Array of generated images (typically 1)
@@ -52,11 +52,11 @@ export async function getRunwareClient(): Promise<RunwareServer> {
  *   model: 'google:4@2',
  * });
  *
- * // Image-to-image (Google uses referenceImages automatically)
+ * // Image-to-image with multiple references (Google supports up to 14)
  * const images = await generateImage({
- *   prompt: 'Make it more vibrant',
+ *   prompt: 'Combine styles from these images',
  *   model: 'google:4@2',
- *   seedImage: 'https://r2.example.com/source.png',
+ *   seedImages: ['https://r2.example.com/ref1.png', 'https://r2.example.com/ref2.png'],
  * });
  */
 export async function generateImage(
