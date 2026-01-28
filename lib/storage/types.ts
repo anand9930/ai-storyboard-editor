@@ -60,14 +60,6 @@ export interface IStorageService {
   uploadBuffer(buffer: Buffer, options?: UploadOptions): Promise<UploadResult>;
 
   /**
-   * Upload an image from a URL
-   * Fetches the image and re-uploads it to storage
-   * @param imageUrl - URL of the image to fetch and upload
-   * @param options - Upload options
-   */
-  uploadFromUrl(imageUrl: string, options?: UploadOptions): Promise<UploadResult>;
-
-  /**
    * Generate a presigned URL for direct browser upload
    * @param options - Presigned URL options
    */

@@ -42,30 +42,25 @@ export async function POST(req: NextRequest) {
     // Convert aspect ratio to width/height dimensions
     const { width, height } = aspectRatioToDimensions(aspectRatio ?? null);
 
-    // Generate image using Runware SDK
-    const results = await generateImage({
+    // Generate presigned URL for direct Runware upload to R2
+    const presignedData = await storageService.generatePresignedUploadUrl({
+      folder: 'generated',
+      contentType: 'image/png',
+    });
+
+    // Generate image using Runware SDK with direct upload to R2
+    await generateImage({
       prompt,
       model,
       seedImage: sourceImage, // R2 URL passed directly - Runware supports URLs
       width,
       height,
-    });
-
-    // Get the generated image URL
-    const generatedImageUrl = results[0]?.imageURL;
-
-    if (!generatedImageUrl) {
-      throw new Error('No image URL returned from generation');
-    }
-
-    // Re-upload to R2 for consistent storage and long-term access
-    const uploadResult = await storageService.uploadFromUrl(generatedImageUrl, {
-      folder: 'generated',
+      uploadEndpoint: presignedData.uploadUrl,
     });
 
     return NextResponse.json({
-      imageUrl: uploadResult.url,
-      key: uploadResult.key,
+      imageUrl: presignedData.publicUrl,
+      key: presignedData.key,
     });
   } catch (error) {
     console.error('Image generation failed:', error);

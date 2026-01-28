@@ -28,6 +28,8 @@ export interface ImageGenerationParams {
   strength?: number;
   /** Negative prompt */
   negativePrompt?: string;
+  /** Presigned URL for direct upload (Runware uploads directly to this URL) */
+  uploadEndpoint?: string;
 }
 
 /**
@@ -85,6 +87,11 @@ export function buildModelProviderRequest(
       }
     }
     // If provider supports neither, seedImage is silently ignored
+  }
+
+  // Pass through uploadEndpoint for direct storage upload
+  if (params.uploadEndpoint) {
+    request.uploadEndpoint = params.uploadEndpoint;
   }
 
   return request;
