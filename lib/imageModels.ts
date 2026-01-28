@@ -24,6 +24,12 @@ export interface ImageModel {
  */
 export const IMAGE_MODELS: ImageModel[] = [
   {
+    id: 'google:4@1',
+    name: 'Nano Banana',
+    defaultWidth: 1024,
+    defaultHeight: 1024,
+  },
+  {
     id: 'google:4@2',
     name: 'Banana Pro',
     defaultWidth: 1024,
