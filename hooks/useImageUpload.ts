@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { validateImage } from '@/lib/imageValidation';
 
 /**
  * Image metadata from upload
@@ -96,10 +97,16 @@ export function useImageUpload(
       setError(null);
 
       try {
-        // Step 1: Validate image and get dimensions first
+        // Step 1: Validate image (format, size, dimensions)
+        const validation = await validateImage(file);
+        if (!validation.valid) {
+          throw new Error(validation.error);
+        }
+
+        // Step 2: Get dimensions for metadata
         const dimensions = await getImageDimensions(file);
 
-        // Step 2: Get presigned URL from our API
+        // Step 3: Get presigned URL from our API
         const presignedRes = await fetch('/api/storage/presigned', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -118,7 +125,7 @@ export function useImageUpload(
 
         const { uploadUrl, publicUrl, key } = await presignedRes.json();
 
-        // Step 3: Upload directly to R2 using presigned URL
+        // Step 4: Upload directly to R2 using presigned URL
         const uploadRes = await fetch(uploadUrl, {
           method: 'PUT',
           body: file,
