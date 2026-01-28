@@ -32,8 +32,8 @@ function TextNodeComponent({ data, id, selected }: NodeProps<TextNodeType>) {
   const [editor, setEditor] = useState<Editor | null>(null);
   const [showFullScreen, setShowFullScreen] = useState(false);
 
-  // Use custom hook for source image tracking (returns array of all connected images)
-  const { sourceImages, isConnected, connectedNodeTypes } = useSourceConnection({
+  // Use custom hook for source image and text tracking
+  const { sourceImages, sourceTexts, isConnected, connectedNodeTypes } = useSourceConnection({
     nodeId: id,
   });
 
@@ -67,6 +67,18 @@ function TextNodeComponent({ data, id, selected }: NodeProps<TextNodeType>) {
       });
     }
   }, [sourceImages, id, nodeData.connectedSourceImages, updateNodeData]);
+
+  // Update connected source texts when connections change (for TextNode -> TextNode connections)
+  useEffect(() => {
+    const currentJson = JSON.stringify(nodeData.connectedSourceTexts || []);
+    const newJson = JSON.stringify(sourceTexts);
+
+    if (currentJson !== newJson) {
+      updateNodeData(id, {
+        connectedSourceTexts: sourceTexts,
+      });
+    }
+  }, [sourceTexts, id, nodeData.connectedSourceTexts, updateNodeData]);
 
   // Create a source node with placeholder image and connect it to this text node
   const createSourceNodeWithConnection = useCallback(() => {

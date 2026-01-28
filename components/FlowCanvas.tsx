@@ -271,11 +271,24 @@ export default function FlowCanvas() {
       try {
         if (selectedNode.type === 'text') {
           const textData = selectedNode.data as TextNodeData;
+
+          // Build combined prompt: user prompt + connected TextNode contents
+          let combinedPrompt = prompt;
+          if (textData.connectedSourceTexts?.length) {
+            const textContents = textData.connectedSourceTexts
+              .map(t => t.content.replace(/<[^>]*>/g, '').trim()) // Strip HTML tags
+              .filter(t => t.length > 0);
+
+            if (textContents.length > 0) {
+              combinedPrompt = prompt + '\n\n' + textContents.join('\n\n');
+            }
+          }
+
           const response = await fetch('/api/generate-text', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              prompt,
+              prompt: combinedPrompt, // Combined prompt with connected texts
               model: FIXED_MODELS.text.id,
               images: textData.connectedSourceImages || [],
             }),
@@ -294,11 +307,24 @@ export default function FlowCanvas() {
           });
         } else if (selectedNode.type === 'image') {
           const imageData = selectedNode.data as ImageNodeData;
+
+          // Build combined prompt: user prompt + connected TextNode contents
+          let combinedPrompt = prompt;
+          if (imageData.connectedSourceTexts?.length) {
+            const textContents = imageData.connectedSourceTexts
+              .map(t => t.content.replace(/<[^>]*>/g, '').trim()) // Strip HTML tags
+              .filter(t => t.length > 0);
+
+            if (textContents.length > 0) {
+              combinedPrompt = prompt + '\n\n' + textContents.join('\n\n');
+            }
+          }
+
           const response = await fetch('/api/generate-image', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              prompt,
+              prompt: combinedPrompt, // Combined prompt with connected texts
               model: imageData.model, // Use selected model from node data
               sourceImages: (imageData.connectedSourceImages || []).map(img => img.url), // Send ALL image URLs
               aspectRatio: imageData.aspectRatio, // null = Auto (let API decide)

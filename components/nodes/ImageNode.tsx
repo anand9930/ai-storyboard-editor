@@ -24,8 +24,8 @@ function ImageNodeComponent({ data, id, selected }: NodeProps<ImageNodeType>) {
   const { updateNodeData, setSelectedNodeIds, addNode, addEdge, nodes } = useWorkflowStore();
   const [popupSide, setPopupSide] = useState<'left' | 'right' | null>(null);
 
-  // Use custom hook for source image tracking (returns array of all connected images)
-  const { sourceImages, isConnected } = useSourceConnection({
+  // Use custom hook for source image and text tracking
+  const { sourceImages, sourceTexts, isConnected } = useSourceConnection({
     nodeId: id,
   });
 
@@ -66,11 +66,22 @@ function ImageNodeComponent({ data, id, selected }: NodeProps<ImageNodeType>) {
 
     if (currentJson !== newJson) {
       updateNodeData(id, {
-        sourceImage: sourceImages[0]?.url,
         connectedSourceImages: sourceImages,
       });
     }
   }, [sourceImages, id, nodeData.connectedSourceImages, updateNodeData]);
+
+  // Update source texts when connections change (for TextNode -> ImageNode connections)
+  useEffect(() => {
+    const currentJson = JSON.stringify(nodeData.connectedSourceTexts || []);
+    const newJson = JSON.stringify(sourceTexts);
+
+    if (currentJson !== newJson) {
+      updateNodeData(id, {
+        connectedSourceTexts: sourceTexts,
+      });
+    }
+  }, [sourceTexts, id, nodeData.connectedSourceTexts, updateNodeData]);
 
   // Create a source node with placeholder image and connect it to this image node
   const createSourceNodeWithConnection = useCallback(() => {

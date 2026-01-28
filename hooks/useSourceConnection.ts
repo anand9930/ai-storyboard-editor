@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import { useNodeConnections, useNodesData } from '@xyflow/react';
-import type { AppNode, SourceNodeData, ImageNodeData, ConnectedImage } from '@/types/nodes';
+import type { AppNode, SourceNodeData, ImageNodeData, TextNodeData, ConnectedImage, ConnectedText } from '@/types/nodes';
 
 interface UseSourceConnectionOptions {
   nodeId: string;
@@ -10,6 +10,7 @@ interface UseSourceConnectionOptions {
 
 interface UseSourceConnectionResult {
   sourceImages: ConnectedImage[];
+  sourceTexts: ConnectedText[];
   isConnected: boolean;
   connectedNodeIds: string[];
   connectedNodeTypes: string[];
@@ -56,36 +57,45 @@ export function useSourceConnection({
     [connectedNodesData]
   );
 
-  // Extract all source images from connected nodes
-  const sourceImages = useMemo(() => {
+  // Extract all source images and texts from connected nodes
+  const { sourceImages, sourceTexts } = useMemo(() => {
     const images: ConnectedImage[] = [];
+    const texts: ConnectedText[] = [];
 
     for (const node of connectedNodesData) {
       if (!node) continue;
 
-      let imageUrl: string | undefined;
-
       // Check if it's a source node with an image
       if (node.type === 'source') {
         const sourceData = node.data as SourceNodeData;
-        imageUrl = sourceData?.image?.url;
+        const imageUrl = sourceData?.image?.url;
+        if (imageUrl) {
+          images.push({ id: node.id, url: imageUrl });
+        }
       }
       // Check if it's an image node with a generated image
       else if (node.type === 'image') {
         const imageData = node.data as ImageNodeData;
-        imageUrl = imageData?.generatedImage;
+        const imageUrl = imageData?.generatedImage;
+        if (imageUrl) {
+          images.push({ id: node.id, url: imageUrl });
+        }
       }
-
-      if (imageUrl) {
-        images.push({ id: node.id, url: imageUrl });
+      // Check if it's a text node with content
+      else if (node.type === 'text') {
+        const textData = node.data as TextNodeData;
+        if (textData?.content) {
+          texts.push({ id: node.id, content: textData.content });
+        }
       }
     }
 
-    return images;
+    return { sourceImages: images, sourceTexts: texts };
   }, [connectedNodesData]);
 
   return {
     sourceImages,
+    sourceTexts,
     isConnected: connectedNodeIds.length > 0,
     connectedNodeIds,
     connectedNodeTypes,

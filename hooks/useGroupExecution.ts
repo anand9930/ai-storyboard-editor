@@ -60,11 +60,22 @@ export function useGroupExecution({
     ): Promise<ExecutionOutput> => {
       const nodeData = node.data as TextNodeData;
 
+      // Build combined prompt: node prompt + connected text contents
+      let combinedPrompt = nodeData.prompt;
+      if (nodeData.connectedSourceTexts?.length) {
+        const textContents = nodeData.connectedSourceTexts
+          .map(t => t.content.replace(/<[^>]*>/g, '').trim())
+          .filter(t => t.length > 0);
+        if (textContents.length > 0) {
+          combinedPrompt = nodeData.prompt + '\n\n' + textContents.join('\n\n');
+        }
+      }
+
       const response = await fetch('/api/generate-text', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          prompt: nodeData.prompt,
+          prompt: combinedPrompt,
           model: FIXED_MODELS.text.id,
           images: inputImages,
         }),
@@ -94,13 +105,24 @@ export function useGroupExecution({
     ): Promise<ExecutionOutput> => {
       const nodeData = node.data as ImageNodeData;
 
+      // Build combined prompt: node prompt + connected text contents
+      let combinedPrompt = nodeData.prompt;
+      if (nodeData.connectedSourceTexts?.length) {
+        const textContents = nodeData.connectedSourceTexts
+          .map(t => t.content.replace(/<[^>]*>/g, '').trim())
+          .filter(t => t.length > 0);
+        if (textContents.length > 0) {
+          combinedPrompt = nodeData.prompt + '\n\n' + textContents.join('\n\n');
+        }
+      }
+
       const response = await fetch('/api/generate-image', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          prompt: nodeData.prompt,
-          model: nodeData.model, // Use selected model from node data
-          sourceImage: inputImages[0]?.url || nodeData.sourceImage,
+          prompt: combinedPrompt,
+          model: nodeData.model,
+          sourceImages: inputImages.map(img => img.url), // Array of URLs
           aspectRatio: nodeData.aspectRatio,
           quality: nodeData.quality,
         }),

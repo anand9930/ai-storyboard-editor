@@ -9,6 +9,12 @@ export interface ConnectedImage {
   url: string;
 }
 
+// Shared type for connected source texts (from TextNodes)
+export interface ConnectedText {
+  id: string;
+  content: string;
+}
+
 // Fixed model for text generation (image models are now dynamic - see lib/imageModels.ts)
 export const FIXED_MODELS = {
   text: { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash', provider: 'google' },
@@ -45,6 +51,7 @@ export interface TextNodeData extends Record<string, unknown> {
   prompt: string;
   selectedAction: 'write' | 'prompt_from_image' | null;
   connectedSourceImages?: ConnectedImage[];
+  connectedSourceTexts?: ConnectedText[];
   status: NodeStatus;
   error?: string;
 }
@@ -74,8 +81,8 @@ export const IMAGE_QUALITIES: { value: ImageQuality; label: string }[] = [
 
 export interface ImageNodeData extends Record<string, unknown> {
   name: string;
-  sourceImage?: string;
   connectedSourceImages?: ConnectedImage[];
+  connectedSourceTexts?: ConnectedText[];
   generatedImage?: string;
   generatedImageMetadata?: {
     width: number;
@@ -150,7 +157,6 @@ function getDefaultTextNodeData(): TextNodeData {
 function getDefaultImageNodeData(): ImageNodeData {
   return {
     name: 'Image',
-    sourceImage: undefined,
     generatedImage: undefined,
     prompt: '',
     selectedAction: null,
