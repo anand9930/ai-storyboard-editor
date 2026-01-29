@@ -8,7 +8,7 @@
  * Supported model providers in Runware
  * Model AIR ID format: source:id@version (e.g., google:4@2)
  */
-export type ModelProviderType = 'google' | 'default';
+export type ModelProviderType = 'google' | 'bfl' | 'bytedance' | 'default';
 
 /**
  * Capabilities that define what parameters a model provider supports
@@ -38,6 +38,28 @@ export interface ModelProviderCapabilities {
 export const MODEL_PROVIDER_CAPABILITIES: Record<ModelProviderType, ModelProviderCapabilities> = {
   // Google Imagen models use referenceImages instead of seedImage/strength
   google: {
+    supportsImageToImage: true,
+    supportsSeedImage: false,
+    supportsReferenceImages: true,
+    supportsStrength: false,
+    supportsNegativePrompt: false,
+    supportsSteps: false,
+    maxReferenceImages: 14,
+  },
+
+  // Black Forest Labs Flux Kontext models use referenceImages
+  bfl: {
+    supportsImageToImage: true,
+    supportsSeedImage: false,
+    supportsReferenceImages: true,
+    supportsStrength: false,
+    supportsNegativePrompt: false,
+    supportsSteps: false,
+    maxReferenceImages: 2,
+  },
+
+  // ByteDance Seedream models use referenceImages
+  bytedance: {
     supportsImageToImage: true,
     supportsSeedImage: false,
     supportsReferenceImages: true,

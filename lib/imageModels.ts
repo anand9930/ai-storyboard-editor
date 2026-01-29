@@ -35,6 +35,30 @@ export const IMAGE_MODELS: ImageModel[] = [
     defaultWidth: 1024,
     defaultHeight: 1024,
   },
+  {
+    id: 'bfl:4@1',
+    name: 'Flux Max',
+    defaultWidth: 1024,
+    defaultHeight: 1024,
+  },
+  {
+    id: 'bfl:3@1',
+    name: 'Flux',
+    defaultWidth: 1024,
+    defaultHeight: 1024,
+  },
+  {
+    id: 'bytedance:seedream@4.5',
+    name: 'Seedream 4.5',
+    defaultWidth: 2048,
+    defaultHeight: 2048,
+  },
+  {
+    id: 'bytedance:4@1',
+    name: 'Seedream 4',
+    defaultWidth: 2048,
+    defaultHeight: 2048,
+  },
 ];
 
 /** Default model used when creating new image nodes */

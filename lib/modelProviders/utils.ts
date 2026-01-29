@@ -25,6 +25,12 @@ export function getModelProvider(modelId: string): ModelProviderType {
   if (prefix === 'google') {
     return 'google';
   }
+  if (prefix === 'bfl') {
+    return 'bfl';
+  }
+  if (prefix === 'bytedance') {
+    return 'bytedance';
+  }
   return 'default';
 }
 
