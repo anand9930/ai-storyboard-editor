@@ -4,6 +4,7 @@ import { storageService } from '@/lib/storage';
 import { generateImage } from '@/lib/runwareService';
 import { aspectRatioToDimensions } from '@/lib/aspectRatioUtils';
 import { DEFAULT_IMAGE_MODEL } from '@/lib/imageModels';
+import { extractRunwareErrorMessage } from '@/lib/errors/runwareErrors';
 
 // Zod schema for request validation
 const generateImageSchema = z.object({
@@ -64,7 +65,7 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error('Image generation failed:', error);
-    const message = error instanceof Error ? error.message : 'Failed to generate image';
+    const message = extractRunwareErrorMessage(error);
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
