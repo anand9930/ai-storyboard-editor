@@ -153,13 +153,13 @@ export function NodeInputPanel({
           )}
 
           {/* Aspect Ratio Popover (for image only) */}
-          {nodeType === 'image' && onAspectRatioChange && onQualityChange && (
+          {nodeType === 'image' && model && onAspectRatioChange && onQualityChange && (
             <AspectRatioPopover
               aspectRatio={aspectRatio ?? null}
               quality={quality ?? null}
+              modelId={model}
               onAspectRatioChange={onAspectRatioChange}
               onQualityChange={onQualityChange}
-              supportedQualities={[]} // Currently no quality options
             />
           )}
         </div>

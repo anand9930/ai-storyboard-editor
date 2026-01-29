@@ -35,6 +35,7 @@ import { NodeContextMenu } from './ui/NodeContextMenu';
 import { FIXED_MODELS } from '@/types/nodes';
 import type { AppNode, ImageNodeData, TextNodeData, AspectRatio, ImageQuality } from '@/types/nodes';
 import { nodeTypes, defaultEdgeOptions, isValidNodeConnection } from '@/lib/flowConfig';
+import { getModelDefaults } from '@/lib/modelSpecs';
 
 // Canvas context menu state interface
 interface ContextMenuState {
@@ -392,11 +393,16 @@ export default function FlowCanvas() {
     [selectedNode, updateNodeData]
   );
 
-  // Handler for model changes
+  // Handler for model changes - resets quality and aspectRatio to new model's defaults
   const handleModelChange = useCallback(
     (modelId: string) => {
       if (!selectedNode || selectedNode.type !== 'image') return;
-      updateNodeData(selectedNode.id, { model: modelId });
+      const defaults = getModelDefaults(modelId);
+      updateNodeData(selectedNode.id, {
+        model: modelId,
+        quality: defaults.quality,
+        aspectRatio: defaults.aspectRatio,
+      });
     },
     [selectedNode, updateNodeData]
   );

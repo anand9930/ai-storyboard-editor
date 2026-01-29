@@ -2,17 +2,20 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { storageService } from '@/lib/storage';
 import { generateImage } from '@/lib/runwareService';
-import { aspectRatioToDimensions } from '@/lib/aspectRatioUtils';
-import { DEFAULT_IMAGE_MODEL } from '@/lib/imageModels';
+import { getDimensions, DEFAULT_MODEL_SPEC } from '@/lib/modelSpecs';
 import { extractRunwareErrorMessage } from '@/lib/errors/runwareErrors';
 
 // Zod schema for request validation
 const generateImageSchema = z.object({
   prompt: z.string().min(1, 'Prompt is required'),
-  model: z.string().default(DEFAULT_IMAGE_MODEL.id),
+  model: z.string().default(DEFAULT_MODEL_SPEC.id),
   sourceImages: z.array(z.string()).optional().default([]), // Array of R2 URLs for image-to-image
   aspectRatio: z
-    .enum(['1:1', '9:16', '16:9', '3:4', '4:3', '3:2', '2:3', '5:4', '4:5', '21:9'])
+    .enum(['1:1', '9:16', '16:9', '3:4', '4:3', '3:2', '2:3', '5:4', '4:5', '21:9', '9:21'])
+    .optional()
+    .nullable(),
+  quality: z
+    .enum(['Auto', '1K', '2K', '4K'])
     .optional()
     .nullable(),
 });
@@ -30,7 +33,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { prompt, model, sourceImages, aspectRatio } = parseResult.data;
+    const { prompt, model, sourceImages, aspectRatio, quality } = parseResult.data;
 
     // Verify Runware API key is configured
     if (!process.env.RUNWARE_API_KEY) {
@@ -40,8 +43,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Convert aspect ratio to width/height dimensions
-    const { width, height } = aspectRatioToDimensions(aspectRatio ?? null);
+    // Get dimensions based on model, quality, and aspect ratio
+    const { width, height } = getDimensions(model, quality ?? null, aspectRatio ?? null);
 
     // Generate presigned URL for direct Runware upload to R2
     const presignedData = await storageService.generatePresignedUploadUrl({

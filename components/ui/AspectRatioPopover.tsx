@@ -5,14 +5,15 @@ import * as Popover from '@radix-ui/react-popover';
 import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { AspectRatio, ImageQuality } from '@/types/nodes';
-import { ASPECT_RATIOS, IMAGE_QUALITIES } from '@/types/nodes';
+import { getModelSpec, DEFAULT_MODEL_SPEC } from '@/lib/modelSpecs';
+import type { Quality } from '@/lib/modelSpecs';
 
 interface AspectRatioPopoverProps {
   aspectRatio: AspectRatio | null;
   quality: ImageQuality | null;
+  modelId: string;
   onAspectRatioChange: (value: AspectRatio | null) => void;
   onQualityChange: (value: ImageQuality | null) => void;
-  supportedQualities?: ImageQuality[]; // If empty or undefined, show only "Auto"
 }
 
 // SVG icons for aspect ratios - colors inherit from text via currentColor
@@ -41,6 +42,8 @@ function AspectRatioIcon({ ratio, className }: { ratio: AspectRatio | 'auto'; cl
         return { width: 10, height: 12 };
       case '21:9':
         return { width: 16, height: 7 };
+      case '9:21':
+        return { width: 7, height: 16 };
       default:
         return { width: 12, height: 12 };
     }
@@ -78,15 +81,22 @@ function AspectRatioIcon({ ratio, className }: { ratio: AspectRatio | 'auto'; cl
 export function AspectRatioPopover({
   aspectRatio,
   quality,
+  modelId,
   onAspectRatioChange,
   onQualityChange,
-  supportedQualities = [],
 }: AspectRatioPopoverProps) {
   const [open, setOpen] = useState(false);
 
+  // Get model spec for supported options
+  const modelSpec = getModelSpec(modelId) ?? DEFAULT_MODEL_SPEC;
+  const supportedQualities = modelSpec.supportedQualities;
+  const supportedAspectRatios = modelSpec.supportedAspectRatios;
+
+  // For single-quality models, show quality as non-interactive
+  const isSingleQuality = supportedQualities.length === 1;
+
   const displayAspectRatio = aspectRatio || 'Auto';
-  const displayQuality = quality || 'Auto';
-  const showQualityOptions = supportedQualities.length > 0;
+  const displayQuality = quality || supportedQualities[0] || 'Auto';
 
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
@@ -126,33 +136,32 @@ export function AspectRatioPopover({
           {/* Quality Section */}
           <div className="mb-4">
             <h4 className="text-xs text-theme-text-muted mb-2 font-medium">Quality</h4>
-            {showQualityOptions ? (
+            {isSingleQuality ? (
+              <button
+                className={cn(
+                  'w-full flex items-center justify-center px-3 py-2 rounded-lg text-sm',
+                  'bg-interactive-active text-theme-text-primary cursor-default'
+                )}
+              >
+                <span>{supportedQualities[0]}</span>
+              </button>
+            ) : (
               <div className="flex gap-1">
-                {IMAGE_QUALITIES.filter(q => supportedQualities.includes(q.value)).map((q) => (
+                {supportedQualities.map((q) => (
                   <button
-                    key={q.value}
-                    onClick={() => onQualityChange(quality === q.value ? null : q.value)}
+                    key={q}
+                    onClick={() => onQualityChange(q as ImageQuality)}
                     className={cn(
                       'flex-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
-                      quality === q.value
+                      quality === q
                         ? 'bg-interactive-active text-theme-text-primary'
                         : 'bg-surface-secondary text-theme-text-primary hover:bg-interactive-hover'
                     )}
                   >
-                    {q.label}
+                    {q}
                   </button>
                 ))}
               </div>
-            ) : (
-              <button
-                className={cn(
-                  'w-full flex items-center justify-center px-3 py-2 rounded-lg text-sm',
-                  'bg-surface-secondary text-theme-text-primary'
-                )}
-                disabled
-              >
-                <span>Auto</span>
-              </button>
             )}
           </div>
 
@@ -174,20 +183,20 @@ export function AspectRatioPopover({
                 <span className="text-[10px]">Auto</span>
               </button>
 
-              {/* All aspect ratios - arranged in 2 rows of 5 */}
-              {ASPECT_RATIOS.map((ar) => (
+              {/* Supported aspect ratios only */}
+              {supportedAspectRatios.map((ar) => (
                 <button
-                  key={ar.value}
-                  onClick={() => onAspectRatioChange(ar.value)}
+                  key={ar}
+                  onClick={() => onAspectRatioChange(ar)}
                   className={cn(
                     'flex flex-col items-center justify-center p-2 rounded-lg transition-colors',
-                    aspectRatio === ar.value
+                    aspectRatio === ar
                       ? 'bg-interactive-active text-theme-text-primary'
                       : 'bg-surface-secondary text-theme-text-primary hover:bg-interactive-hover'
                   )}
                 >
-                  <AspectRatioIcon ratio={ar.value} className="w-4 h-4 mb-0.5" />
-                  <span className="text-[10px]">{ar.label}</span>
+                  <AspectRatioIcon ratio={ar} className="w-4 h-4 mb-0.5" />
+                  <span className="text-[10px]">{ar}</span>
                 </button>
               ))}
             </div>

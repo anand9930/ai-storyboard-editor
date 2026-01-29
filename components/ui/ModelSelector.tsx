@@ -4,7 +4,7 @@ import { useState } from 'react';
 import * as Popover from '@radix-ui/react-popover';
 import { ChevronDown, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { IMAGE_MODELS, type ImageModel } from '@/lib/imageModels';
+import { MODEL_SPECS_LIST, type ModelSpec } from '@/lib/modelSpecs';
 
 interface ModelSelectorProps {
   value: string;
@@ -14,7 +14,7 @@ interface ModelSelectorProps {
 
 export function ModelSelector({ value, onChange, disabled }: ModelSelectorProps) {
   const [open, setOpen] = useState(false);
-  const selectedModel = IMAGE_MODELS.find((m) => m.id === value);
+  const selectedModel = MODEL_SPECS_LIST.find((m) => m.id === value);
 
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
@@ -53,7 +53,7 @@ export function ModelSelector({ value, onChange, disabled }: ModelSelectorProps)
           sideOffset={8}
         >
           <div className="space-y-1">
-            {IMAGE_MODELS.map((model) => (
+            {MODEL_SPECS_LIST.map((model) => (
               <ModelOption
                 key={model.id}
                 model={model}
@@ -74,7 +74,7 @@ export function ModelSelector({ value, onChange, disabled }: ModelSelectorProps)
 }
 
 interface ModelOptionProps {
-  model: ImageModel;
+  model: ModelSpec;
   selected: boolean;
   onSelect: () => void;
 }
