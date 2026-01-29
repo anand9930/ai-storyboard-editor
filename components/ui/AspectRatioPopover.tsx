@@ -6,7 +6,6 @@ import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { AspectRatio, ImageQuality } from '@/types/nodes';
 import { getModelSpec, DEFAULT_MODEL_SPEC } from '@/lib/modelSpecs';
-import type { Quality } from '@/lib/modelSpecs';
 
 interface AspectRatioPopoverProps {
   aspectRatio: AspectRatio | null;
@@ -25,13 +24,13 @@ function AspectRatioIcon({ ratio, className }: { ratio: AspectRatio | 'auto'; cl
       case '1:1':
         return { width: 12, height: 12 };
       case '9:16':
-        return { width: 9, height: 14 };
+        return { width: 8, height: 14 };
       case '16:9':
-        return { width: 14, height: 9 };
+        return { width: 14, height: 8 };
       case '3:4':
-        return { width: 10, height: 13 };
+        return { width: 10, height: 14 };
       case '4:3':
-        return { width: 13, height: 10 };
+        return { width: 14, height: 10 };
       case '3:2':
         return { width: 12, height: 8 };
       case '2:3':
@@ -41,9 +40,9 @@ function AspectRatioIcon({ ratio, className }: { ratio: AspectRatio | 'auto'; cl
       case '4:5':
         return { width: 10, height: 12 };
       case '21:9':
-        return { width: 16, height: 7 };
+        return { width: 14, height: 6 };
       case '9:21':
-        return { width: 7, height: 16 };
+        return { width: 6, height: 14 };
       default:
         return { width: 12, height: 12 };
     }
@@ -54,15 +53,15 @@ function AspectRatioIcon({ ratio, className }: { ratio: AspectRatio | 'auto'; cl
     return (
       <svg className={className} width="16" height="16" viewBox="0 0 16 16" fill="none">
         {/* Top-left corner */}
-        <path d="M1 5V2.5C1 1.67 1.67 1 2.5 1H5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M1 5V2.5C1 1.67 1.67 1 2.5 1H5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
         {/* Top-right corner */}
-        <path d="M11 1H13.5C14.33 1 15 1.67 15 2.5V5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M11 1H13.5C14.33 1 15 1.67 15 2.5V5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
         {/* Bottom-left corner */}
-        <path d="M1 11V13.5C1 14.33 1.67 15 2.5 15H5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M1 11V13.5C1 14.33 1.67 15 2.5 15H5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
         {/* Bottom-right corner */}
-        <path d="M11 15H13.5C14.33 15 15 14.33 15 13.5V11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M11 15H13.5C14.33 15 15 14.33 15 13.5V11" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
         {/* Center square */}
-        <rect x="5.5" y="5.5" width="5" height="5" rx="0.5" stroke="currentColor" strokeWidth="1.5" />
+        <rect x="5.5" y="5.5" width="5" height="5" rx="0.5" stroke="currentColor" strokeWidth="1" />
       </svg>
     );
   }
@@ -73,7 +72,7 @@ function AspectRatioIcon({ ratio, className }: { ratio: AspectRatio | 'auto'; cl
 
   return (
     <svg className={className} width="16" height="16" viewBox="0 0 16 16" fill="none">
-      <rect x={x} y={y} width={width} height={height} rx="1" stroke="currentColor" strokeWidth="1.5" />
+      <rect x={x} y={y} width={width} height={height} rx="1" stroke="currentColor" strokeWidth="1" />
     </svg>
   );
 }
