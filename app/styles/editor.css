@@ -45,13 +45,13 @@
 
 .ProseMirror hr {
   border: none;
-  border-top: 1px solid hsl(var(--border));
+  border-top: 1px solid var(--border);
   margin: 1rem 0;
 }
 
 /* Placeholder text for empty editor */
 .ProseMirror p.is-editor-empty:first-child::before {
-  color: hsl(var(--text-muted));
+  color: var(--text-muted);
   content: attr(data-placeholder);
   float: left;
   height: 0;

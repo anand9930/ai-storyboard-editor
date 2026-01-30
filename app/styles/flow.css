@@ -2,75 +2,75 @@
 
 /* Canvas Background */
 .react-flow__background {
-  background-color: hsl(var(--flow-canvas-bg)) !important;
+  background-color: var(--flow-canvas-bg) !important;
 }
 
 /* Background pattern (dots/grid) */
 .react-flow__background pattern circle {
-  fill: hsl(var(--flow-canvas-dots)) !important;
+  fill: var(--flow-canvas-dots) !important;
 }
 
 .react-flow__background pattern line {
-  stroke: hsl(var(--flow-canvas-dots)) !important;
+  stroke: var(--flow-canvas-dots) !important;
 }
 
 /* MiniMap */
 .react-flow__minimap {
-  background-color: hsl(var(--flow-minimap-bg)) !important;
-  border: 1px solid hsl(var(--border)) !important;
+  background-color: var(--flow-minimap-bg) !important;
+  border: 1px solid var(--border) !important;
   border-radius: 8px !important;
 }
 
 .react-flow__minimap-mask {
-  fill: hsl(var(--flow-minimap-mask) / 0.8) !important;
+  fill: color-mix(in oklch, var(--flow-minimap-mask) 80%, transparent) !important;
 }
 
 .react-flow__minimap-node {
-  fill: hsl(var(--flow-minimap-node)) !important;
+  fill: var(--flow-minimap-node) !important;
 }
 
 /* Controls */
 .react-flow__controls {
-  background-color: hsl(var(--flow-controls-bg)) !important;
-  border: 1px solid hsl(var(--border)) !important;
+  background-color: var(--flow-controls-bg) !important;
+  border: 1px solid var(--border) !important;
   border-radius: 8px !important;
 }
 
 .react-flow__controls-button {
-  background-color: hsl(var(--flow-controls-bg)) !important;
-  border-color: hsl(var(--border)) !important;
-  fill: hsl(var(--muted-foreground)) !important;
+  background-color: var(--flow-controls-bg) !important;
+  border-color: var(--border) !important;
+  fill: var(--muted-foreground) !important;
 }
 
 .react-flow__controls-button:hover {
-  background-color: hsl(var(--accent)) !important;
+  background-color: var(--accent) !important;
 }
 
 /* Edges */
 .react-flow__edge-path {
-  stroke: hsl(var(--flow-edge-stroke)) !important;
+  stroke: var(--flow-edge-stroke) !important;
   stroke-width: 2 !important;
 }
 
 /* Highlighted edges - connected to selected nodes */
 .react-flow__edge.highlighted .react-flow__edge-path {
-  stroke: hsl(var(--flow-edge-stroke-highlighted)) !important;
+  stroke: var(--flow-edge-stroke-highlighted) !important;
 }
 
 /* Node status borders - override selection border */
 .node-status-processing {
-  border-color: hsl(var(--status-processing) / 0.5) !important;
+  border-color: color-mix(in oklch, var(--status-processing) 50%, transparent) !important;
 }
 .node-status-completed {
-  border-color: hsl(var(--status-success) / 0.5) !important;
+  border-color: color-mix(in oklch, var(--status-success) 50%, transparent) !important;
 }
 .node-status-error {
-  border-color: hsl(var(--status-error) / 0.5) !important;
+  border-color: color-mix(in oklch, var(--status-error) 50%, transparent) !important;
 }
 
 /* Connection line (while dragging) */
 .react-flow__connection-line {
-  stroke: hsl(var(--primary)) !important;
+  stroke: var(--primary) !important;
   stroke-width: 2 !important;
 }
 

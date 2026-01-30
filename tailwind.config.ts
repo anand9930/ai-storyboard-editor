@@ -11,89 +11,109 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: 'hsl(var(--background))',
-        foreground: 'hsl(var(--foreground))',
+        // Core shadcn colors (using var() directly since CSS contains oklch values)
+        background: 'var(--background)',
+        foreground: 'var(--foreground)',
         card: {
-          DEFAULT: 'hsl(var(--card))',
-          foreground: 'hsl(var(--card-foreground))',
+          DEFAULT: 'var(--card)',
+          foreground: 'var(--card-foreground)',
         },
         popover: {
-          DEFAULT: 'hsl(var(--popover))',
-          foreground: 'hsl(var(--popover-foreground))',
+          DEFAULT: 'var(--popover)',
+          foreground: 'var(--popover-foreground)',
         },
         primary: {
-          DEFAULT: 'hsl(var(--primary))',
-          foreground: 'hsl(var(--primary-foreground))',
+          DEFAULT: 'var(--primary)',
+          foreground: 'var(--primary-foreground)',
         },
         secondary: {
-          DEFAULT: 'hsl(var(--secondary))',
-          foreground: 'hsl(var(--secondary-foreground))',
+          DEFAULT: 'var(--secondary)',
+          foreground: 'var(--secondary-foreground)',
         },
         muted: {
-          DEFAULT: 'hsl(var(--muted))',
-          foreground: 'hsl(var(--muted-foreground))',
+          DEFAULT: 'var(--muted)',
+          foreground: 'var(--muted-foreground)',
         },
         accent: {
-          DEFAULT: 'hsl(var(--accent))',
-          foreground: 'hsl(var(--accent-foreground))',
+          DEFAULT: 'var(--accent)',
+          foreground: 'var(--accent-foreground)',
         },
         destructive: {
-          DEFAULT: 'hsl(var(--destructive))',
-          foreground: 'hsl(var(--destructive-foreground))',
+          DEFAULT: 'var(--destructive)',
+          foreground: 'var(--destructive-foreground)',
         },
-        border: 'hsl(var(--border))',
-        input: 'hsl(var(--input))',
-        ring: 'hsl(var(--ring))',
-        /* Flow-specific colors for ReactFlow canvas */
+        border: 'var(--border)',
+        input: 'var(--input)',
+        ring: 'var(--ring)',
+        // Chart colors
+        chart: {
+          '1': 'var(--chart-1)',
+          '2': 'var(--chart-2)',
+          '3': 'var(--chart-3)',
+          '4': 'var(--chart-4)',
+          '5': 'var(--chart-5)',
+        },
+        // Sidebar
+        sidebar: {
+          DEFAULT: 'var(--sidebar-background)',
+          foreground: 'var(--sidebar-foreground)',
+          primary: 'var(--sidebar-primary)',
+          'primary-foreground': 'var(--sidebar-primary-foreground)',
+          accent: 'var(--sidebar-accent)',
+          'accent-foreground': 'var(--sidebar-accent-foreground)',
+          border: 'var(--sidebar-border)',
+          ring: 'var(--sidebar-ring)',
+        },
+        // Flow-specific colors for ReactFlow canvas
         flow: {
-          canvas: 'hsl(var(--flow-canvas-bg))',
-          dots: 'hsl(var(--flow-canvas-dots))',
-          edge: 'hsl(var(--flow-edge-stroke))',
-          minimap: 'hsl(var(--flow-minimap-bg))',
-          controls: 'hsl(var(--flow-controls-bg))',
+          canvas: 'var(--flow-canvas-bg)',
+          dots: 'var(--flow-canvas-dots)',
+          edge: 'var(--flow-edge-stroke)',
+          minimap: 'var(--flow-minimap-bg)',
+          controls: 'var(--flow-controls-bg)',
         },
-        /* Scrollbar colors */
+        // Scrollbar colors
         scrollbar: {
-          track: 'hsl(var(--scrollbar-track))',
-          thumb: 'hsl(var(--scrollbar-thumb))',
+          track: 'var(--scrollbar-track)',
+          thumb: 'var(--scrollbar-thumb)',
         },
-        /* Surface colors for consistent theming */
+        // Surface colors for consistent theming
         surface: {
-          primary: 'hsl(var(--surface-primary))',
-          secondary: 'hsl(var(--surface-secondary))',
-          elevated: 'hsl(var(--surface-elevated))',
+          primary: 'var(--surface-primary)',
+          secondary: 'var(--surface-secondary)',
+          elevated: 'var(--surface-elevated)',
         },
-        /* Semantic text colors */
+        // Semantic text colors
         'theme-text': {
-          primary: 'hsl(var(--text-primary))',
-          secondary: 'hsl(var(--text-secondary))',
-          muted: 'hsl(var(--text-muted))',
+          primary: 'var(--text-primary)',
+          secondary: 'var(--text-secondary)',
+          muted: 'var(--text-muted)',
         },
-        /* Interactive state colors */
+        // Interactive state colors
         interactive: {
-          hover: 'hsl(var(--interactive-hover))',
-          active: 'hsl(var(--interactive-active))',
+          hover: 'var(--interactive-hover)',
+          active: 'var(--interactive-active)',
         },
-        /* Node colors */
+        // Node colors
         node: {
-          bg: 'hsl(var(--node-bg))',
-          border: 'hsl(var(--node-border))',
-          'border-selected': 'hsl(var(--node-border-selected))',
+          bg: 'var(--node-bg)',
+          border: 'var(--node-border)',
+          'border-selected': 'var(--node-border-selected)',
         },
-        /* Status colors */
+        // Status colors
         status: {
-          error: 'hsl(var(--status-error))',
-          success: 'hsl(var(--status-success))',
-          warning: 'hsl(var(--status-warning))',
-          processing: 'hsl(var(--status-processing))',
+          error: 'var(--status-error)',
+          success: 'var(--status-success)',
+          warning: 'var(--status-warning)',
+          processing: 'var(--status-processing)',
         },
-        /* Accent highlights */
-        'accent-blue': 'hsl(var(--accent-blue))',
-        'accent-yellow': 'hsl(var(--accent-yellow))',
+        // Accent highlights
+        'accent-blue': 'var(--accent-blue)',
+        'accent-yellow': 'var(--accent-yellow)',
       },
       borderColor: {
-        node: 'hsl(var(--node-border))',
-        'node-selected': 'hsl(var(--node-border-selected))',
+        node: 'var(--node-border)',
+        'node-selected': 'var(--node-border-selected)',
       },
       borderRadius: {
         lg: 'var(--radius)',

@@ -85,8 +85,9 @@ The project uses a feature-based organization for multi-page scalability:
 - `app/styles/scrollbar.css` - Scrollbar styling
 
 **CSS Variable Patterns:**
-- Variables use HSL values without wrapper: `--background: 0 0% 100%`
-- Usage: `hsl(var(--variable-name))`
+- Variables use OKLCH color values: `--background: oklch(1 0 0)`
+- Usage: `var(--variable-name)` directly (OKLCH values include the function)
+- For opacity: use `color-mix(in oklch, var(--color) 50%, transparent)`
 - Prefixes by category: `--flow-*`, `--node-*`, `--surface-*`, `--text-*`, `--scrollbar-*`
 - Light mode in `:root`, dark mode in `.dark`
 
@@ -111,4 +112,27 @@ import type { AppNode } from '@/features/flow/types/nodes';
 import { cn } from '@/lib/utils';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { ErrorBoundary } from '@/components/ui';
+```
+
+### shadcn/ui Components
+
+The project uses shadcn/ui for UI components:
+
+**Configuration:**
+- `components.json` - shadcn CLI configuration
+- Components installed in `components/ui/`
+
+**Usage:**
+```typescript
+import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+```
+
+**Available Components:**
+54 components including: accordion, alert, avatar, badge, button, card, checkbox, dialog, dropdown-menu, form, input, label, popover, select, separator, sheet, skeleton, slider, switch, table, tabs, textarea, toggle, tooltip, and more.
+
+**Adding New Components:**
+```bash
+npx shadcn@latest add [component-name]
 ```
