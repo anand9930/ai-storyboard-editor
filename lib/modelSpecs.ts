@@ -7,7 +7,7 @@
  * Data sourced from Runware provider documentation.
  */
 
-import type { AspectRatio } from '@/types/nodes';
+import type { AspectRatio } from '@/features/flow/types/nodes';
 
 export type Quality = 'Auto' | '1K' | '2K' | '4K';
 

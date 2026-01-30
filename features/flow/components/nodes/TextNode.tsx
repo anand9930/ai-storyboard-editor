@@ -1,0 +1,257 @@
+'use client';
+
+import { useState, memo, useCallback, useEffect } from 'react';
+import { NodeProps } from '@xyflow/react';
+import { Editor } from '@tiptap/react';
+import { Pencil, ImageIcon, LucideIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { BaseNode } from './BaseNode';
+import { NODE_ACTIONS, PLACEHOLDER_IMAGE } from '@/features/flow/types/nodes';
+import type { TextNode as TextNodeType, TextNodeData } from '@/features/flow/types/nodes';
+import { defaultEdgeOptions } from '@/features/flow/lib/flowConfig';
+import { useWorkflowStore } from '@/features/flow/store/workflowStore';
+import { useSourceConnection } from '@/features/flow/hooks/useSourceConnection';
+import { GenerateFromNodePopup } from '../popups/GenerateFromNodePopup';
+import { RichTextEditor } from '../editors/RichTextEditor';
+import { TextFormattingToolbar } from '../toolbars/TextFormattingToolbar';
+import { FullScreenEditorModal } from '../editors/FullScreenEditorModal';
+
+const iconMap: Record<string, LucideIcon> = {
+  Pencil,
+  ImageIcon,
+};
+
+function TextNodeComponent({ data, id, selected }: NodeProps<TextNodeType>) {
+  // data is now properly typed as TextNodeData
+  const nodeData = data as TextNodeData;
+
+  // Get store values and actions
+  // Note: nodes is only used inside callbacks, so it doesn't cause render issues
+  const { updateNodeData, setSelectedNodeIds, addNode, addEdge, nodes } = useWorkflowStore();
+  const [popupSide, setPopupSide] = useState<'left' | 'right' | null>(null);
+  const [editor, setEditor] = useState<Editor | null>(null);
+  const [showFullScreen, setShowFullScreen] = useState(false);
+
+  // Use custom hook for source image and text tracking
+  const { sourceImages, sourceTexts, isConnected, connectedNodeTypes } = useSourceConnection({
+    nodeId: id,
+  });
+
+  // Auto-transition when ANY connection exists (even if source has no output yet)
+  useEffect(() => {
+    const shouldAutoTransition =
+      nodeData.selectedAction === null &&
+      !nodeData.content &&
+      isConnected;
+
+    if (shouldAutoTransition) {
+      // Determine action based on what type of node is connected
+      // If connected to SourceNode or ImageNode -> will receive images -> 'prompt_from_image'
+      // If connected to TextNode -> will receive text -> 'write'
+      const hasImageSource = connectedNodeTypes.some(t => t === 'source' || t === 'image');
+      const action = hasImageSource ? 'prompt_from_image' : 'write';
+      updateNodeData(id, { selectedAction: action });
+    }
+  }, [isConnected, connectedNodeTypes, id, nodeData.selectedAction, nodeData.content, updateNodeData]);
+
+  // Update connected source images when connections change (separate from auto-transition)
+  // Uses JSON.stringify for deep comparison to detect changes to ANY connected image,
+  // not just the first one or count changes
+  useEffect(() => {
+    const currentJson = JSON.stringify(nodeData.connectedSourceImages || []);
+    const newJson = JSON.stringify(sourceImages);
+
+    if (currentJson !== newJson) {
+      updateNodeData(id, {
+        connectedSourceImages: sourceImages,
+      });
+    }
+  }, [sourceImages, id, nodeData.connectedSourceImages, updateNodeData]);
+
+  // Update connected source texts when connections change (for TextNode -> TextNode connections)
+  useEffect(() => {
+    const currentJson = JSON.stringify(nodeData.connectedSourceTexts || []);
+    const newJson = JSON.stringify(sourceTexts);
+
+    if (currentJson !== newJson) {
+      updateNodeData(id, {
+        connectedSourceTexts: sourceTexts,
+      });
+    }
+  }, [sourceTexts, id, nodeData.connectedSourceTexts, updateNodeData]);
+
+  // Create a source node with placeholder image and connect it to this text node
+  const createSourceNodeWithConnection = useCallback(() => {
+    const currentNode = nodes.find((n) => n.id === id);
+    if (!currentNode) return;
+
+    const sourceNodeId = `source-${Date.now()}`;
+    const newPosition = {
+      x: currentNode.position.x - 400,
+      y: currentNode.position.y,
+    };
+
+    // Create SourceNode with placeholder image
+    addNode({
+      id: sourceNodeId,
+      type: 'source',
+      position: newPosition,
+      data: {
+        name: 'Source',
+        image: {
+          id: `placeholder-${Date.now()}`,
+          url: PLACEHOLDER_IMAGE.url,
+          metadata: PLACEHOLDER_IMAGE.metadata,
+        },
+      },
+    });
+
+    // Create edge: SourceNode → TextNode
+    addEdge({
+      id: `edge-${sourceNodeId}-${id}`,
+      source: sourceNodeId,
+      target: id,
+      sourceHandle: 'image',
+      targetHandle: 'any',
+      ...defaultEdgeOptions,
+    });
+  }, [id, nodes, addNode, addEdge]);
+
+  // Handle action click - sets the action but doesn't start editing yet
+  const handleActionClick = (action: 'write' | 'prompt_from_image') => {
+    if (action === 'prompt_from_image') {
+      // Create SourceNode with placeholder image
+      createSourceNodeWithConnection();
+    }
+    // Just set the action - user needs to double-click to start editing
+    updateNodeData(id, { selectedAction: action });
+    setSelectedNodeIds([id]);
+  };
+
+  // Handle double-click to enter editing mode
+  const handleDoubleClick = useCallback(() => {
+    if (nodeData.selectedAction && !nodeData.content) {
+      // Enter editing mode with empty content
+      updateNodeData(id, { content: '<p></p>' });
+    }
+  }, [id, nodeData.selectedAction, nodeData.content, updateNodeData]);
+
+  // Handle name change
+  const handleNameChange = useCallback((newName: string) => {
+    updateNodeData(id, { name: newName });
+  }, [id, updateNodeData]);
+
+  const handleContentChange = useCallback((newContent: string) => {
+    updateNodeData(id, { content: newContent });
+  }, [id, updateNodeData]);
+
+  const handleEditorReady = useCallback((editorInstance: Editor) => {
+    setEditor(editorInstance);
+  }, []);
+
+  const handleCopy = useCallback(() => {
+    if (editor) {
+      const text = editor.getText();
+      navigator.clipboard.writeText(text);
+    }
+  }, [editor]);
+
+  const handleFullScreenClose = useCallback((newContent: string) => {
+    updateNodeData(id, { content: newContent });
+    setShowFullScreen(false);
+  }, [id, updateNodeData]);
+
+  // Toolbar content for when we have content and an editor
+  const toolbarContent = nodeData.content && editor ? (
+    <TextFormattingToolbar
+      editor={editor}
+      onCopy={handleCopy}
+      onFullScreen={() => setShowFullScreen(true)}
+    />
+  ) : null;
+
+  return (
+    <>
+      <BaseNode
+        id={id}
+        handles={{ inputs: ['any'], outputs: ['text'] }}
+        selected={selected}
+        status={nodeData.status}
+        onPlusClick={(side) => setPopupSide(side)}
+        toolbarContent={toolbarContent}
+        nodeName={nodeData.name}
+        onNameChange={handleNameChange}
+        noPadding={true}
+      >
+        <div className={cn("h-full flex flex-col p-2", !nodeData.content && !nodeData.selectedAction && "justify-center")}>
+          {/* Action Options - only show when no action selected and no content */}
+          {!nodeData.content && !nodeData.selectedAction && (
+            <div className="space-y-2 flex-shrink-0">
+              <span className="text-xs text-theme-text-muted">Try to:</span>
+              {NODE_ACTIONS.text.map((action) => {
+                const Icon = iconMap[action.icon] || Pencil;
+                return (
+                  <button
+                    key={action.id}
+                    onClick={() =>
+                      handleActionClick(action.id as 'write' | 'prompt_from_image')
+                    }
+                    className={cn(
+                      'w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-left transition-colors',
+                      'hover:bg-interactive-hover text-theme-text-secondary'
+                    )}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span>{action.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Ready-to-edit state - show after action selected but before editing */}
+          {!nodeData.content && nodeData.selectedAction && (
+            <div
+              onDoubleClick={handleDoubleClick}
+              className="h-full flex items-center justify-center cursor-pointer"
+            >
+              <span className="text-sm text-theme-text-secondary">
+                Double-click to start editing...
+              </span>
+            </div>
+          )}
+
+          {/* Rich Text Editor - show when content exists */}
+          {nodeData.content && (
+            <div className="flex-1 overflow-y-auto">
+              <RichTextEditor
+                content={nodeData.content}
+                onChange={handleContentChange}
+                onEditorReady={handleEditorReady}
+              />
+            </div>
+          )}
+        </div>
+      </BaseNode>
+
+      {/* Generate from Node Popup */}
+      {popupSide && (
+        <GenerateFromNodePopup
+          sourceNodeId={id}
+          side={popupSide}
+          onClose={() => setPopupSide(null)}
+        />
+      )}
+
+      {/* Full Screen Modal */}
+      {showFullScreen && nodeData.content && (
+        <FullScreenEditorModal
+          content={nodeData.content}
+          onClose={handleFullScreenClose}
+        />
+      )}
+    </>
+  );
+}
+
+export const TextNode = memo(TextNodeComponent);

@@ -16,22 +16,64 @@ This contains the full xyflow/xyflow source code for reference. Key areas to exp
 
 ## Project Architecture
 
-### Type System
-- `types/nodes.ts` - Node type definitions with proper generics (AppNode, TextNode, ImageNode, SourceNode)
-- `types/index.ts` - Re-exports all types
+### Feature-Based Structure
 
-### Flow Configuration
+The project uses a feature-based organization for multi-page scalability:
+
+```
+├── app/                          # Next.js app router
+│   ├── layout.tsx                # Root layout
+│   ├── page.tsx                  # Home page (flow editor)
+│   ├── (flow)/api/               # Flow-specific API routes
+│   │   ├── generate-image/
+│   │   └── generate-text/
+│   └── api/storage/              # App-wide API routes
+├── features/                     # Feature modules
+│   └── flow/                     # Flow editor feature
+│       ├── components/           # React components
+│       │   ├── FlowCanvas.tsx    # Main canvas
+│       │   ├── nodes/            # Node components
+│       │   ├── toolbars/         # Toolbar components
+│       │   ├── context-menus/    # Context menu components
+│       │   ├── editors/          # Text editor components
+│       │   ├── selectors/        # Popover selectors
+│       │   ├── popups/           # Popup dialogs
+│       │   └── layout/           # Flow-specific layout
+│       ├── hooks/                # Flow-specific hooks
+│       ├── lib/                  # Flow-specific utilities
+│       ├── store/                # Zustand store
+│       ├── types/                # TypeScript types
+│       └── index.ts              # Feature barrel export
+├── components/                   # Shared components
+│   ├── ui/                       # Reusable UI (ErrorBoundary)
+│   └── providers/                # Global providers
+├── hooks/                        # App-wide hooks (useImageUpload)
+└── lib/                          # App-wide utilities
+    ├── utils.ts                  # Generic utilities (cn)
+    ├── modelSpecs.ts             # AI model specifications
+    ├── storage/                  # R2 storage service
+    └── modelProviders/           # AI provider implementations
+```
+
+### Flow Feature (`features/flow/`)
+
+**Type System:**
+- `types/nodes.ts` - Node type definitions with proper generics (AppNode, TextNode, ImageNode, SourceNode)
+
+**Configuration:**
 - `lib/flowConfig.ts` - Centralized nodeTypes, defaultEdgeOptions, and connection validation
 
-### Custom Hooks
-- `hooks/useSourceConnection.ts` - Tracks source image connections (replaces deprecated useHandleConnections)
+**Custom Hooks:**
+- `hooks/useSourceConnection.ts` - Tracks source image connections
+- `hooks/useUndoRedoShortcuts.ts` - Keyboard shortcuts for undo/redo
+- `hooks/useGroupExecution.ts` - Group node execution logic
 
-### Node Components
+**Node Components:**
 - All nodes in `components/nodes/` use `NodeProps<NodeType>` generic for proper typing
 - BaseNode provides common functionality (handles, toolbar, resizing)
 
-### State Management
-- `store/workflowStore.ts` - Zustand store with typed selectors
+**State Management:**
+- `store/workflowStore.ts` - Zustand store with temporal history (zundo)
 
 ### Styling
 
@@ -51,3 +93,22 @@ This contains the full xyflow/xyflow source code for reference. Key areas to exp
 **React Flow Styling:**
 - Override React Flow classes in `flow.css` using project CSS variables
 - Reference: `react-flow-references/packages/system/src/styles/` for xyflow patterns
+
+### Import Conventions
+
+**Feature imports:**
+```typescript
+// Import from feature barrel
+import { FlowCanvas, useWorkflowStore } from '@/features/flow';
+
+// Or import specific modules
+import { useWorkflowStore } from '@/features/flow/store/workflowStore';
+import type { AppNode } from '@/features/flow/types/nodes';
+```
+
+**App-wide imports:**
+```typescript
+import { cn } from '@/lib/utils';
+import { useImageUpload } from '@/hooks/useImageUpload';
+import { ErrorBoundary } from '@/components/ui';
+```

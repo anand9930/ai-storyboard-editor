@@ -1,7 +1,7 @@
 'use client';
 
-import FlowCanvas from '@/components/FlowCanvas';
-import { ErrorBoundary } from '@/components/ErrorBoundary';
+import FlowCanvas from '@/features/flow/components/FlowCanvas';
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 
 export default function Home() {
   return (
