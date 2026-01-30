@@ -2,9 +2,17 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Sparkles, ChevronDown, Download, Upload, Trash2, Sun, Moon } from 'lucide-react';
-import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { useWorkflowStore, ColorMode } from '@/features/flow/store/workflowStore';
 import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 export function ProjectHeader() {
   const { projectName, setProjectName, exportWorkflow, importWorkflow, clearWorkflow, colorMode, setColorMode } =
@@ -118,7 +126,7 @@ export function ProjectHeader() {
   };
 
   return (
-    <div className="relative flex items-center gap-2 bg-surface-primary/95 backdrop-blur border border-node rounded-xl p-2">
+    <div className="relative flex items-center gap-2 rounded-lg border bg-card p-2 shadow-sm">
       {/* Hidden span for measuring text width */}
       <span
         ref={measureRef}
@@ -130,78 +138,63 @@ export function ProjectHeader() {
 
       {/* Icon + Dropdown grouped */}
       <div className="flex items-center">
-        <Sparkles className="w-5 h-5 text-primary" />
-        <DropdownMenu.Root>
-          <DropdownMenu.Trigger asChild>
-            <button className="p-1 hover:bg-interactive-hover rounded transition-colors">
-              <ChevronDown className="w-4 h-4 text-theme-text-secondary" />
-            </button>
-          </DropdownMenu.Trigger>
+        <Sparkles className="h-5 w-5 text-primary" />
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-7 w-7">
+              <ChevronDown className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
 
-          <DropdownMenu.Portal>
-            <DropdownMenu.Content
-              className="z-50 min-w-[160px] bg-surface-primary border border-node rounded-xl p-1 shadow-xl animate-in fade-in-0 zoom-in-95"
-              sideOffset={8}
-              align="start"
-              alignOffset={-8}
+          <DropdownMenuContent align="start" sideOffset={8}>
+            <DropdownMenuItem onClick={handleExport}>
+              <Download className="mr-2 h-4 w-4" />
+              Export
+            </DropdownMenuItem>
+
+            <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
+              <Upload className="mr-2 h-4 w-4" />
+              Import
+            </DropdownMenuItem>
+
+            <DropdownMenuSeparator />
+
+            <DropdownMenuItem
+              onClick={handleClear}
+              className="text-destructive focus:text-destructive focus:bg-destructive/10"
             >
-              <DropdownMenu.Item
-                onClick={handleExport}
-                className="flex items-center gap-2 px-3 py-2 text-sm text-theme-text-primary hover:bg-interactive-hover rounded-lg cursor-pointer outline-none"
-              >
-                <Download className="w-4 h-4" />
-                Export
-              </DropdownMenu.Item>
+              <Trash2 className="mr-2 h-4 w-4" />
+              Clear
+            </DropdownMenuItem>
 
-              <DropdownMenu.Item
-                onClick={() => fileInputRef.current?.click()}
-                className="flex items-center gap-2 px-3 py-2 text-sm text-theme-text-primary hover:bg-interactive-hover rounded-lg cursor-pointer outline-none"
-              >
-                <Upload className="w-4 h-4" />
-                Import
-              </DropdownMenu.Item>
+            <DropdownMenuSeparator />
 
-              <DropdownMenu.Separator className="h-px bg-interactive-active my-1" />
-
-              <DropdownMenu.Item
-                onClick={handleClear}
-                className="flex items-center gap-2 px-3 py-2 text-sm text-status-error hover:bg-status-error/10 rounded-lg cursor-pointer outline-none"
-              >
-                <Trash2 className="w-4 h-4" />
-                Clear
-              </DropdownMenu.Item>
-
-              <DropdownMenu.Separator className="h-px bg-interactive-active my-1" />
-
-              <DropdownMenu.Item
-                onClick={cycleTheme}
-                className="flex items-center gap-2 px-3 py-2 text-sm text-theme-text-primary hover:bg-interactive-hover rounded-lg cursor-pointer outline-none"
-              >
-                <ThemeIcon className="w-4 h-4" />
-                {colorMode === 'dark' ? 'Dark Mode' : 'Light Mode'}
-              </DropdownMenu.Item>
-            </DropdownMenu.Content>
-          </DropdownMenu.Portal>
-        </DropdownMenu.Root>
+            <DropdownMenuItem onClick={cycleTheme}>
+              <ThemeIcon className="mr-2 h-4 w-4" />
+              {colorMode === 'dark' ? 'Dark Mode' : 'Light Mode'}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {/* Editable Project Name - normal weight, dynamic width */}
       {isEditing ? (
-        <input
+        <Input
           ref={inputRef}
           type="text"
           value={editValue}
           onChange={(e) => setEditValue(e.target.value)}
           onBlur={handleNameSave}
           onKeyDown={handleNameKeyDown}
+          aria-label="Project name"
           style={{ width: inputWidth }}
-          className="bg-transparent border-none outline-none text-theme-text-primary font-normal text-sm px-1"
+          className="h-7 border-none bg-transparent px-1 text-sm font-normal focus-visible:ring-0 focus-visible:ring-offset-0"
         />
       ) : (
         <span
           onClick={handleNameClick}
           style={{ minWidth: inputWidth }}
-          className="font-normal text-theme-text-primary text-sm cursor-text hover:text-theme-text-secondary transition-colors px-1"
+          className="cursor-text px-1 text-sm font-normal text-foreground transition-colors hover:text-muted-foreground"
         >
           {projectName}
         </span>

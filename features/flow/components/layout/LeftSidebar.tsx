@@ -11,12 +11,23 @@ import {
   MessageSquare,
   History,
   ImagePlay,
-  X,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { useWorkflowStore } from '@/features/flow/store/workflowStore';
 import { getDefaultNodeData } from '@/features/flow/types/nodes';
-import * as Tooltip from '@radix-ui/react-tooltip';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 
 // Node types available for adding
 const ADD_NODE_ITEMS = [
@@ -105,193 +116,152 @@ export function LeftSidebar() {
   };
 
   return (
-    <div className="relative">
-      {/* Main sidebar buttons */}
-      <div className="flex flex-col gap-2 bg-surface-primary/95 backdrop-blur border border-node rounded-xl p-2">
-        {/* Add Node Button */}
-        <Tooltip.Root>
-          <Tooltip.Trigger asChild>
-            <button
-              onClick={() => setShowNodeMenu(!showNodeMenu)}
-              className={cn(
-                'p-2 rounded-lg transition-colors',
-                showNodeMenu
-                  ? 'bg-interactive-active text-theme-text-primary'
-                  : 'hover:bg-interactive-hover text-theme-text-secondary'
-              )}
-            >
-              <Plus className="w-5 h-5" />
-            </button>
-          </Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Content
-              side="right"
-              className="bg-surface-secondary text-theme-text-primary text-sm px-2 py-1 rounded shadow-lg"
-            >
-              Add Node
-              <Tooltip.Arrow className="fill-surface-secondary" />
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        </Tooltip.Root>
+    <TooltipProvider delayDuration={300}>
+      <div className="relative">
+        {/* Main sidebar buttons */}
+        <div className="flex flex-col gap-1 rounded-lg border bg-card p-1.5 shadow-sm">
+          {/* Add Node Button with Popover */}
+          <Popover open={showNodeMenu} onOpenChange={setShowNodeMenu}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={showNodeMenu ? 'secondary' : 'ghost'}
+                    size="icon"
+                  >
+                    <Plus className="h-5 w-5" />
+                  </Button>
+                </PopoverTrigger>
+              </TooltipTrigger>
+              <TooltipContent side="right">
+                Add Node
+              </TooltipContent>
+            </Tooltip>
 
-        {/* Divider */}
-        <div className="w-full h-px bg-interactive-active" />
-
-        {/* Templates */}
-        <Tooltip.Root>
-          <Tooltip.Trigger asChild>
-            <button className="p-2 hover:bg-interactive-hover rounded-lg transition-colors text-theme-text-secondary">
-              <LayoutTemplate className="w-5 h-5" />
-            </button>
-          </Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Content
-              side="right"
-              className="bg-surface-secondary text-theme-text-primary text-sm px-2 py-1 rounded shadow-lg"
-            >
-              Templates
-              <Tooltip.Arrow className="fill-surface-secondary" />
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        </Tooltip.Root>
-
-        {/* Layers */}
-        <Tooltip.Root>
-          <Tooltip.Trigger asChild>
-            <button className="p-2 hover:bg-interactive-hover rounded-lg transition-colors text-theme-text-secondary">
-              <Layers className="w-5 h-5" />
-            </button>
-          </Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Content
-              side="right"
-              className="bg-surface-secondary text-theme-text-primary text-sm px-2 py-1 rounded shadow-lg"
-            >
-              Layers
-              <Tooltip.Arrow className="fill-surface-secondary" />
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        </Tooltip.Root>
-
-        {/* Chat */}
-        <Tooltip.Root>
-          <Tooltip.Trigger asChild>
-            <button className="p-2 hover:bg-interactive-hover rounded-lg transition-colors text-theme-text-secondary">
-              <MessageSquare className="w-5 h-5" />
-            </button>
-          </Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Content
-              side="right"
-              className="bg-surface-secondary text-theme-text-primary text-sm px-2 py-1 rounded shadow-lg"
-            >
-              Chat
-              <Tooltip.Arrow className="fill-surface-secondary" />
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        </Tooltip.Root>
-
-        {/* History */}
-        <Tooltip.Root>
-          <Tooltip.Trigger asChild>
-            <button className="p-2 hover:bg-interactive-hover rounded-lg transition-colors text-theme-text-secondary">
-              <History className="w-5 h-5" />
-            </button>
-          </Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Content
-              side="right"
-              className="bg-surface-secondary text-theme-text-primary text-sm px-2 py-1 rounded shadow-lg"
-            >
-              History
-              <Tooltip.Arrow className="fill-surface-secondary" />
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        </Tooltip.Root>
-
-        {/* Gallery */}
-        <Tooltip.Root>
-          <Tooltip.Trigger asChild>
-            <button className="p-2 hover:bg-interactive-hover rounded-lg transition-colors text-theme-text-secondary">
-              <ImagePlay className="w-5 h-5" />
-            </button>
-          </Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Content
-              side="right"
-              className="bg-surface-secondary text-theme-text-primary text-sm px-2 py-1 rounded shadow-lg"
-            >
-              Gallery
-              <Tooltip.Arrow className="fill-surface-secondary" />
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        </Tooltip.Root>
-      </div>
-
-      {/* Node Menu Dropdown */}
-      {showNodeMenu && (
-        <div className="absolute left-full ml-2 top-0 bg-surface-primary border border-node rounded-xl p-3 w-56 shadow-xl z-50">
-          {/* Close button */}
-          <button
-            onClick={() => setShowNodeMenu(false)}
-            className="absolute top-2 right-2 p-1 hover:bg-interactive-hover rounded"
-          >
-            <X className="w-4 h-4 text-theme-text-secondary" />
-          </button>
-
-          {/* Add Nodes Section */}
-          <div className="mb-4">
-            <div className="text-xs text-theme-text-secondary px-2 py-1 mb-2">Add Nodes</div>
-            {ADD_NODE_ITEMS.map((item) => (
-              <button
-                key={item.type}
-                onClick={() => handleAddNode(item.type)}
-                className="w-full flex items-center gap-3 px-2 py-2 rounded-lg text-left hover:bg-interactive-hover text-theme-text-primary transition-colors"
-              >
-                <item.icon className="w-5 h-5 text-theme-text-secondary" />
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium">{item.label}</span>
-                    {item.badge && (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent-blue/20 text-accent-blue">
-                        {item.badge}
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-xs text-theme-text-muted">{item.description}</span>
+            <PopoverContent side="right" align="start" className="w-56 p-2">
+              {/* Add Nodes Section */}
+              <div className="mb-3">
+                <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
+                  Add Nodes
                 </div>
-              </button>
-            ))}
-          </div>
+                {ADD_NODE_ITEMS.map((item) => (
+                  <button
+                    key={item.type}
+                    onClick={() => handleAddNode(item.type)}
+                    className="relative flex w-full cursor-default select-none items-center gap-3 rounded-sm px-2 py-2 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    <item.icon className="h-5 w-5 text-muted-foreground" />
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">{item.label}</span>
+                        {item.badge && (
+                          <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+                            {item.badge}
+                          </Badge>
+                        )}
+                      </div>
+                      <span className="text-xs text-muted-foreground">{item.description}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
 
-          {/* Add Source Section */}
-          <div>
-            <div className="text-xs text-theme-text-secondary px-2 py-1 mb-2">Add Source</div>
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="w-full flex items-center gap-3 px-2 py-2 rounded-lg text-left hover:bg-interactive-hover text-theme-text-primary transition-colors"
-            >
-              <Upload className="w-5 h-5 text-theme-text-secondary" />
-              <span className="text-sm font-medium">Upload</span>
-            </button>
-          </div>
+              <Separator className="my-2" />
 
-          {/* Hidden file input */}
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) {
-                handleUpload(file);
-              }
-              e.target.value = '';
-            }}
-            className="hidden"
-          />
+              {/* Add Source Section */}
+              <div>
+                <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
+                  Add Source
+                </div>
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="relative flex w-full cursor-default select-none items-center gap-3 rounded-sm px-2 py-2 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <Upload className="h-5 w-5 text-muted-foreground" />
+                  <span className="font-medium">Upload</span>
+                </button>
+              </div>
+
+              {/* Hidden file input */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    handleUpload(file);
+                  }
+                  e.target.value = '';
+                }}
+                className="hidden"
+              />
+            </PopoverContent>
+          </Popover>
+
+          <Separator className="my-1" />
+
+          {/* Templates */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <LayoutTemplate className="h-5 w-5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              Templates
+            </TooltipContent>
+          </Tooltip>
+
+          {/* Layers */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Layers className="h-5 w-5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              Layers
+            </TooltipContent>
+          </Tooltip>
+
+          {/* Chat */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <MessageSquare className="h-5 w-5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              Chat
+            </TooltipContent>
+          </Tooltip>
+
+          {/* History */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <History className="h-5 w-5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              History
+            </TooltipContent>
+          </Tooltip>
+
+          {/* Gallery */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <ImagePlay className="h-5 w-5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              Gallery
+            </TooltipContent>
+          </Tooltip>
         </div>
-      )}
-    </div>
+      </div>
+    </TooltipProvider>
   );
 }

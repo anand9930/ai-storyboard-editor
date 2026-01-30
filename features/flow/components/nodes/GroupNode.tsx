@@ -88,7 +88,7 @@ function GroupNodeComponent({ data, id, selected }: NodeProps<GroupNodeType>) {
         minHeight={150}
         isVisible={selected}
         lineStyle={{ borderColor: handleColor }}
-        handleStyle={{ backgroundColor: handleColor, borderColor: 'white' }}
+        handleStyle={{ backgroundColor: handleColor }}
       />
 
       {/* Group Header with Name - Outside container to match BaseNode */}
@@ -101,13 +101,22 @@ function GroupNodeComponent({ data, id, selected }: NodeProps<GroupNodeType>) {
             onChange={(e) => setEditedName(e.target.value)}
             onBlur={handleNameBlur}
             onKeyDown={handleNameKeyDown}
-            className="text-xs font-medium bg-transparent text-theme-text-primary outline-none min-w-[60px]"
+            aria-label="Group name"
+            className="text-xs font-medium bg-transparent text-foreground outline-none min-w-[60px] focus:ring-1 focus:ring-ring rounded-sm"
             style={{ width: `${Math.max(60, editedName.length * 7)}px` }}
           />
         ) : (
           <span
+            role="button"
+            tabIndex={0}
             onClick={handleNameClick}
-            className="text-xs font-medium text-theme-text-secondary cursor-text hover:text-theme-text-primary transition-colors"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleNameClick();
+              }
+            }}
+            className="text-xs font-medium text-muted-foreground cursor-text hover:text-foreground transition-colors focus:outline-none focus:ring-1 focus:ring-ring rounded-sm"
             title="Click to edit name"
           >
             {nodeData.name || 'New Group'}

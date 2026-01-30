@@ -3,6 +3,7 @@
 import { NodeToolbar, useStore, ReactFlowState, Position } from '@xyflow/react';
 import { Group, Plus } from 'lucide-react';
 import { useWorkflowStore } from '@/features/flow/store/workflowStore';
+import { Button } from '@/components/ui/button';
 
 // Get selected nodes with their parent info (excludes group nodes)
 const selectedNodesDataSelector = (state: ReactFlowState) =>
@@ -82,26 +83,30 @@ export function MultiSelectionToolbar() {
       isVisible={isVisible}
       position={Position.Top}
       offset={20}
-      className="flex gap-1 bg-surface-primary border border-node rounded-lg p-1 shadow-lg"
+      className="flex gap-1 rounded-lg border bg-card p-1 shadow-md"
     >
       {showAddToGroup ? (
-        <button
+        <Button
+          variant="secondary"
+          size="sm"
           onClick={handleAddToGroup}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-theme-text-primary hover:bg-interactive-hover rounded transition-colors"
+          className="gap-1.5"
           title="Add selected nodes to group"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="h-4 w-4" />
           Add to Group
-        </button>
+        </Button>
       ) : showCreateGroup ? (
-        <button
+        <Button
+          variant="secondary"
+          size="sm"
           onClick={handleGroup}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-theme-text-primary hover:bg-interactive-hover rounded transition-colors"
+          className="gap-1.5"
           title="Group selected nodes"
         >
-          <Group className="w-4 h-4" />
+          <Group className="h-4 w-4" />
           Group
-        </button>
+        </Button>
       ) : null}
     </NodeToolbar>
   );

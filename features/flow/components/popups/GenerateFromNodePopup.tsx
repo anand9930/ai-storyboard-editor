@@ -1,12 +1,11 @@
 'use client';
 
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { Type, Image as ImageIcon, LucideIcon } from 'lucide-react';
-import { useShallow } from 'zustand/shallow';
 import { cn } from '@/lib/utils';
 import { useWorkflowStore } from '@/features/flow/store/workflowStore';
 import { getDefaultNodeData, GENERATE_OPTIONS } from '@/features/flow/types/nodes';
-import type { SourceNodeData, ImageNodeData, TextNodeData, AppNode } from '@/features/flow/types/nodes';
+import type { SourceNodeData, ImageNodeData, TextNodeData } from '@/features/flow/types/nodes';
 import { defaultEdgeOptions } from '@/features/flow/lib/flowConfig';
 import type { Node } from '@xyflow/react';
 
@@ -26,6 +25,8 @@ export function GenerateFromNodePopup({
   side,
   onClose,
 }: GenerateFromNodePopupProps) {
+  const popupRef = useRef<HTMLDivElement>(null);
+
   // Only get the source node we need, not the entire nodes array
   const sourceNode = useWorkflowStore(
     useCallback(
@@ -36,6 +37,39 @@ export function GenerateFromNodePopup({
 
   // Get actions separately
   const { addNode, addEdge, setSelectedNodeIds } = useWorkflowStore();
+
+  // Handle click outside to close
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (popupRef.current && !popupRef.current.contains(event.target as HTMLElement)) {
+        onClose();
+      }
+    }
+
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    }
+
+    // Add listeners with slight delay to avoid immediate close
+    const timeoutId = setTimeout(() => {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleEscape);
+    }, 0);
+
+    return () => {
+      clearTimeout(timeoutId);
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [onClose]);
+
+  // Focus first button when opened
+  useEffect(() => {
+    const firstButton = popupRef.current?.querySelector('button');
+    firstButton?.focus();
+  }, []);
 
   const handleSelect = (type: 'text' | 'image') => {
     if (!sourceNode) return;
@@ -115,36 +149,40 @@ export function GenerateFromNodePopup({
   };
 
   return (
-    <>
-      {/* Backdrop */}
-      <div className="fixed inset-0 z-40" onClick={onClose} />
-
-      {/* Popup - position based on which side was clicked */}
-      <div className={cn(
-        "absolute z-50 bg-card border border-border rounded-xl p-2 w-56 shadow-xl top-1/2 -translate-y-1/2",
+    <div
+      ref={popupRef}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Generate from this node"
+      className={cn(
+        "absolute z-50 bg-popover border border-border rounded-xl p-2 w-56 shadow-lg top-1/2 -translate-y-1/2",
+        "animate-in fade-in-0 zoom-in-95",
         side === 'right' ? 'left-full ml-2' : 'right-full mr-2'
-      )}>
-        <div className="text-xs text-muted-foreground px-2 py-1 mb-1">
-          Generate from this node
-        </div>
-
-        {GENERATE_OPTIONS.map((option) => {
-          const Icon = iconMap[option.icon] || Type;
-          return (
-            <button
-              key={option.id}
-              onClick={() => handleSelect(option.id as 'text' | 'image')}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left hover:bg-accent text-card-foreground transition-colors"
-            >
-              <Icon className="w-5 h-5 text-muted-foreground" />
-              <div>
-                <div className="text-sm font-medium">{option.label}</div>
-                <div className="text-xs text-muted-foreground">{option.description}</div>
-              </div>
-            </button>
-          );
-        })}
+      )}
+    >
+      <div className="text-xs text-muted-foreground px-2 py-1 mb-1">
+        Generate from this node
       </div>
-    </>
+
+      {GENERATE_OPTIONS.map((option) => {
+        const Icon = iconMap[option.icon] || Type;
+        return (
+          <button
+            key={option.id}
+            onClick={() => handleSelect(option.id as 'text' | 'image')}
+            className={cn(
+              "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left text-popover-foreground",
+              "transition-colors hover:bg-accent focus:bg-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            )}
+          >
+            <Icon className="w-5 h-5 text-muted-foreground" />
+            <div>
+              <div className="text-sm font-medium">{option.label}</div>
+              <div className="text-xs text-muted-foreground">{option.description}</div>
+            </div>
+          </button>
+        );
+      })}
+    </div>
   );
 }

@@ -93,11 +93,13 @@ function SourceNodeComponent({ data, id, selected }: NodeProps<SourceNodeType>) 
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={isUploading}
+              aria-label={isUploading ? "Uploading image" : "Upload new image"}
+              aria-busy={isUploading}
               className={cn(
-                "absolute top-2 right-2 flex items-center gap-1.5 px-2.5 py-1.5 text-white text-xs font-medium rounded-md backdrop-blur-sm transition-colors",
+                "absolute top-2 right-2 flex items-center gap-1.5 px-2.5 py-1.5 text-foreground text-xs font-medium rounded-md backdrop-blur-sm transition-colors",
                 isUploading
-                  ? "bg-surface-secondary/80 cursor-not-allowed"
-                  : "bg-background/80 hover:bg-interactive-hover/80"
+                  ? "bg-muted/80 cursor-not-allowed"
+                  : "bg-background/80 hover:bg-accent/80"
               )}
             >
               {isUploading ? (
@@ -112,23 +114,33 @@ function SourceNodeComponent({ data, id, selected }: NodeProps<SourceNodeType>) 
           </div>
         ) : (
           <div
+            role="button"
+            tabIndex={isUploading ? -1 : 0}
             onClick={() => !isUploading && fileInputRef.current?.click()}
+            onKeyDown={(e) => {
+              if ((e.key === 'Enter' || e.key === ' ') && !isUploading) {
+                e.preventDefault();
+                fileInputRef.current?.click();
+              }
+            }}
+            aria-label={isUploading ? "Uploading image" : "Click to upload image"}
+            aria-busy={isUploading}
             className={cn(
-              "w-full h-full bg-surface-secondary border-2 border-dashed rounded-xl flex flex-col items-center justify-center transition-colors",
+              "w-full h-full bg-muted border-2 border-dashed rounded-xl flex flex-col items-center justify-center transition-colors",
               isUploading
-                ? "border-theme-text-muted cursor-not-allowed"
-                : "border-node hover:border-node-selected cursor-pointer"
+                ? "border-muted-foreground cursor-not-allowed"
+                : "border-border hover:border-primary cursor-pointer focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             )}
           >
             {isUploading ? (
               <>
-                <Loader2 className="w-8 h-8 text-theme-text-muted mb-2 animate-spin" />
-                <span className="text-xs text-theme-text-muted">Uploading...</span>
+                <Loader2 className="w-8 h-8 text-muted-foreground mb-2 animate-spin" />
+                <span className="text-xs text-muted-foreground">Uploading...</span>
               </>
             ) : (
               <>
-                <Upload className="w-8 h-8 text-theme-text-muted mb-2" />
-                <span className="text-xs text-theme-text-muted">Click to upload</span>
+                <Upload className="w-8 h-8 text-muted-foreground mb-2" />
+                <span className="text-xs text-muted-foreground">Click to upload</span>
               </>
             )}
           </div>
@@ -136,7 +148,7 @@ function SourceNodeComponent({ data, id, selected }: NodeProps<SourceNodeType>) 
 
         {/* Error display */}
         {error && (
-          <div className="absolute bottom-2 left-2 right-2 bg-status-error/90 text-white text-xs px-2 py-1 rounded">
+          <div className="absolute bottom-2 left-2 right-2 bg-destructive/90 text-destructive-foreground text-xs px-2 py-1 rounded">
             {error}
           </div>
         )}

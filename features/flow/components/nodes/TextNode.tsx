@@ -187,7 +187,7 @@ function TextNodeComponent({ data, id, selected }: NodeProps<TextNodeType>) {
           {/* Action Options - only show when no action selected and no content */}
           {!nodeData.content && !nodeData.selectedAction && (
             <div className="space-y-2 flex-shrink-0">
-              <span className="text-xs text-theme-text-muted">Try to:</span>
+              <span className="text-xs text-muted-foreground">Try to:</span>
               {NODE_ACTIONS.text.map((action) => {
                 const Icon = iconMap[action.icon] || Pencil;
                 return (
@@ -198,7 +198,7 @@ function TextNodeComponent({ data, id, selected }: NodeProps<TextNodeType>) {
                     }
                     className={cn(
                       'w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-left transition-colors',
-                      'hover:bg-interactive-hover text-theme-text-secondary'
+                      'hover:bg-accent text-muted-foreground'
                     )}
                   >
                     <Icon className="w-4 h-4" />
@@ -215,7 +215,7 @@ function TextNodeComponent({ data, id, selected }: NodeProps<TextNodeType>) {
               onDoubleClick={handleDoubleClick}
               className="h-full flex items-center justify-center cursor-pointer"
             >
-              <span className="text-sm text-theme-text-secondary">
+              <span className="text-sm text-muted-foreground">
                 Double-click to start editing...
               </span>
             </div>

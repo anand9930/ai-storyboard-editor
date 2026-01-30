@@ -167,7 +167,7 @@ export function BaseNode({
           isVisible={selected && selectedNodeCount === 1}
           position={Position.Top}
           offset={20}
-          className="flex gap-1 bg-surface-primary border border-node rounded-lg p-1 shadow-lg"
+          className="flex gap-1 bg-card border rounded-lg p-1 shadow-lg"
         >
           {toolbarContent}
         </NodeToolbar>
@@ -193,13 +193,22 @@ export function BaseNode({
               onChange={(e) => setEditedName(e.target.value)}
               onBlur={handleNameBlur}
               onKeyDown={handleNameKeyDown}
-              className="text-xs font-medium bg-transparent text-theme-text-primary outline-none min-w-[60px]"
+              aria-label="Node name"
+              className="text-xs font-medium bg-transparent text-foreground outline-none min-w-[60px] focus:ring-1 focus:ring-ring rounded-sm"
               style={{ width: `${Math.max(60, editedName.length * 7)}px` }}
             />
           ) : (
             <span
+              role="button"
+              tabIndex={0}
               onClick={handleNameClick}
-              className="text-xs font-medium text-theme-text-secondary cursor-text hover:text-theme-text-primary transition-colors"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleNameClick();
+                }
+              }}
+              className="text-xs font-medium text-muted-foreground cursor-text hover:text-foreground transition-colors focus:outline-none focus:ring-1 focus:ring-ring rounded-sm"
               title="Click to edit name"
             >
               {nodeName}
@@ -224,7 +233,7 @@ export function BaseNode({
         {/* Inner container with overflow-hidden for image clipping */}
         <div
           className={cn(
-            'relative bg-surface-primary rounded-xl shadow-lg overflow-hidden',
+            'relative bg-card rounded-xl shadow-lg overflow-hidden',
             !noPadding && 'p-4',
             'w-full h-full',
             'transition-all duration-200',
@@ -234,8 +243,8 @@ export function BaseNode({
             className
           )}
           style={{
-            border: `1px solid hsl(var(${selected ? '--node-border-selected' : '--node-border'}))`,
-            boxShadow: selected ? `0 0 0 1px hsl(var(--node-border-selected))` : undefined,
+            border: `1px solid var(${selected ? '--node-border-selected' : '--node-border'})`,
+            boxShadow: selected ? `0 0 0 1px var(--node-border-selected)` : undefined,
           }}
         >
           {/* Input Handles - Invisible but functional */}
@@ -275,18 +284,21 @@ export function BaseNode({
               e.stopPropagation();
               if (!plusDisabled) onPlusClick('left');
             }}
+            aria-label="Add node to left"
+            disabled={plusDisabled}
             style={{
               transform: `translate(${magneticOffsetLeft.x}px, calc(-50% + ${magneticOffsetLeft.y}px))`,
               transition: 'transform 0.15s ease-out, opacity 0.2s ease-out, left 0.25s ease-out',
             }}
             className={cn(
               'absolute top-1/2 p-1.5 rounded-full',
-              'bg-surface-primary border border-node shadow-md',
+              'bg-card border shadow-md',
+              'focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
               // Pop-in animation: start from outside, animate further outside when visible
               isHovered ? 'opacity-100 -left-10' : 'opacity-0 -left-8',
               plusDisabled
-                ? 'text-theme-text-muted cursor-not-allowed'
-                : 'text-theme-text-secondary hover:bg-interactive-hover hover:text-theme-text-primary hover:scale-110'
+                ? 'text-muted-foreground cursor-not-allowed'
+                : 'text-muted-foreground hover:bg-accent hover:text-foreground hover:scale-110'
             )}
           >
             <Plus className="w-4 h-4" />
@@ -301,18 +313,21 @@ export function BaseNode({
               e.stopPropagation();
               if (!plusDisabled) onPlusClick('right');
             }}
+            aria-label="Add node to right"
+            disabled={plusDisabled}
             style={{
               transform: `translate(${magneticOffsetRight.x}px, calc(-50% + ${magneticOffsetRight.y}px))`,
               transition: 'transform 0.15s ease-out, opacity 0.2s ease-out, right 0.25s ease-out',
             }}
             className={cn(
               'absolute top-1/2 p-1.5 rounded-full',
-              'bg-surface-primary border border-node shadow-md',
+              'bg-card border shadow-md',
+              'focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
               // Pop-in animation: start from outside, animate further outside when visible
               isHovered ? 'opacity-100 -right-10' : 'opacity-0 -right-8',
               plusDisabled
-                ? 'text-theme-text-muted cursor-not-allowed'
-                : 'text-theme-text-secondary hover:bg-interactive-hover hover:text-theme-text-primary hover:scale-110'
+                ? 'text-muted-foreground cursor-not-allowed'
+                : 'text-muted-foreground hover:bg-accent hover:text-foreground hover:scale-110'
             )}
           >
             <Plus className="w-4 h-4" />

@@ -9,8 +9,9 @@ export { GroupNode } from './nodes/GroupNode';
 export { BaseNode } from './nodes/BaseNode';
 
 // Context menus
-export { CanvasContextMenu } from './context-menus/CanvasContextMenu';
-export { NodeContextMenu } from './context-menus/NodeContextMenu';
+export { FlowContextMenuProvider, useFlowContextMenu } from './context-menus';
+export { CanvasContextMenuContent } from './context-menus/CanvasContextMenuContent';
+export { NodeContextMenuContent } from './context-menus/NodeContextMenuContent';
 
 // Toolbars
 export { NodeInputPanel } from './toolbars/NodeInputPanel';

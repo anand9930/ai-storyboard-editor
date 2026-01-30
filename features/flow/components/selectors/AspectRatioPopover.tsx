@@ -1,11 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import * as Popover from '@radix-ui/react-popover';
 import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { AspectRatio, ImageQuality } from '@/features/flow/types/nodes';
 import { getModelSpec, DEFAULT_MODEL_SPEC } from '@/lib/modelSpecs';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 
 interface AspectRatioPopoverProps {
   aspectRatio: AspectRatio | null;
@@ -98,18 +102,18 @@ export function AspectRatioPopover({
   const displayQuality = quality || supportedQualities[0] || 'Auto';
 
   return (
-    <Popover.Root open={open} onOpenChange={setOpen}>
-      <Popover.Trigger asChild>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
         <button
           className={cn(
-            'flex items-center gap-1.5 bg-surface-secondary px-2 py-1 rounded-lg',
-            'hover:bg-interactive-hover transition-colors',
-            'text-sm text-theme-text-primary'
+            'flex items-center gap-1.5 bg-secondary px-2 py-1 rounded-lg',
+            'hover:bg-accent transition-colors',
+            'text-sm text-foreground'
           )}
         >
           <AspectRatioIcon ratio={aspectRatio || 'auto'} className="w-4 h-4" />
           <span>{displayAspectRatio}</span>
-          <span className="text-theme-text-muted">·</span>
+          <span className="text-muted-foreground">·</span>
           <span>{displayQuality}</span>
           <ChevronDown
             className={cn(
@@ -118,92 +122,83 @@ export function AspectRatioPopover({
             )}
           />
         </button>
-      </Popover.Trigger>
+      </PopoverTrigger>
 
-      <Popover.Portal>
-        <Popover.Content
-          className={cn(
-            'z-50 bg-surface-primary border border-node rounded-xl p-4 shadow-xl',
-            'w-[280px]',
-            'animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
-            'data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2'
-          )}
-          side="top"
-          align="start"
-          sideOffset={8}
-        >
-          {/* Quality Section */}
-          <div className="mb-4">
-            <h4 className="text-xs text-theme-text-muted mb-2 font-medium">Quality</h4>
-            {isSingleQuality ? (
-              <button
-                className={cn(
-                  'w-full flex items-center justify-center px-3 py-2 rounded-lg text-sm',
-                  'bg-interactive-active text-theme-text-primary cursor-default'
-                )}
-              >
-                <span>{supportedQualities[0]}</span>
-              </button>
-            ) : (
-              <div className="flex gap-1">
-                {supportedQualities.map((q) => (
-                  <button
-                    key={q}
-                    onClick={() => onQualityChange(q as ImageQuality)}
-                    className={cn(
-                      'flex-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
-                      quality === q
-                        ? 'bg-interactive-active text-theme-text-primary'
-                        : 'bg-surface-secondary text-theme-text-primary hover:bg-interactive-hover'
-                    )}
-                  >
-                    {q}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Aspect Ratio Section */}
-          <div>
-            <h4 className="text-xs text-theme-text-muted mb-2 font-medium">Aspect Ratio</h4>
-            <div className="grid grid-cols-6 gap-1" style={{ gridTemplateRows: 'auto auto' }}>
-              {/* Auto option - spans 2 rows */}
-              <button
-                onClick={() => onAspectRatioChange(null)}
-                className={cn(
-                  'row-span-2 flex flex-col items-center justify-center p-2 rounded-lg transition-colors',
-                  aspectRatio === null
-                    ? 'bg-interactive-active text-theme-text-primary'
-                    : 'bg-surface-secondary text-theme-text-primary hover:bg-interactive-hover'
-                )}
-              >
-                <AspectRatioIcon ratio="auto" className="w-5 h-5 mb-1" />
-                <span className="text-[10px]">Auto</span>
-              </button>
-
-              {/* Supported aspect ratios only */}
-              {supportedAspectRatios.map((ar) => (
+      <PopoverContent
+        className="w-[280px] p-4"
+        side="top"
+        align="start"
+        sideOffset={8}
+      >
+        {/* Quality Section */}
+        <div className="mb-4">
+          <h4 className="text-xs text-muted-foreground mb-2 font-medium">Quality</h4>
+          {isSingleQuality ? (
+            <button
+              className={cn(
+                'w-full flex items-center justify-center px-3 py-2 rounded-lg text-sm',
+                'bg-accent text-foreground cursor-default'
+              )}
+            >
+              <span>{supportedQualities[0]}</span>
+            </button>
+          ) : (
+            <div className="flex gap-1">
+              {supportedQualities.map((q) => (
                 <button
-                  key={ar}
-                  onClick={() => onAspectRatioChange(ar)}
+                  key={q}
+                  onClick={() => onQualityChange(q as ImageQuality)}
                   className={cn(
-                    'flex flex-col items-center justify-center p-2 rounded-lg transition-colors',
-                    aspectRatio === ar
-                      ? 'bg-interactive-active text-theme-text-primary'
-                      : 'bg-surface-secondary text-theme-text-primary hover:bg-interactive-hover'
+                    'flex-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
+                    quality === q
+                      ? 'bg-accent text-foreground'
+                      : 'bg-secondary text-foreground hover:bg-accent'
                   )}
                 >
-                  <AspectRatioIcon ratio={ar} className="w-4 h-4 mb-0.5" />
-                  <span className="text-[10px]">{ar}</span>
+                  {q}
                 </button>
               ))}
             </div>
-          </div>
+          )}
+        </div>
 
-          <Popover.Arrow className="fill-surface-primary" />
-        </Popover.Content>
-      </Popover.Portal>
-    </Popover.Root>
+        {/* Aspect Ratio Section */}
+        <div>
+          <h4 className="text-xs text-muted-foreground mb-2 font-medium">Aspect Ratio</h4>
+          <div className="grid grid-cols-6 gap-1" style={{ gridTemplateRows: 'auto auto' }}>
+            {/* Auto option - spans 2 rows */}
+            <button
+              onClick={() => onAspectRatioChange(null)}
+              className={cn(
+                'row-span-2 flex flex-col items-center justify-center p-2 rounded-lg transition-colors',
+                aspectRatio === null
+                  ? 'bg-accent text-foreground'
+                  : 'bg-secondary text-foreground hover:bg-accent'
+              )}
+            >
+              <AspectRatioIcon ratio="auto" className="w-5 h-5 mb-1" />
+              <span className="text-[10px]">Auto</span>
+            </button>
+
+            {/* Supported aspect ratios only */}
+            {supportedAspectRatios.map((ar) => (
+              <button
+                key={ar}
+                onClick={() => onAspectRatioChange(ar)}
+                className={cn(
+                  'flex flex-col items-center justify-center p-2 rounded-lg transition-colors',
+                  aspectRatio === ar
+                    ? 'bg-accent text-foreground'
+                    : 'bg-secondary text-foreground hover:bg-accent'
+                )}
+              >
+                <AspectRatioIcon ratio={ar} className="w-4 h-4 mb-0.5" />
+                <span className="text-[10px]">{ar}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 }

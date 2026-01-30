@@ -29,7 +29,7 @@ export function RichTextEditor({ content, onChange, onEditorReady, className }: 
     immediatelyRender: false,
     editorProps: {
       attributes: {
-        class: 'prose prose-sm prose-invert max-w-none focus:outline-none text-xs text-theme-text-primary',
+        class: 'prose prose-sm prose-invert max-w-none focus:outline-none text-xs text-foreground',
       },
     },
     onUpdate: ({ editor }) => {

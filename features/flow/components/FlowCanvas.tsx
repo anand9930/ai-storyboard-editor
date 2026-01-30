@@ -30,28 +30,11 @@ import { ProjectHeader } from './layout/ProjectHeader';
 import { CreditsDisplay } from './layout/CreditsDisplay';
 import { NodeInputPanel } from './toolbars/NodeInputPanel';
 import { MultiSelectionToolbar } from './toolbars/MultiSelectionToolbar';
-import { CanvasContextMenu } from './context-menus/CanvasContextMenu';
-import { NodeContextMenu } from './context-menus/NodeContextMenu';
+import { useFlowContextMenu } from './context-menus';
 import { FIXED_MODELS } from '@/features/flow/types/nodes';
 import type { AppNode, ImageNodeData, TextNodeData, AspectRatio, ImageQuality } from '@/features/flow/types/nodes';
 import { nodeTypes, defaultEdgeOptions, isValidNodeConnection } from '@/features/flow/lib/flowConfig';
 import { getModelDefaults } from '@/lib/modelSpecs';
-
-// Canvas context menu state interface
-interface ContextMenuState {
-  show: boolean;
-  x: number;
-  y: number;
-  flowPosition: { x: number; y: number };
-}
-
-// Node context menu state interface
-interface NodeContextMenuState {
-  show: boolean;
-  nodeId: string | null;
-  x: number;
-  y: number;
-}
 
 export default function FlowCanvas() {
   // Enable undo/redo keyboard shortcuts (Ctrl+Z / Ctrl+Y)
@@ -78,18 +61,9 @@ export default function FlowCanvas() {
   } = useWorkflowStore();
 
   const [isGenerating, setIsGenerating] = useState(false);
-  const [contextMenu, setContextMenu] = useState<ContextMenuState>({
-    show: false,
-    x: 0,
-    y: 0,
-    flowPosition: { x: 0, y: 0 },
-  });
-  const [nodeContextMenu, setNodeContextMenu] = useState<NodeContextMenuState>({
-    show: false,
-    nodeId: null,
-    x: 0,
-    y: 0,
-  });
+
+  // Context menu hook from provider
+  const { openCanvasMenu, openNodeMenu, closeMenu } = useFlowContextMenu();
 
   // Store React Flow instance for coordinate conversion
   const reactFlowInstance = useRef<ReactFlowInstance | null>(null);
@@ -193,9 +167,8 @@ export default function FlowCanvas() {
   // Handle pane click - deselect and close context menus
   const onPaneClick = useCallback(() => {
     setSelectedNodeIds([]);
-    setContextMenu((prev) => ({ ...prev, show: false }));
-    setNodeContextMenu((prev) => ({ ...prev, show: false }));
-  }, [setSelectedNodeIds]);
+    closeMenu();
+  }, [setSelectedNodeIds, closeMenu]);
 
   // Handle right-click on canvas - show context menu
   const onPaneContextMenu = useCallback(
@@ -204,61 +177,32 @@ export default function FlowCanvas() {
 
       if (!reactFlowInstance.current) return;
 
-      // Close node context menu if open
-      setNodeContextMenu((prev) => ({ ...prev, show: false }));
-
       // Convert screen coordinates to flow coordinates
       const flowPosition = reactFlowInstance.current.screenToFlowPosition({
         x: event.clientX,
         y: event.clientY,
       });
 
-      setContextMenu({
-        show: true,
-        x: event.clientX,
-        y: event.clientY,
-        flowPosition,
-      });
+      openCanvasMenu(event, flowPosition);
     },
-    []
+    [openCanvasMenu]
   );
-
-  // Close canvas context menu
-  const closeContextMenu = useCallback(() => {
-    setContextMenu((prev) => ({ ...prev, show: false }));
-  }, []);
 
   // Handle right-click on node - show node context menu
   const onNodeContextMenu = useCallback(
     (event: React.MouseEvent, node: Node) => {
-      event.preventDefault();
-      // Close canvas context menu if open
-      setContextMenu((prev) => ({ ...prev, show: false }));
-      // Open node context menu
-      setNodeContextMenu({
-        show: true,
-        nodeId: node.id,
-        x: event.clientX,
-        y: event.clientY,
-      });
+      openNodeMenu(event, node);
     },
-    []
+    [openNodeMenu]
   );
-
-  // Close node context menu
-  const closeNodeContextMenu = useCallback(() => {
-    setNodeContextMenu((prev) => ({ ...prev, show: false }));
-  }, []);
 
   // Handle right-click on selection - prevent default browser context menu
   const onSelectionContextMenu = useCallback(
     (event: React.MouseEvent, _nodes: Node[]) => {
       event.preventDefault();
-      // Close any open menus
-      setContextMenu((prev) => ({ ...prev, show: false }));
-      setNodeContextMenu((prev) => ({ ...prev, show: false }));
+      closeMenu();
     },
-    []
+    [closeMenu]
   );
 
   // Handle generation from input panel
@@ -543,26 +487,6 @@ export default function FlowCanvas() {
           </NodeToolbar>
         )}
       </ReactFlow>
-
-      {/* Canvas Context Menu - Shows on right-click on empty canvas */}
-      {contextMenu.show && (
-        <CanvasContextMenu
-          x={contextMenu.x}
-          y={contextMenu.y}
-          canvasPosition={contextMenu.flowPosition}
-          onClose={closeContextMenu}
-        />
-      )}
-
-      {/* Node Context Menu - Shows on right-click on a node */}
-      {nodeContextMenu.show && nodeContextMenu.nodeId && (
-        <NodeContextMenu
-          nodeId={nodeContextMenu.nodeId}
-          x={nodeContextMenu.x}
-          y={nodeContextMenu.y}
-          onClose={closeNodeContextMenu}
-        />
-      )}
     </div>
   );
 }

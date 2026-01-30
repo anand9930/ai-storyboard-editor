@@ -49,20 +49,6 @@
     --node-border: oklch(0.74 0.01 286);
     --node-border-selected: oklch(0.55 0.01 286);
 
-    /* Surface colors - Light mode */
-    --surface-primary: oklch(1 0 0);
-    --surface-secondary: oklch(0.967 0.001 286.4);
-    --surface-elevated: oklch(1 0 0);
-
-    /* Text colors - Light mode */
-    --text-primary: oklch(0.145 0 0);
-    --text-secondary: oklch(0.553 0.013 286.1);
-    --text-muted: oklch(0.7 0.01 286);
-
-    /* Interactive states - Light mode */
-    --interactive-hover: oklch(0.967 0.001 286.4);
-    --interactive-active: oklch(0.922 0.004 286.3);
-
     /* Status colors - Light mode */
     --status-error: oklch(0.577 0.245 27.3);
     --status-success: oklch(0.527 0.154 150.1);
@@ -133,20 +119,6 @@
     --node-bg: oklch(0.18 0.01 286);
     --node-border: oklch(0.35 0.01 286);
     --node-border-selected: oklch(0.6 0.01 286);
-
-    /* Surface colors - Dark mode */
-    --surface-primary: oklch(0.18 0.01 286);
-    --surface-secondary: oklch(0.235 0.01 286);
-    --surface-elevated: oklch(0.18 0.01 286);
-
-    /* Text colors - Dark mode */
-    --text-primary: oklch(0.985 0 0);
-    --text-secondary: oklch(0.7 0.01 286);
-    --text-muted: oklch(0.5 0.01 286);
-
-    /* Interactive states - Dark mode */
-    --interactive-hover: oklch(0.235 0.01 286);
-    --interactive-active: oklch(0.35 0.01 286);
 
     /* Status colors - Dark mode */
     --status-error: oklch(0.577 0.245 27.3);

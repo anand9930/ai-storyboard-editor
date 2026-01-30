@@ -13,8 +13,20 @@ import {
   X,
   Pilcrow,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { createPortal } from 'react-dom';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Toggle } from '@/components/ui/toggle';
+import { Separator } from '@/components/ui/separator';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 
 interface FullScreenEditorModalProps {
   content: string;
@@ -33,8 +45,7 @@ const COLORS = [
 ];
 
 export function FullScreenEditorModal({ content, onClose }: FullScreenEditorModalProps) {
-  const [showColorPicker, setShowColorPicker] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const [open, setOpen] = useState(true);
 
   const editor = useEditor({
     extensions: [
@@ -51,11 +62,6 @@ export function FullScreenEditorModal({ content, onClose }: FullScreenEditorModa
     },
   });
 
-  useEffect(() => {
-    setMounted(true);
-    return () => setMounted(false);
-  }, []);
-
   const handleCopy = useCallback(() => {
     if (editor) {
       const text = editor.getText();
@@ -67,6 +73,7 @@ export function FullScreenEditorModal({ content, onClose }: FullScreenEditorModa
     if (editor) {
       onClose(editor.getHTML());
     }
+    setOpen(false);
   }, [editor, onClose]);
 
   // Handle escape key
@@ -80,190 +87,157 @@ export function FullScreenEditorModal({ content, onClose }: FullScreenEditorModa
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleClose]);
 
-  if (!editor || !mounted) {
+  if (!editor) {
     return null;
   }
 
-  const modalContent = (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-      <div className="relative w-full max-w-4xl max-h-[90vh] m-4 bg-surface-primary border border-node rounded-xl shadow-2xl overflow-hidden flex flex-col">
+  return (
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleClose()}>
+      <DialogContent className="max-w-4xl max-h-[90vh] p-0 gap-0 overflow-hidden">
         {/* Header with Toolbar */}
-        <div className="flex items-center justify-between p-4 border-b border-node">
-          <div className="flex items-center gap-0.5 bg-surface-secondary border border-node rounded-lg p-1">
-            {/* Color Picker */}
-            <div className="relative">
-              <button
-                onClick={() => setShowColorPicker(!showColorPicker)}
-                className="p-1.5 hover:bg-interactive-hover rounded transition-colors"
-                title="Text Color"
-              >
-                <div
-                  className="w-4 h-4 rounded-full border border-node"
-                  style={{ backgroundColor: editor.getAttributes('textStyle').color || '#ffffff' }}
-                />
-              </button>
-              {showColorPicker && (
-                <div className="absolute top-full left-0 mt-1 p-2 bg-surface-secondary border border-node rounded-lg shadow-xl z-50 grid grid-cols-4 gap-1">
-                  {COLORS.map((color) => (
-                    <button
-                      key={color}
-                      onClick={() => {
-                        editor.chain().focus().setColor(color).run();
-                        setShowColorPicker(false);
-                      }}
-                      className="w-6 h-6 rounded-full border border-node hover:scale-110 transition-transform"
-                      style={{ backgroundColor: color }}
+        <DialogHeader className="p-4 border-b">
+          <div className="flex items-center justify-between">
+            <DialogTitle className="sr-only">Full Screen Editor</DialogTitle>
+            <div className="flex items-center gap-0.5 rounded-md border bg-muted p-1">
+              {/* Color Picker */}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                    <div
+                      className="h-4 w-4 rounded-full border"
+                      style={{ backgroundColor: editor.getAttributes('textStyle').color || '#ffffff' }}
                     />
-                  ))}
-                </div>
-              )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-2">
+                  <div className="grid grid-cols-4 gap-1">
+                    {COLORS.map((color) => (
+                      <button
+                        key={color}
+                        onClick={() => {
+                          editor.chain().focus().setColor(color).run();
+                        }}
+                        className="h-6 w-6 rounded-full border transition-transform hover:scale-110"
+                        style={{ backgroundColor: color }}
+                      />
+                    ))}
+                  </div>
+                </PopoverContent>
+              </Popover>
+
+              <Separator orientation="vertical" className="mx-1 h-5" />
+
+              {/* Headings */}
+              <Toggle
+                size="sm"
+                pressed={editor.isActive('heading', { level: 1 })}
+                onPressedChange={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+                className="h-8 px-2 text-xs font-medium"
+              >
+                H<sub>1</sub>
+              </Toggle>
+              <Toggle
+                size="sm"
+                pressed={editor.isActive('heading', { level: 2 })}
+                onPressedChange={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+                className="h-8 px-2 text-xs font-medium"
+              >
+                H<sub>2</sub>
+              </Toggle>
+              <Toggle
+                size="sm"
+                pressed={editor.isActive('heading', { level: 3 })}
+                onPressedChange={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+                className="h-8 px-2 text-xs font-medium"
+              >
+                H<sub>3</sub>
+              </Toggle>
+
+              <Toggle
+                size="sm"
+                pressed={editor.isActive('paragraph') && !editor.isActive('heading')}
+                onPressedChange={() => editor.chain().focus().setParagraph().run()}
+              >
+                <Pilcrow className="h-3.5 w-3.5" />
+              </Toggle>
+
+              <Separator orientation="vertical" className="mx-1 h-5" />
+
+              {/* Text Formatting */}
+              <Toggle
+                size="sm"
+                pressed={editor.isActive('bold')}
+                onPressedChange={() => editor.chain().focus().toggleBold().run()}
+                className="h-8 px-2 text-sm font-bold"
+              >
+                B
+              </Toggle>
+              <Toggle
+                size="sm"
+                pressed={editor.isActive('italic')}
+                onPressedChange={() => editor.chain().focus().toggleItalic().run()}
+                className="h-8 px-2 text-sm italic"
+              >
+                I
+              </Toggle>
+
+              {/* Lists */}
+              <Toggle
+                size="sm"
+                pressed={editor.isActive('bulletList')}
+                onPressedChange={() => editor.chain().focus().toggleBulletList().run()}
+              >
+                <List className="h-3.5 w-3.5" />
+              </Toggle>
+              <Toggle
+                size="sm"
+                pressed={editor.isActive('orderedList')}
+                onPressedChange={() => editor.chain().focus().toggleOrderedList().run()}
+              >
+                <ListOrdered className="h-3.5 w-3.5" />
+              </Toggle>
+
+              {/* Horizontal Rule */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => editor.chain().focus().setHorizontalRule().run()}
+                className="h-8 w-8 p-0"
+              >
+                <Minus className="h-3.5 w-3.5" />
+              </Button>
+
+              <Separator orientation="vertical" className="mx-1 h-5" />
+
+              {/* Copy */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleCopy}
+                className="h-8 w-8 p-0"
+              >
+                <Copy className="h-3.5 w-3.5" />
+              </Button>
             </div>
 
-            <div className="w-px h-5 bg-interactive-active mx-1" />
-
-            {/* Headings */}
-            <button
-              onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-              className={cn(
-                'px-1.5 py-1 text-xs font-medium rounded transition-colors',
-                editor.isActive('heading', { level: 1 })
-                  ? 'bg-interactive-active text-theme-text-primary'
-                  : 'hover:bg-interactive-hover text-theme-text-secondary'
-              )}
-              title="Heading 1"
+            {/* Close Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleClose}
+              className="h-8 w-8"
             >
-              H<sub>1</sub>
-            </button>
-            <button
-              onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-              className={cn(
-                'px-1.5 py-1 text-xs font-medium rounded transition-colors',
-                editor.isActive('heading', { level: 2 })
-                  ? 'bg-interactive-active text-theme-text-primary'
-                  : 'hover:bg-interactive-hover text-theme-text-secondary'
-              )}
-              title="Heading 2"
-            >
-              H<sub>2</sub>
-            </button>
-            <button
-              onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-              className={cn(
-                'px-1.5 py-1 text-xs font-medium rounded transition-colors',
-                editor.isActive('heading', { level: 3 })
-                  ? 'bg-interactive-active text-theme-text-primary'
-                  : 'hover:bg-interactive-hover text-theme-text-secondary'
-              )}
-              title="Heading 3"
-            >
-              H<sub>3</sub>
-            </button>
-
-            <button
-              onClick={() => editor.chain().focus().setParagraph().run()}
-              className={cn(
-                'p-1.5 rounded transition-colors',
-                editor.isActive('paragraph') && !editor.isActive('heading')
-                  ? 'bg-interactive-active text-theme-text-primary'
-                  : 'hover:bg-interactive-hover text-theme-text-secondary'
-              )}
-              title="Paragraph"
-            >
-              <Pilcrow className="w-3.5 h-3.5" />
-            </button>
-
-            <div className="w-px h-5 bg-interactive-active mx-1" />
-
-            {/* Text Formatting */}
-            <button
-              onClick={() => editor.chain().focus().toggleBold().run()}
-              className={cn(
-                'p-1.5 rounded transition-colors font-bold text-sm',
-                editor.isActive('bold')
-                  ? 'bg-interactive-active text-theme-text-primary'
-                  : 'hover:bg-interactive-hover text-theme-text-secondary'
-              )}
-              title="Bold"
-            >
-              B
-            </button>
-            <button
-              onClick={() => editor.chain().focus().toggleItalic().run()}
-              className={cn(
-                'p-1.5 rounded transition-colors italic text-sm',
-                editor.isActive('italic')
-                  ? 'bg-interactive-active text-theme-text-primary'
-                  : 'hover:bg-interactive-hover text-theme-text-secondary'
-              )}
-              title="Italic"
-            >
-              I
-            </button>
-
-            {/* Lists */}
-            <button
-              onClick={() => editor.chain().focus().toggleBulletList().run()}
-              className={cn(
-                'p-1.5 rounded transition-colors',
-                editor.isActive('bulletList')
-                  ? 'bg-interactive-active text-theme-text-primary'
-                  : 'hover:bg-interactive-hover text-theme-text-secondary'
-              )}
-              title="Bullet List"
-            >
-              <List className="w-3.5 h-3.5" />
-            </button>
-            <button
-              onClick={() => editor.chain().focus().toggleOrderedList().run()}
-              className={cn(
-                'p-1.5 rounded transition-colors',
-                editor.isActive('orderedList')
-                  ? 'bg-interactive-active text-theme-text-primary'
-                  : 'hover:bg-interactive-hover text-theme-text-secondary'
-              )}
-              title="Numbered List"
-            >
-              <ListOrdered className="w-3.5 h-3.5" />
-            </button>
-
-            {/* Horizontal Rule */}
-            <button
-              onClick={() => editor.chain().focus().setHorizontalRule().run()}
-              className="p-1.5 hover:bg-interactive-hover rounded transition-colors text-theme-text-secondary"
-              title="Horizontal Rule"
-            >
-              <Minus className="w-3.5 h-3.5" />
-            </button>
-
-            <div className="w-px h-5 bg-interactive-active mx-1" />
-
-            {/* Copy */}
-            <button
-              onClick={handleCopy}
-              className="p-1.5 hover:bg-interactive-hover rounded transition-colors text-theme-text-secondary"
-              title="Copy"
-            >
-              <Copy className="w-3.5 h-3.5" />
-            </button>
+              <X className="h-4 w-4" />
+              <span className="sr-only">Close (Esc)</span>
+            </Button>
           </div>
-
-          {/* Close Button */}
-          <button
-            onClick={handleClose}
-            className="p-2 hover:bg-interactive-hover rounded-lg transition-colors text-theme-text-secondary hover:text-theme-text-primary"
-            title="Close (Esc)"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+        </DialogHeader>
 
         {/* Editor Content */}
         <div className="flex-1 overflow-y-auto bg-background">
           <EditorContent editor={editor} />
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
-
-  return createPortal(modalContent, document.body);
 }

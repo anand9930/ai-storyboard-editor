@@ -2,11 +2,16 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { ArrowUp, X } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { FIXED_MODELS } from '@/features/flow/types/nodes';
 import type { ConnectedImage, AspectRatio, ImageQuality } from '@/features/flow/types/nodes';
 import { AspectRatioPopover } from '../selectors/AspectRatioPopover';
 import { ModelSelector } from '../selectors/ModelSelector';
+import { Card } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Separator } from '@/components/ui/separator';
 
 interface NodeInputPanelProps {
   nodeId: string;
@@ -83,64 +88,73 @@ export function NodeInputPanel({
   );
 
   return (
-    <div className="bg-surface-primary/95 backdrop-blur border border-node rounded-xl p-4 shadow-xl w-[500px]">
+    <Card className="w-[500px] p-4 shadow-xl backdrop-blur bg-card/95">
       {/* Error Display */}
       {error && (
-        <div className="bg-status-error/10 border border-status-error/30 rounded-lg p-3 text-sm text-status-error mb-3 flex items-start gap-2">
-          <span className="flex-1">{error}</span>
-          {onErrorDismiss && (
-            <button
-              onClick={onErrorDismiss}
-              className="p-0.5 hover:bg-status-error/20 rounded transition-colors flex-shrink-0"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          )}
-        </div>
+        <Alert variant="destructive" className="mb-3 py-2">
+          <AlertDescription className="flex items-start gap-2">
+            <span className="flex-1">{error}</span>
+            {onErrorDismiss && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onErrorDismiss}
+                className="h-5 w-5 shrink-0"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+          </AlertDescription>
+        </Alert>
       )}
 
       {/* Connected Images Preview */}
       {connectedImages && connectedImages.length > 0 && (
-        <div className="flex gap-2 mb-3 flex-wrap">
+        <div className="mb-3 flex flex-wrap gap-2">
           {connectedImages.map((img, idx) => (
             <div
               key={img.id}
-              className="relative w-12 h-12 rounded-lg overflow-hidden border border-node"
+              className="relative h-12 w-12 overflow-hidden rounded-lg border"
             >
               <img
                 src={img.url}
                 alt={`Connected ${idx + 1}`}
-                className="w-full h-full object-cover"
+                className="h-full w-full object-cover"
               />
-              <span className="absolute top-0 right-0 bg-interactive-active text-[10px] text-theme-text-secondary px-1 rounded-bl">
+              <Badge
+                variant="secondary"
+                className="absolute right-0 top-0 h-4 rounded-bl px-1 text-[10px]"
+              >
                 {idx + 1}
-              </span>
+              </Badge>
             </div>
           ))}
         </div>
       )}
 
       {/* Prompt Input */}
-      <textarea
+      <Textarea
         value={prompt}
         onChange={(e) => handlePromptChange(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
-        className="w-full bg-transparent text-sm text-theme-text-primary placeholder:text-theme-text-muted resize-none focus:outline-none min-h-[60px]"
+        className="min-h-[60px] resize-none border-none bg-transparent p-0 text-sm shadow-none focus-visible:ring-0"
         rows={2}
         disabled={isGenerating}
       />
 
+      <Separator className="my-3" />
+
       {/* Bottom Controls */}
-      <div className="flex items-center justify-between pt-3 border-t border-node mt-3">
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           {/* Model Selection/Badge */}
           {nodeType === 'text' ? (
             // Text model is fixed - show badge
-            <div className="flex items-center gap-1.5 bg-surface-secondary px-2 py-1 rounded-lg">
-              <span className="text-xs text-theme-text-secondary">G</span>
-              <span className="text-sm text-theme-text-primary">{textModel.name}</span>
-            </div>
+            <Badge variant="secondary" className="gap-1.5">
+              <span className="text-xs opacity-70">G</span>
+              {textModel.name}
+            </Badge>
           ) : (
             // Image model is selectable
             model && onModelChange && (
@@ -166,24 +180,20 @@ export function NodeInputPanel({
 
         <div className="flex items-center gap-3">
           {/* Generation Count */}
-          <span className="text-sm text-theme-text-secondary">1x</span>
-          <span className="text-sm text-theme-text-secondary">4</span>
+          <span className="text-sm text-muted-foreground">1x</span>
+          <span className="text-sm text-muted-foreground">4</span>
 
           {/* Submit Button */}
-          <button
+          <Button
+            size="icon"
             onClick={handleSubmit}
             disabled={isGenerating || !prompt.trim()}
-            className={cn(
-              'p-2 rounded-full transition-all',
-              isGenerating || !prompt.trim()
-                ? 'bg-interactive-active text-theme-text-muted cursor-not-allowed'
-                : 'bg-primary hover:bg-primary/90 text-primary-foreground'
-            )}
+            className="h-8 w-8 rounded-full"
           >
-            <ArrowUp className="w-4 h-4" />
-          </button>
+            <ArrowUp className="h-4 w-4" />
+          </Button>
         </div>
       </div>
-    </div>
+    </Card>
   );
 }

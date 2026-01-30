@@ -149,8 +149,8 @@ function ImageNodeComponent({ data, id, selected }: NodeProps<ImageNodeType>) {
   const toolbarContent = nodeData.generatedImage ? (
     <button
       onClick={handleDownload}
-      className="p-1.5 hover:bg-interactive-hover rounded transition-colors text-theme-text-secondary"
-      title="Download image"
+      className="p-1.5 hover:bg-accent rounded transition-colors text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+      aria-label="Download generated image"
     >
       <Download className="w-4 h-4" />
     </button>
@@ -175,14 +175,15 @@ function ImageNodeComponent({ data, id, selected }: NodeProps<ImageNodeType>) {
           {/* Initial state - Action Options - only show when no action selected and no generated image */}
           {!nodeData.generatedImage && !nodeData.selectedAction && (
             <div className="space-y-2 flex-shrink-0">
-              <span className="text-xs text-theme-text-muted">Try to:</span>
+              <span className="text-xs text-muted-foreground">Try to:</span>
               {NODE_ACTIONS.image.map((action) => (
                 <button
                   key={action.id}
                   onClick={() => handleActionClick(action.id as 'image_to_image')}
                   className={cn(
                     'w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-left transition-colors',
-                    'hover:bg-interactive-hover text-theme-text-secondary'
+                    'hover:bg-accent text-muted-foreground',
+                    'focus:outline-none focus-visible:ring-2 focus-visible:ring-ring'
                   )}
                 >
                   <RefreshCw className="w-4 h-4" />
@@ -194,7 +195,7 @@ function ImageNodeComponent({ data, id, selected }: NodeProps<ImageNodeType>) {
 
           {/* Active/Ready state - empty dark area waiting for prompt */}
           {!nodeData.generatedImage && nodeData.selectedAction && (
-            <div className="h-full flex items-center justify-center bg-surface-secondary rounded-lg min-h-[120px]">
+            <div className="h-full flex items-center justify-center bg-muted rounded-lg min-h-[120px]">
               {/* Empty state - user enters prompt in NodeInputPanel below */}
             </div>
           )}

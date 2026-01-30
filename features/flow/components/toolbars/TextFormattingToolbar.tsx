@@ -9,7 +9,15 @@ import {
   Maximize2,
   Pilcrow,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Toggle } from '@/components/ui/toggle';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface TextFormattingToolbarProps {
   editor: Editor | null;
@@ -23,138 +31,168 @@ export function TextFormattingToolbar({ editor, onCopy, onFullScreen }: TextForm
   }
 
   return (
-    <div className="flex items-center gap-0.5">
-      {/* Headings */}
-      <button
-        onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-        className={cn(
-          'px-1 py-0.5 text-xs font-semibold rounded transition-colors',
-          editor.isActive('heading', { level: 1 })
-            ? 'bg-interactive-active text-theme-text-primary'
-            : 'hover:bg-interactive-hover text-theme-text-secondary'
-        )}
-        title="Heading 1"
-      >
-        H1
-      </button>
-      <button
-        onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-        className={cn(
-          'px-1 py-0.5 text-xs font-semibold rounded transition-colors',
-          editor.isActive('heading', { level: 2 })
-            ? 'bg-interactive-active text-theme-text-primary'
-            : 'hover:bg-interactive-hover text-theme-text-secondary'
-        )}
-        title="Heading 2"
-      >
-        H2
-      </button>
-      <button
-        onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-        className={cn(
-          'px-1 py-0.5 text-xs font-semibold rounded transition-colors',
-          editor.isActive('heading', { level: 3 })
-            ? 'bg-interactive-active text-theme-text-primary'
-            : 'hover:bg-interactive-hover text-theme-text-secondary'
-        )}
-        title="Heading 3"
-      >
-        H3
-      </button>
+    <TooltipProvider delayDuration={300}>
+      <div className="flex items-center gap-0.5">
+        {/* Headings */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Toggle
+              size="sm"
+              pressed={editor.isActive('heading', { level: 1 })}
+              onPressedChange={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+              className="h-7 px-1.5 text-xs font-semibold"
+            >
+              H1
+            </Toggle>
+          </TooltipTrigger>
+          <TooltipContent>Heading 1</TooltipContent>
+        </Tooltip>
 
-      <button
-        onClick={() => editor.chain().focus().setParagraph().run()}
-        className={cn(
-          'p-1.5 rounded transition-colors',
-          editor.isActive('paragraph') && !editor.isActive('heading')
-            ? 'bg-interactive-active text-theme-text-primary'
-            : 'hover:bg-interactive-hover text-theme-text-secondary'
-        )}
-        title="Paragraph"
-      >
-        <Pilcrow className="w-3.5 h-3.5" />
-      </button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Toggle
+              size="sm"
+              pressed={editor.isActive('heading', { level: 2 })}
+              onPressedChange={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+              className="h-7 px-1.5 text-xs font-semibold"
+            >
+              H2
+            </Toggle>
+          </TooltipTrigger>
+          <TooltipContent>Heading 2</TooltipContent>
+        </Tooltip>
 
-      <div className="w-px h-5 bg-interactive-active mx-0.5" />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Toggle
+              size="sm"
+              pressed={editor.isActive('heading', { level: 3 })}
+              onPressedChange={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+              className="h-7 px-1.5 text-xs font-semibold"
+            >
+              H3
+            </Toggle>
+          </TooltipTrigger>
+          <TooltipContent>Heading 3</TooltipContent>
+        </Tooltip>
 
-      {/* Text Formatting */}
-      <button
-        onClick={() => editor.chain().focus().toggleBold().run()}
-        className={cn(
-          'p-1.5 rounded transition-colors font-bold text-xs',
-          editor.isActive('bold')
-            ? 'bg-interactive-active text-theme-text-primary'
-            : 'hover:bg-interactive-hover text-theme-text-secondary'
-        )}
-        title="Bold"
-      >
-        B
-      </button>
-      <button
-        onClick={() => editor.chain().focus().toggleItalic().run()}
-        className={cn(
-          'p-1.5 rounded transition-colors italic text-xs',
-          editor.isActive('italic')
-            ? 'bg-interactive-active text-theme-text-primary'
-            : 'hover:bg-interactive-hover text-theme-text-secondary'
-        )}
-        title="Italic"
-      >
-        I
-      </button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Toggle
+              size="sm"
+              pressed={editor.isActive('paragraph') && !editor.isActive('heading')}
+              onPressedChange={() => editor.chain().focus().setParagraph().run()}
+            >
+              <Pilcrow className="h-3.5 w-3.5" />
+            </Toggle>
+          </TooltipTrigger>
+          <TooltipContent>Paragraph</TooltipContent>
+        </Tooltip>
 
-      {/* Lists */}
-      <button
-        onClick={() => editor.chain().focus().toggleBulletList().run()}
-        className={cn(
-          'p-1.5 rounded transition-colors',
-          editor.isActive('bulletList')
-            ? 'bg-interactive-active text-theme-text-primary'
-            : 'hover:bg-interactive-hover text-theme-text-secondary'
-        )}
-        title="Bullet List"
-      >
-        <List className="w-3.5 h-3.5" />
-      </button>
-      <button
-        onClick={() => editor.chain().focus().toggleOrderedList().run()}
-        className={cn(
-          'p-1.5 rounded transition-colors',
-          editor.isActive('orderedList')
-            ? 'bg-interactive-active text-theme-text-primary'
-            : 'hover:bg-interactive-hover text-theme-text-secondary'
-        )}
-        title="Numbered List"
-      >
-        <ListOrdered className="w-3.5 h-3.5" />
-      </button>
+        <Separator orientation="vertical" className="mx-0.5 h-5" />
 
-      {/* Horizontal Rule */}
-      <button
-        onClick={() => editor.chain().focus().setHorizontalRule().run()}
-        className="p-1.5 hover:bg-interactive-hover rounded transition-colors text-theme-text-secondary"
-        title="Horizontal Rule"
-      >
-        <Minus className="w-3.5 h-3.5" />
-      </button>
+        {/* Text Formatting */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Toggle
+              size="sm"
+              pressed={editor.isActive('bold')}
+              onPressedChange={() => editor.chain().focus().toggleBold().run()}
+              className="h-7 px-1.5 text-xs font-bold"
+            >
+              B
+            </Toggle>
+          </TooltipTrigger>
+          <TooltipContent>Bold</TooltipContent>
+        </Tooltip>
 
-      <div className="w-px h-5 bg-interactive-active mx-0.5" />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Toggle
+              size="sm"
+              pressed={editor.isActive('italic')}
+              onPressedChange={() => editor.chain().focus().toggleItalic().run()}
+              className="h-7 px-1.5 text-xs italic"
+            >
+              I
+            </Toggle>
+          </TooltipTrigger>
+          <TooltipContent>Italic</TooltipContent>
+        </Tooltip>
 
-      {/* Actions */}
-      <button
-        onClick={onCopy}
-        className="p-1.5 hover:bg-interactive-hover rounded transition-colors text-theme-text-secondary"
-        title="Copy"
-      >
-        <Copy className="w-3.5 h-3.5" />
-      </button>
-      <button
-        onClick={onFullScreen}
-        className="p-1.5 hover:bg-interactive-hover rounded transition-colors text-theme-text-secondary"
-        title="Full Screen"
-      >
-        <Maximize2 className="w-3.5 h-3.5" />
-      </button>
-    </div>
+        {/* Lists */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Toggle
+              size="sm"
+              pressed={editor.isActive('bulletList')}
+              onPressedChange={() => editor.chain().focus().toggleBulletList().run()}
+            >
+              <List className="h-3.5 w-3.5" />
+            </Toggle>
+          </TooltipTrigger>
+          <TooltipContent>Bullet List</TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Toggle
+              size="sm"
+              pressed={editor.isActive('orderedList')}
+              onPressedChange={() => editor.chain().focus().toggleOrderedList().run()}
+            >
+              <ListOrdered className="h-3.5 w-3.5" />
+            </Toggle>
+          </TooltipTrigger>
+          <TooltipContent>Numbered List</TooltipContent>
+        </Tooltip>
+
+        {/* Horizontal Rule */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => editor.chain().focus().setHorizontalRule().run()}
+              className="h-7 w-7 p-0"
+            >
+              <Minus className="h-3.5 w-3.5" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Horizontal Rule</TooltipContent>
+        </Tooltip>
+
+        <Separator orientation="vertical" className="mx-0.5 h-5" />
+
+        {/* Actions */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onCopy}
+              className="h-7 w-7 p-0"
+            >
+              <Copy className="h-3.5 w-3.5" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Copy</TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onFullScreen}
+              className="h-7 w-7 p-0"
+            >
+              <Maximize2 className="h-3.5 w-3.5" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Full Screen</TooltipContent>
+        </Tooltip>
+      </div>
+    </TooltipProvider>
   );
 }

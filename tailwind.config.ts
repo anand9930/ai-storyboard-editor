@@ -77,23 +77,6 @@ const config: Config = {
           track: 'var(--scrollbar-track)',
           thumb: 'var(--scrollbar-thumb)',
         },
-        // Surface colors for consistent theming
-        surface: {
-          primary: 'var(--surface-primary)',
-          secondary: 'var(--surface-secondary)',
-          elevated: 'var(--surface-elevated)',
-        },
-        // Semantic text colors
-        'theme-text': {
-          primary: 'var(--text-primary)',
-          secondary: 'var(--text-secondary)',
-          muted: 'var(--text-muted)',
-        },
-        // Interactive state colors
-        interactive: {
-          hover: 'var(--interactive-hover)',
-          active: 'var(--interactive-active)',
-        },
         // Node colors
         node: {
           bg: 'var(--node-bg)',
