@@ -131,7 +131,7 @@ function MenuItem({
         'w-full flex items-center px-4 py-2 text-left',
         'transition-colors',
         variant === 'danger'
-          ? 'text-red-400 hover:bg-red-500/10'
+          ? 'text-status-error hover:bg-status-error/10'
           : 'text-theme-text-primary hover:bg-interactive-hover'
       )}
       onClick={onClick}
@@ -140,7 +140,7 @@ function MenuItem({
       {shortcut && (
         <span className={cn(
           'text-xs ml-4',
-          variant === 'danger' ? 'text-red-400/60' : 'text-theme-text-muted'
+          variant === 'danger' ? 'text-status-error/60' : 'text-theme-text-muted'
         )}>{shortcut}</span>
       )}
     </button>

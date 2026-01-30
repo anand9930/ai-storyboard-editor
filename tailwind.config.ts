@@ -79,6 +79,16 @@ const config: Config = {
           border: 'hsl(var(--node-border))',
           'border-selected': 'hsl(var(--node-border-selected))',
         },
+        /* Status colors */
+        status: {
+          error: 'hsl(var(--status-error))',
+          success: 'hsl(var(--status-success))',
+          warning: 'hsl(var(--status-warning))',
+          processing: 'hsl(var(--status-processing))',
+        },
+        /* Accent highlights */
+        'accent-blue': 'hsl(var(--accent-blue))',
+        'accent-yellow': 'hsl(var(--accent-yellow))',
       },
       borderColor: {
         node: 'hsl(var(--node-border))',

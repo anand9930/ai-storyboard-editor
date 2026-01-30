@@ -177,8 +177,8 @@ export function BaseNode({
           minWidth={minWidth}
           minHeight={minHeight}
           isVisible={selected}
-          lineClassName="!border-blue-500"
-          handleClassName="!w-2 !h-2 !bg-blue-500 !border-blue-500"
+          lineClassName="!border-primary"
+          handleClassName="!w-2 !h-2 !bg-primary !border-primary"
         />
       )}
 

@@ -130,7 +130,7 @@ export function ProjectHeader() {
 
       {/* Icon + Dropdown grouped */}
       <div className="flex items-center">
-        <Sparkles className="w-5 h-5 text-blue-500" />
+        <Sparkles className="w-5 h-5 text-primary" />
         <DropdownMenu.Root>
           <DropdownMenu.Trigger asChild>
             <button className="p-1 hover:bg-interactive-hover rounded transition-colors">
@@ -165,7 +165,7 @@ export function ProjectHeader() {
 
               <DropdownMenu.Item
                 onClick={handleClear}
-                className="flex items-center gap-2 px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 rounded-lg cursor-pointer outline-none"
+                className="flex items-center gap-2 px-3 py-2 text-sm text-status-error hover:bg-status-error/10 rounded-lg cursor-pointer outline-none"
               >
                 <Trash2 className="w-4 h-4" />
                 Clear

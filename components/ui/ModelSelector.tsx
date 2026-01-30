@@ -94,7 +94,7 @@ function ModelOption({ model, selected, onSelect }: ModelOptionProps) {
         {model.name}
       </span>
       {selected && (
-        <Check className="w-4 h-4 text-blue-400 flex-shrink-0" />
+        <Check className="w-4 h-4 text-primary flex-shrink-0" />
       )}
     </button>
   );

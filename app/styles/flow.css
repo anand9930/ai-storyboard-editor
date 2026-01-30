@@ -59,13 +59,13 @@
 
 /* Node status borders - override selection border */
 .node-status-processing {
-  border-color: hsl(217.2 91.2% 59.8% / 0.5) !important;
+  border-color: hsl(var(--status-processing) / 0.5) !important;
 }
 .node-status-completed {
-  border-color: hsl(142 76% 36% / 0.5) !important;
+  border-color: hsl(var(--status-success) / 0.5) !important;
 }
 .node-status-error {
-  border-color: hsl(0 84% 60% / 0.5) !important;
+  border-color: hsl(var(--status-error) / 0.5) !important;
 }
 
 /* Connection line (while dragging) */

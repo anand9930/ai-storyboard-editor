@@ -86,24 +86,24 @@ export function FullScreenEditorModal({ content, onClose }: FullScreenEditorModa
 
   const modalContent = (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-      <div className="relative w-full max-w-4xl max-h-[90vh] m-4 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl overflow-hidden flex flex-col">
+      <div className="relative w-full max-w-4xl max-h-[90vh] m-4 bg-surface-primary border border-node rounded-xl shadow-2xl overflow-hidden flex flex-col">
         {/* Header with Toolbar */}
-        <div className="flex items-center justify-between p-4 border-b border-zinc-800">
-          <div className="flex items-center gap-0.5 bg-zinc-800 border border-zinc-700 rounded-lg p-1">
+        <div className="flex items-center justify-between p-4 border-b border-node">
+          <div className="flex items-center gap-0.5 bg-surface-secondary border border-node rounded-lg p-1">
             {/* Color Picker */}
             <div className="relative">
               <button
                 onClick={() => setShowColorPicker(!showColorPicker)}
-                className="p-1.5 hover:bg-zinc-700 rounded transition-colors"
+                className="p-1.5 hover:bg-interactive-hover rounded transition-colors"
                 title="Text Color"
               >
                 <div
-                  className="w-4 h-4 rounded-full border border-zinc-600"
+                  className="w-4 h-4 rounded-full border border-node"
                   style={{ backgroundColor: editor.getAttributes('textStyle').color || '#ffffff' }}
                 />
               </button>
               {showColorPicker && (
-                <div className="absolute top-full left-0 mt-1 p-2 bg-zinc-800 border border-zinc-700 rounded-lg shadow-xl z-50 grid grid-cols-4 gap-1">
+                <div className="absolute top-full left-0 mt-1 p-2 bg-surface-secondary border border-node rounded-lg shadow-xl z-50 grid grid-cols-4 gap-1">
                   {COLORS.map((color) => (
                     <button
                       key={color}
@@ -111,7 +111,7 @@ export function FullScreenEditorModal({ content, onClose }: FullScreenEditorModa
                         editor.chain().focus().setColor(color).run();
                         setShowColorPicker(false);
                       }}
-                      className="w-6 h-6 rounded-full border border-zinc-600 hover:scale-110 transition-transform"
+                      className="w-6 h-6 rounded-full border border-node hover:scale-110 transition-transform"
                       style={{ backgroundColor: color }}
                     />
                   ))}
@@ -119,7 +119,7 @@ export function FullScreenEditorModal({ content, onClose }: FullScreenEditorModa
               )}
             </div>
 
-            <div className="w-px h-5 bg-zinc-700 mx-1" />
+            <div className="w-px h-5 bg-interactive-active mx-1" />
 
             {/* Headings */}
             <button
@@ -127,8 +127,8 @@ export function FullScreenEditorModal({ content, onClose }: FullScreenEditorModa
               className={cn(
                 'px-1.5 py-1 text-xs font-medium rounded transition-colors',
                 editor.isActive('heading', { level: 1 })
-                  ? 'bg-zinc-600 text-white'
-                  : 'hover:bg-zinc-700 text-zinc-400'
+                  ? 'bg-interactive-active text-theme-text-primary'
+                  : 'hover:bg-interactive-hover text-theme-text-secondary'
               )}
               title="Heading 1"
             >
@@ -139,8 +139,8 @@ export function FullScreenEditorModal({ content, onClose }: FullScreenEditorModa
               className={cn(
                 'px-1.5 py-1 text-xs font-medium rounded transition-colors',
                 editor.isActive('heading', { level: 2 })
-                  ? 'bg-zinc-600 text-white'
-                  : 'hover:bg-zinc-700 text-zinc-400'
+                  ? 'bg-interactive-active text-theme-text-primary'
+                  : 'hover:bg-interactive-hover text-theme-text-secondary'
               )}
               title="Heading 2"
             >
@@ -151,8 +151,8 @@ export function FullScreenEditorModal({ content, onClose }: FullScreenEditorModa
               className={cn(
                 'px-1.5 py-1 text-xs font-medium rounded transition-colors',
                 editor.isActive('heading', { level: 3 })
-                  ? 'bg-zinc-600 text-white'
-                  : 'hover:bg-zinc-700 text-zinc-400'
+                  ? 'bg-interactive-active text-theme-text-primary'
+                  : 'hover:bg-interactive-hover text-theme-text-secondary'
               )}
               title="Heading 3"
             >
@@ -164,15 +164,15 @@ export function FullScreenEditorModal({ content, onClose }: FullScreenEditorModa
               className={cn(
                 'p-1.5 rounded transition-colors',
                 editor.isActive('paragraph') && !editor.isActive('heading')
-                  ? 'bg-zinc-600 text-white'
-                  : 'hover:bg-zinc-700 text-zinc-400'
+                  ? 'bg-interactive-active text-theme-text-primary'
+                  : 'hover:bg-interactive-hover text-theme-text-secondary'
               )}
               title="Paragraph"
             >
               <Pilcrow className="w-3.5 h-3.5" />
             </button>
 
-            <div className="w-px h-5 bg-zinc-700 mx-1" />
+            <div className="w-px h-5 bg-interactive-active mx-1" />
 
             {/* Text Formatting */}
             <button
@@ -180,8 +180,8 @@ export function FullScreenEditorModal({ content, onClose }: FullScreenEditorModa
               className={cn(
                 'p-1.5 rounded transition-colors font-bold text-sm',
                 editor.isActive('bold')
-                  ? 'bg-zinc-600 text-white'
-                  : 'hover:bg-zinc-700 text-zinc-400'
+                  ? 'bg-interactive-active text-theme-text-primary'
+                  : 'hover:bg-interactive-hover text-theme-text-secondary'
               )}
               title="Bold"
             >
@@ -192,8 +192,8 @@ export function FullScreenEditorModal({ content, onClose }: FullScreenEditorModa
               className={cn(
                 'p-1.5 rounded transition-colors italic text-sm',
                 editor.isActive('italic')
-                  ? 'bg-zinc-600 text-white'
-                  : 'hover:bg-zinc-700 text-zinc-400'
+                  ? 'bg-interactive-active text-theme-text-primary'
+                  : 'hover:bg-interactive-hover text-theme-text-secondary'
               )}
               title="Italic"
             >
@@ -206,8 +206,8 @@ export function FullScreenEditorModal({ content, onClose }: FullScreenEditorModa
               className={cn(
                 'p-1.5 rounded transition-colors',
                 editor.isActive('bulletList')
-                  ? 'bg-zinc-600 text-white'
-                  : 'hover:bg-zinc-700 text-zinc-400'
+                  ? 'bg-interactive-active text-theme-text-primary'
+                  : 'hover:bg-interactive-hover text-theme-text-secondary'
               )}
               title="Bullet List"
             >
@@ -218,8 +218,8 @@ export function FullScreenEditorModal({ content, onClose }: FullScreenEditorModa
               className={cn(
                 'p-1.5 rounded transition-colors',
                 editor.isActive('orderedList')
-                  ? 'bg-zinc-600 text-white'
-                  : 'hover:bg-zinc-700 text-zinc-400'
+                  ? 'bg-interactive-active text-theme-text-primary'
+                  : 'hover:bg-interactive-hover text-theme-text-secondary'
               )}
               title="Numbered List"
             >
@@ -229,18 +229,18 @@ export function FullScreenEditorModal({ content, onClose }: FullScreenEditorModa
             {/* Horizontal Rule */}
             <button
               onClick={() => editor.chain().focus().setHorizontalRule().run()}
-              className="p-1.5 hover:bg-zinc-700 rounded transition-colors text-zinc-400"
+              className="p-1.5 hover:bg-interactive-hover rounded transition-colors text-theme-text-secondary"
               title="Horizontal Rule"
             >
               <Minus className="w-3.5 h-3.5" />
             </button>
 
-            <div className="w-px h-5 bg-zinc-700 mx-1" />
+            <div className="w-px h-5 bg-interactive-active mx-1" />
 
             {/* Copy */}
             <button
               onClick={handleCopy}
-              className="p-1.5 hover:bg-zinc-700 rounded transition-colors text-zinc-400"
+              className="p-1.5 hover:bg-interactive-hover rounded transition-colors text-theme-text-secondary"
               title="Copy"
             >
               <Copy className="w-3.5 h-3.5" />
@@ -250,7 +250,7 @@ export function FullScreenEditorModal({ content, onClose }: FullScreenEditorModa
           {/* Close Button */}
           <button
             onClick={handleClose}
-            className="p-2 hover:bg-zinc-800 rounded-lg transition-colors text-zinc-400 hover:text-white"
+            className="p-2 hover:bg-interactive-hover rounded-lg transition-colors text-theme-text-secondary hover:text-theme-text-primary"
             title="Close (Esc)"
           >
             <X className="w-5 h-5" />
@@ -258,7 +258,7 @@ export function FullScreenEditorModal({ content, onClose }: FullScreenEditorModa
         </div>
 
         {/* Editor Content */}
-        <div className="flex-1 overflow-y-auto bg-zinc-950">
+        <div className="flex-1 overflow-y-auto bg-background">
           <EditorContent editor={editor} />
         </div>
       </div>

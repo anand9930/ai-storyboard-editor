@@ -92,7 +92,7 @@ export function GroupToolbar({ groupId, isVisible, backgroundColor = '#3b82f6' }
           title="Background Color"
         >
           <div
-            className="w-4 h-4 rounded-full border border-gray-300"
+            className="w-4 h-4 rounded-full border border-node"
             style={{ backgroundColor }}
           />
         </button>
@@ -109,7 +109,7 @@ export function GroupToolbar({ groupId, isVisible, backgroundColor = '#3b82f6' }
                   onClick={() => handleColorChange(color.value)}
                   className={`w-6 h-6 rounded-full border-2 transition-transform hover:scale-110 ${
                     backgroundColor === color.value
-                      ? 'border-white ring-2 ring-offset-1 ring-blue-500'
+                      ? 'border-white ring-2 ring-offset-1 ring-primary'
                       : 'border-transparent'
                   }`}
                   style={{ backgroundColor: color.value }}

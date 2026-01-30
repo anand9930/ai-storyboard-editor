@@ -55,6 +55,16 @@
     --interactive-hover: 240 4.8% 95.9%;
     --interactive-active: 240 5.9% 90%;
 
+    /* Status colors - Light mode */
+    --status-error: 0 84.2% 60.2%;
+    --status-success: 142 76% 36%;
+    --status-warning: 45 93% 47%;
+    --status-processing: 217.2 91.2% 59.8%;
+
+    /* Accent highlights - Light mode */
+    --accent-blue: 217.2 91.2% 59.8%;
+    --accent-yellow: 45 93% 47%;
+
     /* Scrollbar - Light mode */
     --scrollbar-track: 240 4.8% 95.9%;
     --scrollbar-thumb: 240 5.9% 80%;
@@ -111,6 +121,16 @@
     /* Interactive states - Dark mode */
     --interactive-hover: 240 3.7% 15.9%;
     --interactive-active: 240 3.7% 25%;
+
+    /* Status colors - Dark mode */
+    --status-error: 0 84% 60%;
+    --status-success: 142 76% 36%;
+    --status-warning: 45 93% 47%;
+    --status-processing: 217.2 91.2% 59.8%;
+
+    /* Accent highlights - Dark mode */
+    --accent-blue: 217.2 91.2% 59.8%;
+    --accent-yellow: 45 93% 47%;
 
     /* Scrollbar - Dark mode */
     --scrollbar-track: 240 6% 10%;

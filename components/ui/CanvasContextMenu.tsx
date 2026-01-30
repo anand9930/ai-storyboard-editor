@@ -262,7 +262,7 @@ export function CanvasContextMenu({ x, y, canvasPosition, onClose }: CanvasConte
                 <div className="flex items-center gap-2">
                   <span className="text-sm">{item.label}</span>
                   {item.badge && (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400">
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent-blue/20 text-accent-blue">
                       {item.badge}
                     </span>
                   )}

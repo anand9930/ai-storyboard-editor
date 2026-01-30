@@ -86,12 +86,12 @@ export function NodeInputPanel({
     <div className="bg-surface-primary/95 backdrop-blur border border-node rounded-xl p-4 shadow-xl w-[500px]">
       {/* Error Display */}
       {error && (
-        <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 text-sm text-red-400 mb-3 flex items-start gap-2">
+        <div className="bg-status-error/10 border border-status-error/30 rounded-lg p-3 text-sm text-status-error mb-3 flex items-start gap-2">
           <span className="flex-1">{error}</span>
           {onErrorDismiss && (
             <button
               onClick={onErrorDismiss}
-              className="p-0.5 hover:bg-red-500/20 rounded transition-colors flex-shrink-0"
+              className="p-0.5 hover:bg-status-error/20 rounded transition-colors flex-shrink-0"
             >
               <X className="w-4 h-4" />
             </button>
@@ -177,7 +177,7 @@ export function NodeInputPanel({
               'p-2 rounded-full transition-all',
               isGenerating || !prompt.trim()
                 ? 'bg-interactive-active text-theme-text-muted cursor-not-allowed'
-                : 'bg-blue-600 hover:bg-blue-500 text-white'
+                : 'bg-primary hover:bg-primary/90 text-primary-foreground'
             )}
           >
             <ArrowUp className="w-4 h-4" />

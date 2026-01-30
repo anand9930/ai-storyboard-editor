@@ -39,7 +39,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
       return (
         <div className="flex flex-col items-center justify-center h-full p-8 text-center bg-surface-primary">
-          <AlertTriangle className="w-12 h-12 text-red-500 mb-4" />
+          <AlertTriangle className="w-12 h-12 text-status-error mb-4" />
           <h2 className="text-lg font-semibold text-theme-text-primary mb-2">
             Something went wrong
           </h2>
@@ -48,7 +48,7 @@ export class ErrorBoundary extends Component<Props, State> {
           </p>
           <button
             onClick={this.handleReset}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
             Try Again

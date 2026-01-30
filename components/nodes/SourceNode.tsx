@@ -96,8 +96,8 @@ function SourceNodeComponent({ data, id, selected }: NodeProps<SourceNodeType>) 
               className={cn(
                 "absolute top-2 right-2 flex items-center gap-1.5 px-2.5 py-1.5 text-white text-xs font-medium rounded-md backdrop-blur-sm transition-colors",
                 isUploading
-                  ? "bg-zinc-600/80 cursor-not-allowed"
-                  : "bg-zinc-800/80 hover:bg-zinc-700/80"
+                  ? "bg-surface-secondary/80 cursor-not-allowed"
+                  : "bg-background/80 hover:bg-interactive-hover/80"
               )}
             >
               {isUploading ? (
@@ -116,19 +116,19 @@ function SourceNodeComponent({ data, id, selected }: NodeProps<SourceNodeType>) 
             className={cn(
               "w-full h-full bg-surface-secondary border-2 border-dashed rounded-xl flex flex-col items-center justify-center transition-colors",
               isUploading
-                ? "border-zinc-500 cursor-not-allowed"
-                : "border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 cursor-pointer"
+                ? "border-theme-text-muted cursor-not-allowed"
+                : "border-node hover:border-node-selected cursor-pointer"
             )}
           >
             {isUploading ? (
               <>
-                <Loader2 className="w-8 h-8 text-zinc-400 dark:text-zinc-600 mb-2 animate-spin" />
-                <span className="text-xs text-zinc-500">Uploading...</span>
+                <Loader2 className="w-8 h-8 text-theme-text-muted mb-2 animate-spin" />
+                <span className="text-xs text-theme-text-muted">Uploading...</span>
               </>
             ) : (
               <>
-                <Upload className="w-8 h-8 text-zinc-400 dark:text-zinc-600 mb-2" />
-                <span className="text-xs text-zinc-500">Click to upload</span>
+                <Upload className="w-8 h-8 text-theme-text-muted mb-2" />
+                <span className="text-xs text-theme-text-muted">Click to upload</span>
               </>
             )}
           </div>
@@ -136,7 +136,7 @@ function SourceNodeComponent({ data, id, selected }: NodeProps<SourceNodeType>) 
 
         {/* Error display */}
         {error && (
-          <div className="absolute bottom-2 left-2 right-2 bg-red-500/90 text-white text-xs px-2 py-1 rounded">
+          <div className="absolute bottom-2 left-2 right-2 bg-status-error/90 text-white text-xs px-2 py-1 rounded">
             {error}
           </div>
         )}

@@ -51,7 +51,7 @@
 
 /* Placeholder text for empty editor */
 .ProseMirror p.is-editor-empty:first-child::before {
-  color: hsl(var(--text-muted, 240 5% 50%));
+  color: hsl(var(--text-muted));
   content: attr(data-placeholder);
   float: left;
   height: 0;
