@@ -73,6 +73,10 @@
     --sidebar-accent-foreground: oklch(0.21 0.006 285.8);
     --sidebar-border: oklch(0.922 0.013 255);
     --sidebar-ring: oklch(0.623 0.214 259.1);
+
+    /* Tooltip - Light mode (uses secondary-foreground for softer contrast) */
+    --tooltip: oklch(0.21 0.006 285.8);
+    --tooltip-foreground: oklch(0.985 0 0);
   }
 
   /* Dark mode - OKLCH color format */
@@ -144,6 +148,10 @@
     --sidebar-accent-foreground: oklch(0.967 0.001 286.4);
     --sidebar-border: oklch(0.235 0.01 286);
     --sidebar-ring: oklch(0.623 0.214 259.1);
+
+    /* Tooltip - Dark mode (light background for contrast against dark UI) */
+    --tooltip: oklch(0.967 0.001 286.4);
+    --tooltip-foreground: oklch(0.21 0.006 285.8);
   }
 }
 

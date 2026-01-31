@@ -4,8 +4,6 @@ import {
   FileText,
   Download,
   Bookmark,
-  Bell,
-  Menu,
 } from 'lucide-react';
 import type { NavItem } from '../types';
 
@@ -17,7 +15,4 @@ export const sidebarNavItems: NavItem[] = [
   { title: 'Saved', icon: Bookmark, href: '/saved' },
 ];
 
-export const sidebarFooterItems: NavItem[] = [
-  { title: 'Notifications', icon: Bell, href: '#' },
-  { title: 'Menu', icon: Menu, href: '#' },
-];
+export const sidebarFooterItems: NavItem[] = [];

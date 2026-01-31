@@ -3,7 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Sparkles, Sun, Moon } from 'lucide-react';
+import { Sparkles, Sun, Moon, Settings } from 'lucide-react';
 
 import {
   Sidebar,
@@ -20,7 +20,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useTheme } from '@/components/providers/ThemeProvider';
 
-import { sidebarNavItems, sidebarFooterItems } from '../data/navigation';
+import { sidebarNavItems } from '../data/navigation';
 
 export function HomeSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
@@ -45,7 +45,6 @@ export function HomeSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
               size="lg"
               asChild
               className={isMobile ? "!h-8 !w-8 !p-0 justify-center" : "!h-10 !w-10 !p-0 justify-center"}
-              tooltip="AI Storyboard"
             >
               <Link href="/">
                 <div className={`flex aspect-square ${isMobile ? "size-8" : "size-10"} items-center justify-center rounded-lg bg-primary text-primary-foreground`}>
@@ -82,7 +81,7 @@ export function HomeSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
         </SidebarGroup>
       </SidebarContent>
 
-      {/* Footer with theme toggle, notifications, avatar, menu */}
+      {/* Footer with theme toggle, settings, and avatar */}
       <SidebarFooter className="p-2">
         <SidebarMenu className={isMobile ? "" : "items-center"}>
           {/* Theme toggle */}
@@ -93,27 +92,26 @@ export function HomeSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
               className={isMobile ? "justify-start gap-3 px-3" : "!h-10 !w-10 !p-0 justify-center"}
             >
               {colorMode === 'dark' ? (
-                <Moon className="size-5 shrink-0" />
-              ) : (
                 <Sun className="size-5 shrink-0" />
+              ) : (
+                <Moon className="size-5 shrink-0" />
               )}
               {isMobile && <span>{colorMode === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>}
             </SidebarMenuButton>
           </SidebarMenuItem>
-          {sidebarFooterItems.map((item) => (
-            <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton
-                asChild
-                tooltip={item.title}
-                className={isMobile ? "justify-start gap-3 px-3" : "!h-10 !w-10 !p-0 justify-center"}
-              >
-                <Link href={item.href}>
-                  <item.icon className="size-5 shrink-0" />
-                  {isMobile && <span>{item.title}</span>}
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
+          {/* Settings */}
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              tooltip="Settings"
+              className={isMobile ? "justify-start gap-3 px-3" : "!h-10 !w-10 !p-0 justify-center"}
+            >
+              <Link href="/settings">
+                <Settings className="size-5 shrink-0" />
+                {isMobile && <span>Settings</span>}
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
           {/* User avatar */}
           <SidebarMenuItem>
             <SidebarMenuButton
