@@ -1,30 +1,55 @@
+'use client';
+
+import { useRef } from 'react';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
+import type { MasonryProps, RenderComponentProps } from 'masonic';
 import { galleryImages } from '../data/gallery';
+import { useResponsiveMasonry } from '../hooks/useResponsiveMasonry';
+import type { GalleryImage } from '../types';
+
+// Dynamic import to avoid SSR issues with ResizeObserver
+const Masonry = dynamic(
+  () => import('masonic').then((mod) => mod.Masonry),
+  { ssr: false }
+) as <T>(props: MasonryProps<T>) => React.ReactElement;
+
+function GalleryCard({ data, width }: RenderComponentProps<GalleryImage>) {
+  // Calculate height based on aspect ratio
+  const aspectRatio = data.height / data.width;
+  const height = Math.round(width * aspectRatio);
+
+  return (
+    <div
+      className="relative overflow-hidden bg-muted"
+      style={{ height }}
+    >
+      <Image
+        src={data.src}
+        alt={data.alt}
+        fill
+        className="object-cover"
+        sizes="(max-width: 768px) 50vw, 25vw"
+      />
+    </div>
+  );
+}
 
 export function MasonryGallery() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { columnWidth, columnCount, gutter } = useResponsiveMasonry(containerRef);
+
   return (
-    <section className="py-8 px-4">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-6xl mx-auto">
-        {galleryImages.map((image, index) => (
-          <div
-            key={index}
-            className="relative overflow-hidden rounded-xl bg-muted aspect-video"
-          >
-            <Image
-              src={image.src}
-              alt={image.alt}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 33vw"
-              onError={(e) => {
-                // Hide image on error, show placeholder
-                e.currentTarget.style.display = 'none';
-              }}
-            />
-            {/* Placeholder shown when no image */}
-            <div className="absolute inset-0 bg-gradient-to-br from-muted to-muted/50" />
-          </div>
-        ))}
+    <section className="py-xl px-lg">
+      <div className="max-w-7xl mx-auto" ref={containerRef}>
+        <Masonry<GalleryImage>
+          items={galleryImages}
+          render={GalleryCard}
+          columnWidth={columnWidth}
+          columnGutter={gutter}
+          rowGutter={gutter}
+          maxColumnCount={columnCount}
+        />
       </div>
     </section>
   );
