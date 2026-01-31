@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Sparkles, ChevronDown, Download, Upload, Trash2, Sun, Moon } from 'lucide-react';
-import { useWorkflowStore, ColorMode } from '@/features/flow/store/workflowStore';
+import { Sparkles, ChevronDown, Download, Upload, Trash2 } from 'lucide-react';
+import { useWorkflowStore } from '@/features/flow/store/workflowStore';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 export function ProjectHeader() {
-  const { projectName, setProjectName, exportWorkflow, importWorkflow, clearWorkflow, colorMode, setColorMode } =
+  const { projectName, setProjectName, exportWorkflow, importWorkflow, clearWorkflow } =
     useWorkflowStore();
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(projectName);
@@ -45,12 +45,6 @@ export function ProjectHeader() {
     }
   }, [isEditing]);
 
-  // Apply theme class to document
-  useEffect(() => {
-    const root = document.documentElement;
-    root.classList.toggle('dark', colorMode === 'dark');
-  }, [colorMode]);
-
   const handleNameClick = () => {
     setEditValue(projectName);
     setIsEditing(true);
@@ -74,14 +68,6 @@ export function ProjectHeader() {
       setIsEditing(false);
     }
   };
-
-  const cycleTheme = () => {
-    const nextMode: ColorMode = colorMode === 'dark' ? 'light' : 'dark';
-    setColorMode(nextMode);
-    toast.success(`Theme: ${nextMode}`);
-  };
-
-  const ThemeIcon = colorMode === 'dark' ? Moon : Sun;
 
   const handleExport = () => {
     try {
@@ -165,13 +151,6 @@ export function ProjectHeader() {
             >
               <Trash2 className="mr-2 h-4 w-4" />
               Clear
-            </DropdownMenuItem>
-
-            <DropdownMenuSeparator />
-
-            <DropdownMenuItem onClick={cycleTheme}>
-              <ThemeIcon className="mr-2 h-4 w-4" />
-              {colorMode === 'dark' ? 'Dark Mode' : 'Light Mode'}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
