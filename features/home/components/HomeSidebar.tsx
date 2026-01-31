@@ -15,6 +15,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from '@/components/ui/sidebar';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useTheme } from '@/components/providers/ThemeProvider';
@@ -24,6 +25,7 @@ import { sidebarNavItems, sidebarFooterItems } from '../data/navigation';
 export function HomeSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
   const { colorMode, setColorMode } = useTheme();
+  const { isMobile } = useSidebar();
 
   const toggleTheme = () => {
     setColorMode(colorMode === 'dark' ? 'light' : 'dark');
@@ -36,18 +38,18 @@ export function HomeSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
       {...props}
     >
       {/* Logo at top */}
-      <SidebarHeader className="p-2">
-        <SidebarMenu className="items-center">
+      <SidebarHeader className={isMobile ? "!flex-row h-14 !px-5 !py-0 items-center border-b !gap-0" : "p-2"}>
+        <SidebarMenu className={isMobile ? "" : "items-center"}>
           <SidebarMenuItem>
             <SidebarMenuButton
               size="lg"
               asChild
-              className="!h-11 !w-11 !p-0 justify-center"
+              className={isMobile ? "!h-8 !w-8 !p-0 justify-center" : "!h-10 !w-10 !p-0 justify-center"}
               tooltip="AI Storyboard"
             >
               <Link href="/">
-                <div className="flex aspect-square size-11 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                  <Sparkles className="size-6" />
+                <div className={`flex aspect-square ${isMobile ? "size-8" : "size-10"} items-center justify-center rounded-lg bg-primary text-primary-foreground`}>
+                  <Sparkles className={isMobile ? "size-4" : "size-5"} />
                 </div>
               </Link>
             </SidebarMenuButton>
@@ -59,17 +61,18 @@ export function HomeSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
-            <SidebarMenu className="items-center">
+            <SidebarMenu className={isMobile ? "" : "items-center"}>
               {sidebarNavItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     asChild
                     isActive={pathname === item.href}
                     tooltip={item.title}
-                    className="!h-11 !w-11 !p-0 justify-center"
+                    className={isMobile ? "justify-start gap-3 px-3" : "!h-10 !w-10 !p-0 justify-center"}
                   >
                     <Link href={item.href}>
-                      <item.icon className="size-6" />
+                      <item.icon className="size-5 shrink-0" />
+                      {isMobile && <span>{item.title}</span>}
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -81,19 +84,20 @@ export function HomeSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
 
       {/* Footer with theme toggle, notifications, avatar, menu */}
       <SidebarFooter className="p-2">
-        <SidebarMenu className="items-center">
+        <SidebarMenu className={isMobile ? "" : "items-center"}>
           {/* Theme toggle */}
           <SidebarMenuItem>
             <SidebarMenuButton
               onClick={toggleTheme}
               tooltip={colorMode === 'dark' ? 'Light Mode' : 'Dark Mode'}
-              className="!h-11 !w-11 !p-0 justify-center"
+              className={isMobile ? "justify-start gap-3 px-3" : "!h-10 !w-10 !p-0 justify-center"}
             >
               {colorMode === 'dark' ? (
-                <Moon className="size-6" />
+                <Moon className="size-5 shrink-0" />
               ) : (
-                <Sun className="size-6" />
+                <Sun className="size-5 shrink-0" />
               )}
+              {isMobile && <span>{colorMode === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>}
             </SidebarMenuButton>
           </SidebarMenuItem>
           {sidebarFooterItems.map((item) => (
@@ -101,10 +105,11 @@ export function HomeSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
               <SidebarMenuButton
                 asChild
                 tooltip={item.title}
-                className="!h-11 !w-11 !p-0 justify-center"
+                className={isMobile ? "justify-start gap-3 px-3" : "!h-10 !w-10 !p-0 justify-center"}
               >
                 <Link href={item.href}>
-                  <item.icon className="size-6" />
+                  <item.icon className="size-5 shrink-0" />
+                  {isMobile && <span>{item.title}</span>}
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -113,12 +118,13 @@ export function HomeSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
           <SidebarMenuItem>
             <SidebarMenuButton
               tooltip="Profile"
-              className="!h-11 !w-11 !p-0 justify-center"
+              className={isMobile ? "justify-start gap-3 px-3" : "!h-10 !w-10 !p-0 justify-center"}
             >
-              <Avatar className="size-9">
+              <Avatar className="size-7 shrink-0">
                 <AvatarImage src="/avatars/user.jpg" alt="User" />
                 <AvatarFallback className="text-sm">U</AvatarFallback>
               </Avatar>
+              {isMobile && <span>Profile</span>}
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
