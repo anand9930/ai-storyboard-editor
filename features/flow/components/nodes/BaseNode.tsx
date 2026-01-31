@@ -167,7 +167,7 @@ export function BaseNode({
           isVisible={selected && selectedNodeCount === 1}
           position={Position.Top}
           offset={20}
-          className="flex gap-1 bg-card border rounded-lg p-1 shadow-lg"
+          className="flex gap-toolbar bg-card border rounded-lg p-toolbar shadow-lg"
         >
           {toolbarContent}
         </NodeToolbar>
@@ -226,15 +226,15 @@ export function BaseNode({
         style={{
           ...(width && { width: `${width}px` }),
           ...(height && { height: `${height}px` }),
-          ...(!width && !resizable && !autoHeight && { width: '240px' }),
-          ...(!height && !resizable && !autoHeight && { height: '240px' }),
+          ...(!width && !resizable && !autoHeight && { width: 'var(--node-default-size)' }),
+          ...(!height && !resizable && !autoHeight && { height: 'var(--node-default-size)' }),
         }}
       >
         {/* Inner container with overflow-hidden for image clipping */}
         <div
           className={cn(
             'relative bg-card rounded-xl shadow-lg overflow-hidden',
-            !noPadding && 'p-4',
+            !noPadding && 'p-node',
             'w-full h-full',
             'transition-all duration-200',
             status === 'processing' && 'node-status-processing',

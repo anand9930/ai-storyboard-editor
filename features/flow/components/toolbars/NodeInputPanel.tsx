@@ -88,7 +88,7 @@ export function NodeInputPanel({
   );
 
   return (
-    <Card className="w-[500px] p-4 shadow-xl backdrop-blur bg-card/95">
+    <Card className="w-panel-lg p-panel shadow-xl backdrop-blur bg-card/95">
       {/* Error Display */}
       {error && (
         <Alert variant="destructive" className="mb-3 py-2">

@@ -103,6 +103,37 @@ const config: Config = {
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
       },
+      // Semantic spacing tokens
+      spacing: {
+        xs: 'var(--spacing-xs)',
+        sm: 'var(--spacing-sm)',
+        md: 'var(--spacing-md)',
+        lg: 'var(--spacing-lg)',
+        xl: 'var(--spacing-xl)',
+        section: 'var(--spacing-section)',
+        node: 'var(--spacing-node-padding)',
+        toolbar: 'var(--spacing-toolbar-padding)',
+        panel: 'var(--spacing-panel-padding)',
+        popup: 'var(--spacing-popup-padding)',
+      },
+      gap: {
+        toolbar: 'var(--spacing-toolbar-gap)',
+      },
+      width: {
+        node: 'var(--node-default-size)',
+        'panel-sm': 'var(--panel-width-sm)',
+        'panel-md': 'var(--panel-width-md)',
+        'panel-lg': 'var(--panel-width-lg)',
+      },
+      height: {
+        node: 'var(--node-default-size)',
+      },
+      minWidth: {
+        node: 'var(--node-default-size)',
+      },
+      minHeight: {
+        node: 'var(--node-default-size)',
+      },
       keyframes: {
         'accordion-down': {
           from: { height: '0' },

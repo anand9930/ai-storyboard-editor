@@ -125,7 +125,7 @@ export function AspectRatioPopover({
       </PopoverTrigger>
 
       <PopoverContent
-        className="w-[280px] p-4"
+        className="w-panel-md p-4"
         side="top"
         align="start"
         sideOffset={8}

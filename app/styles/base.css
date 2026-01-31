@@ -27,6 +27,28 @@
     --ring: oklch(0.623 0.214 259.1);
     --radius: 0.625rem;
 
+    /* === Spacing Tokens === */
+    /* Semantic spacing scale (theme-independent) */
+    --spacing-xs: 0.25rem;    /* 4px - dense UI gaps */
+    --spacing-sm: 0.5rem;     /* 8px - compact containers */
+    --spacing-md: 0.75rem;    /* 12px - standard internal */
+    --spacing-lg: 1rem;       /* 16px - standard container */
+    --spacing-xl: 1.5rem;     /* 24px - generous container */
+    --spacing-section: 2rem;  /* 32px - between sections */
+
+    /* Component-specific spacing */
+    --spacing-node-padding: 1rem;
+    --spacing-toolbar-gap: 0.25rem;
+    --spacing-toolbar-padding: 0.25rem;
+    --spacing-panel-padding: 1rem;
+    --spacing-popup-padding: 0.5rem;
+
+    /* Fixed dimensions */
+    --node-default-size: 15rem;   /* 240px */
+    --panel-width-sm: 14rem;      /* 224px */
+    --panel-width-md: 17.5rem;    /* 280px */
+    --panel-width-lg: 31.25rem;   /* 500px */
+
     /* Chart colors */
     --chart-1: oklch(0.623 0.214 259.1);
     --chart-2: oklch(0.6 0.15 160);
