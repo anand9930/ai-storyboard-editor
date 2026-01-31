@@ -3,7 +3,6 @@ export { default as FlowCanvas } from './components/FlowCanvas';
 
 // Store
 export { useWorkflowStore } from './store/workflowStore';
-export type { ColorMode } from './store/workflowStore';
 
 // Types
 export * from './types/nodes';

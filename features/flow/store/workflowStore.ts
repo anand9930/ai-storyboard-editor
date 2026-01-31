@@ -11,8 +11,6 @@ import {
 } from '@xyflow/react';
 import type { AppNodeData, GroupNodeData } from '@/features/flow/types/nodes';
 
-export type ColorMode = 'dark' | 'light';
-
 // Flag to batch history entries when node+edge removals happen together
 // React Flow fires onEdgesChange and onNodesChange separately during deletion,
 // so we use microtask batching to combine them into a single history entry.
@@ -73,15 +71,11 @@ interface WorkflowState {
   // Credits
   credits: number;
 
-  // Theme
-  colorMode: ColorMode;
-
   // Actions
   setNodes: (nodes: Node[]) => void;
   setEdges: (edges: Edge[]) => void;
   setProjectName: (name: string) => void;
   setCredits: (credits: number) => void;
-  setColorMode: (mode: ColorMode) => void;
   onNodesChange: (changes: NodeChange[]) => void;
   onEdgesChange: (changes: EdgeChange[]) => void;
   addNode: (node: Node) => void;
@@ -123,13 +117,11 @@ export const useWorkflowStore = create<WorkflowState>()(
         clipboard: null,
         projectName: 'Untitled',
         credits: 1000,
-        colorMode: 'dark' as ColorMode,
 
       setNodes: (nodes) => set({ nodes: sortNodesWithParentsFirst(nodes) }),
       setEdges: (edges) => set({ edges }),
       setProjectName: (name) => set({ projectName: name }),
       setCredits: (credits) => set({ credits }),
-      setColorMode: (mode) => set({ colorMode: mode }),
 
       onNodesChange: (changes) => {
         // Batch removal changes with edges to create single undo entry
@@ -822,7 +814,6 @@ export const useWorkflowStore = create<WorkflowState>()(
           edges: state.edges,
           projectName: state.projectName,
           credits: state.credits,
-          colorMode: state.colorMode,
         }),
       }
     ),

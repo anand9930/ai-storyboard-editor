@@ -17,13 +17,13 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useWorkflowStore } from '@/features/flow/store/workflowStore';
+import { useTheme } from '@/components/providers/ThemeProvider';
 
 import { sidebarNavItems, sidebarFooterItems } from '../data/navigation';
 
 export function HomeSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
-  const { colorMode, setColorMode } = useWorkflowStore();
+  const { colorMode, setColorMode } = useTheme();
 
   const toggleTheme = () => {
     setColorMode(colorMode === 'dark' ? 'light' : 'dark');

@@ -25,6 +25,7 @@ import { useShallow } from 'zustand/shallow';
 
 import { useWorkflowStore } from '@/features/flow/store/workflowStore';
 import { useUndoRedoShortcuts } from '@/features/flow/hooks/useUndoRedoShortcuts';
+import { useTheme } from '@/components/providers/ThemeProvider';
 import { LeftSidebar } from './layout/LeftSidebar';
 import { ProjectHeader } from './layout/ProjectHeader';
 import { CreditsDisplay } from './layout/CreditsDisplay';
@@ -40,13 +41,15 @@ export default function FlowCanvas() {
   // Enable undo/redo keyboard shortcuts (Ctrl+Z / Ctrl+Y)
   useUndoRedoShortcuts();
 
+  // Get theme from app-level provider
+  const { colorMode } = useTheme();
+
   // Use shallow selectors to prevent re-renders when unrelated state changes
-  const { nodes, edges, selectedNodeIds, colorMode } = useWorkflowStore(
+  const { nodes, edges, selectedNodeIds } = useWorkflowStore(
     useShallow((state) => ({
       nodes: state.nodes,
       edges: state.edges,
       selectedNodeIds: state.selectedNodeIds,
-      colorMode: state.colorMode,
     }))
   );
 
