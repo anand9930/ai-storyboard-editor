@@ -18,4 +18,7 @@ export interface GalleryImage {
   alt: string;
   width: number;
   height: number;
+  author: {
+    name: string;
+  };
 }

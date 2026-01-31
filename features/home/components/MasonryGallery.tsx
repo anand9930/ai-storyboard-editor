@@ -4,6 +4,7 @@ import { useRef } from 'react';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import type { MasonryProps, RenderComponentProps } from 'masonic';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { galleryImages } from '../data/gallery';
 import { useResponsiveMasonry } from '../hooks/useResponsiveMasonry';
 import type { GalleryImage } from '../types';
@@ -14,6 +15,10 @@ const Masonry = dynamic(
   { ssr: false }
 ) as <T>(props: MasonryProps<T>) => React.ReactElement;
 
+// Helper to get initials from name
+const getInitials = (name: string) =>
+  name.split(' ').map(n => n[0]).join('').toUpperCase();
+
 function GalleryCard({ data, width }: RenderComponentProps<GalleryImage>) {
   // Calculate height based on aspect ratio
   const aspectRatio = data.height / data.width;
@@ -21,7 +26,7 @@ function GalleryCard({ data, width }: RenderComponentProps<GalleryImage>) {
 
   return (
     <div
-      className="relative overflow-hidden bg-muted"
+      className="group relative overflow-hidden bg-muted cursor-pointer"
       style={{ height }}
     >
       <Image
@@ -31,6 +36,21 @@ function GalleryCard({ data, width }: RenderComponentProps<GalleryImage>) {
         className="object-cover"
         sizes="(max-width: 768px) 50vw, 25vw"
       />
+
+      {/* Hover overlay */}
+      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300" />
+
+      {/* Author info - bottom left */}
+      <div className="absolute bottom-0 left-0 right-0 p-sm md:p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <div className="flex items-center gap-xs md:gap-2">
+          <Avatar className="h-5 w-5 md:h-8 md:w-8">
+            <AvatarFallback className="text-[8px] md:text-xs">
+              {getInitials(data.author.name)}
+            </AvatarFallback>
+          </Avatar>
+          <span className="text-white text-[10px] md:text-sm font-normal truncate">{data.author.name}</span>
+        </div>
+      </div>
     </div>
   );
 }
