@@ -34,7 +34,7 @@ function GalleryCard({ data, width }: RenderComponentProps<GalleryImage>) {
         alt={data.alt}
         fill
         className="object-cover"
-        sizes="(max-width: 768px) 50vw, 25vw"
+        sizes="(max-width: 768px) 50vw, 33vw"
       />
 
       {/* Hover overlay */}
@@ -61,7 +61,7 @@ export function MasonryGallery() {
 
   return (
     <section className="py-xl px-lg">
-      <div className="max-w-7xl mx-auto" ref={containerRef}>
+      <div className="max-w-gallery mx-auto" ref={containerRef}>
         <Masonry<GalleryImage>
           items={galleryImages}
           render={GalleryCard}

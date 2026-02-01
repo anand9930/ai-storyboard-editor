@@ -134,6 +134,9 @@ const config: Config = {
       minHeight: {
         node: 'var(--node-default-size)',
       },
+      maxWidth: {
+        gallery: 'var(--gallery-max-width)',
+      },
       keyframes: {
         'accordion-down': {
           from: { height: '0' },

@@ -48,6 +48,7 @@
     --panel-width-sm: 14rem;      /* 224px */
     --panel-width-md: 17.5rem;    /* 280px */
     --panel-width-lg: 31.25rem;   /* 500px */
+    --gallery-max-width: 81rem;   /* 1296px */
 
     /* Chart colors */
     --chart-1: oklch(0.623 0.214 259.1);
