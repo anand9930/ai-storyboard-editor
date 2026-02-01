@@ -18,9 +18,10 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Separator } from '@/components/ui/separator';
 import { useTheme } from '@/components/providers/ThemeProvider';
 
-import { sidebarNavItems } from '../data/navigation';
+import { sidebarNavGroups } from '../data/navigation';
 
 export function HomeSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
@@ -58,27 +59,34 @@ export function HomeSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
 
       {/* Main navigation icons */}
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu className={isMobile ? "" : "items-center"}>
-              {sidebarNavItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={pathname === item.href}
-                    tooltip={item.title}
-                    className={isMobile ? "justify-start gap-3 px-3" : "!h-10 !w-10 !p-0 justify-center"}
-                  >
-                    <Link href={item.href}>
-                      <item.icon className="size-5 shrink-0" />
-                      {isMobile && <span>{item.title}</span>}
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {sidebarNavGroups.map((group, groupIndex) => (
+          <React.Fragment key={groupIndex}>
+            {groupIndex > 0 && (
+              <Separator className="mx-auto w-8 my-2 bg-sidebar-border" />
+            )}
+            <SidebarGroup>
+              <SidebarGroupContent>
+                <SidebarMenu className={isMobile ? "" : "items-center"}>
+                  {group.items.map((item) => (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={pathname === item.href}
+                        tooltip={item.title}
+                        className={isMobile ? "justify-start gap-3 px-3" : "!h-10 !w-10 !p-0 justify-center"}
+                      >
+                        <Link href={item.href}>
+                          <item.icon className="size-5 shrink-0" />
+                          {isMobile && <span>{item.title}</span>}
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </React.Fragment>
+        ))}
       </SidebarContent>
 
       {/* Footer with theme toggle, settings, and avatar */}

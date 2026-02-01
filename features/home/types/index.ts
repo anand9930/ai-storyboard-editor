@@ -4,7 +4,10 @@ export interface NavItem {
   title: string;
   icon: LucideIcon;
   href: string;
-  isActive?: boolean;
+}
+
+export interface NavGroup {
+  items: NavItem[];
 }
 
 export interface LogoItem {
