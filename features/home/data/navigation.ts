@@ -4,6 +4,7 @@ import {
   FileText,
   Download,
   Bookmark,
+  Star,
 } from 'lucide-react';
 import type { NavItem } from '../types';
 
@@ -13,6 +14,7 @@ export const sidebarNavItems: NavItem[] = [
   { title: 'Documents', icon: FileText, href: '/docs' },
   { title: 'Downloads', icon: Download, href: '/downloads' },
   { title: 'Saved', icon: Bookmark, href: '/saved' },
+  { title: 'Subscription', icon: Star, href: '/subscription' },
 ];
 
 export const sidebarFooterItems: NavItem[] = [];
