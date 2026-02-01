@@ -1,4 +1,4 @@
-import type { GalleryImage } from '../types';
+import type { GalleryItem } from '@/components/ui/masonry-gallery';
 
 // Placeholder author names
 const authors = [
@@ -16,7 +16,7 @@ const authors = [
 
 // Generate gallery images with varied dimensions using picsum.photos
 // Each image has a unique ID for consistent results
-export const galleryImages: GalleryImage[] = [
+export const galleryImages: GalleryItem[] = [
   { src: 'https://picsum.photos/id/10/400/600', alt: 'AI generated artwork', width: 400, height: 600, author: { name: authors[0] } },
   { src: 'https://picsum.photos/id/11/400/300', alt: 'AI generated artwork', width: 400, height: 300, author: { name: authors[1] } },
   { src: 'https://picsum.photos/id/12/400/500', alt: 'AI generated artwork', width: 400, height: 500, author: { name: authors[2] } },

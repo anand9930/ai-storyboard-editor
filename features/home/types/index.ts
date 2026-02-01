@@ -15,13 +15,3 @@ export interface LogoItem {
   src: string;
   href?: string;
 }
-
-export interface GalleryImage {
-  src: string;
-  alt: string;
-  width: number;
-  height: number;
-  author: {
-    name: string;
-  };
-}
