@@ -3,7 +3,7 @@ import {
   Plus,
   Folder,
   Bookmark,
-  Star,
+  Gem,
 } from 'lucide-react';
 import type { NavGroup } from '../types';
 
@@ -18,7 +18,7 @@ export const sidebarNavGroups: NavGroup[] = [
   {
     items: [
       { title: 'Saved', icon: Bookmark, href: '/saved' },
-      { title: 'Subscription', icon: Star, href: '/subscription' },
+      { title: 'Subscription', icon: Gem, href: '/subscription' },
     ],
   },
 ];
