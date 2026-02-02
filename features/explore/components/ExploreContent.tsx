@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Video } from 'lucide-react';
 
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -12,13 +12,49 @@ import {
   EmptyTitle,
   EmptyDescription,
 } from '@/components/ui/empty';
+import { WorkflowViewer, mockWorkflows } from '@/features/workflow-viewer';
+import type { WorkflowData } from '@/features/workflow-viewer';
 
 import { exploreGalleryImages } from '../data/gallery';
-import type { ExploreTab } from '../types';
+import type { ExploreTab, ExploreGalleryItem } from '../types';
 
 export function ExploreContent() {
   const [activeTab, setActiveTab] = useState<ExploreTab>('images');
+  const [selectedWorkflow, setSelectedWorkflow] = useState<WorkflowData | null>(null);
 
+  // Handle gallery image click - show workflow viewer
+  const handleImageClick = useCallback((item: ExploreGalleryItem) => {
+    const workflow = mockWorkflows[item.workflowId];
+    if (workflow) {
+      setSelectedWorkflow(workflow);
+    }
+  }, []);
+
+  // Handle viewer close - return to gallery
+  const handleCloseViewer = useCallback(() => {
+    setSelectedWorkflow(null);
+  }, []);
+
+  // Handle clone action (mock for now)
+  const handleClone = useCallback((workflowId: string) => {
+    console.log('Clone workflow:', workflowId);
+    // TODO: Implement actual clone functionality
+    // 1. Copy workflow to user's projects
+    // 2. Navigate to editor with the new project
+  }, []);
+
+  // If a workflow is selected, show the viewer instead of gallery
+  if (selectedWorkflow) {
+    return (
+      <WorkflowViewer
+        workflow={selectedWorkflow}
+        onClose={handleCloseViewer}
+        onClone={handleClone}
+      />
+    );
+  }
+
+  // Otherwise show the normal gallery content
   return (
     <main className="flex-1 overflow-auto">
       <div className="py-xl px-lg">
@@ -39,7 +75,11 @@ export function ExploreContent() {
 
         {/* Tab Content */}
         {activeTab === 'images' ? (
-          <MasonryGallery items={exploreGalleryImages} className="px-0" />
+          <MasonryGallery
+            items={exploreGalleryImages}
+            className="px-0"
+            onItemClick={handleImageClick}
+          />
         ) : (
           <div className="max-w-gallery mx-auto">
             <Empty className="min-h-[400px]">

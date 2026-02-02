@@ -6,6 +6,7 @@ import { Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { NodeStatus } from '@/features/flow/types/nodes';
 import { useWorkflowStore } from '@/features/flow/store/workflowStore';
+import { useReadOnly } from '@/features/workflow-viewer/context/ReadOnlyContext';
 
 // Selector for getting selected node count (stable reference)
 const selectSelectedNodeCount = (state: { selectedNodeIds: string[] }) => state.selectedNodeIds.length;
@@ -65,6 +66,8 @@ export function BaseNode({
   const { inputs = [], outputs = [] } = handles;
   // Only subscribe to the count, not the full array - prevents re-renders on selection changes
   const selectedNodeCount = useWorkflowStore(selectSelectedNodeCount);
+  // Check if we're in read-only mode (workflow viewer)
+  const { isReadOnly } = useReadOnly();
 
   // Editable name state
   const [isEditingName, setIsEditingName] = useState(false);
@@ -138,8 +141,9 @@ export function BaseNode({
   }, [isEditingName]);
 
   const handleNameClick = useCallback(() => {
+    if (isReadOnly) return;
     setIsEditingName(true);
-  }, []);
+  }, [isReadOnly]);
 
   const handleNameBlur = useCallback(() => {
     setIsEditingName(false);
@@ -162,7 +166,7 @@ export function BaseNode({
 
   return (
     <>
-      {showToolbar && toolbarContent && (
+      {showToolbar && toolbarContent && !isReadOnly && (
         <NodeToolbar
           isVisible={selected && selectedNodeCount === 1}
           position={Position.Top}
@@ -172,7 +176,7 @@ export function BaseNode({
           {toolbarContent}
         </NodeToolbar>
       )}
-      {resizable && (
+      {resizable && !isReadOnly && (
         <NodeResizer
           minWidth={minWidth}
           minHeight={minHeight}
@@ -199,8 +203,8 @@ export function BaseNode({
             />
           ) : (
             <span
-              role="button"
-              tabIndex={0}
+              role={isReadOnly ? undefined : 'button'}
+              tabIndex={isReadOnly ? undefined : 0}
               onClick={handleNameClick}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -208,8 +212,11 @@ export function BaseNode({
                   handleNameClick();
                 }
               }}
-              className="text-xs font-medium text-muted-foreground cursor-text hover:text-foreground transition-colors focus:outline-none focus:ring-1 focus:ring-ring rounded-sm"
-              title="Click to edit name"
+              className={cn(
+                'text-xs font-medium text-muted-foreground transition-colors',
+                !isReadOnly && 'cursor-text hover:text-foreground focus:outline-none focus:ring-1 focus:ring-ring rounded-sm'
+              )}
+              title={isReadOnly ? undefined : 'Click to edit name'}
             >
               {nodeName}
             </span>
@@ -277,7 +284,7 @@ export function BaseNode({
         </div>
 
         {/* Floating Plus Button - Left Edge with Magnetic Effect (outside overflow-hidden) */}
-        {onPlusClick && (plusButtonSide === 'left' || plusButtonSide === 'both') && (
+        {onPlusClick && !isReadOnly && (plusButtonSide === 'left' || plusButtonSide === 'both') && (
           <button
             ref={plusButtonLeftRef}
             onClick={(e) => {
@@ -306,7 +313,7 @@ export function BaseNode({
         )}
 
         {/* Floating Plus Button - Right Edge with Magnetic Effect (outside overflow-hidden) */}
-        {onPlusClick && (plusButtonSide === 'right' || plusButtonSide === 'both') && (
+        {onPlusClick && !isReadOnly && (plusButtonSide === 'right' || plusButtonSide === 'both') && (
           <button
             ref={plusButtonRightRef}
             onClick={(e) => {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import type { MasonryProps, RenderComponentProps } from 'masonic';
@@ -20,9 +20,10 @@ export interface GalleryItem {
 }
 
 // Props interface
-interface MasonryGalleryProps {
-  items: GalleryItem[];
+interface MasonryGalleryProps<T extends GalleryItem = GalleryItem> {
+  items: T[];
   className?: string;
+  onItemClick?: (item: T) => void;
 }
 
 // Dynamic import to avoid SSR issues with ResizeObserver
@@ -35,52 +36,74 @@ const Masonry = dynamic(
 const getInitials = (name: string) =>
   name.split(' ').map(n => n[0]).join('').toUpperCase();
 
-function GalleryCard({ data, width }: RenderComponentProps<GalleryItem>) {
-  // Calculate height based on aspect ratio
-  const aspectRatio = data.height / data.width;
-  const height = Math.round(width * aspectRatio);
+// Factory function to create a GalleryCard with click handler
+function createGalleryCard<T extends GalleryItem>(onItemClick?: (item: T) => void) {
+  return function GalleryCard({ data, width }: RenderComponentProps<T>) {
+    // Calculate height based on aspect ratio
+    const aspectRatio = data.height / data.width;
+    const height = Math.round(width * aspectRatio);
 
-  return (
-    <div
-      className="group relative overflow-hidden bg-muted cursor-pointer"
-      style={{ height }}
-    >
-      <Image
-        src={data.src}
-        alt={data.alt}
-        fill
-        className="object-cover"
-        sizes="(max-width: 768px) 50vw, 33vw"
-      />
+    return (
+      <div
+        className="group relative overflow-hidden bg-muted cursor-pointer"
+        style={{ height }}
+        onClick={() => onItemClick?.(data)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onItemClick?.(data);
+          }
+        }}
+        role="button"
+        tabIndex={0}
+      >
+        <Image
+          src={data.src}
+          alt={data.alt}
+          fill
+          className="object-cover"
+          sizes="(max-width: 768px) 50vw, 33vw"
+        />
 
-      {/* Hover overlay */}
-      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300" />
+        {/* Hover overlay */}
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300" />
 
-      {/* Author info - bottom left */}
-      <div className="absolute bottom-0 left-0 right-0 p-sm md:p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        <div className="flex items-center gap-xs md:gap-2">
-          <Avatar className="h-5 w-5 md:h-8 md:w-8">
-            <AvatarFallback className="text-[8px] md:text-xs">
-              {getInitials(data.author.name)}
-            </AvatarFallback>
-          </Avatar>
-          <span className="text-white text-[10px] md:text-sm font-normal truncate">{data.author.name}</span>
+        {/* Author info - bottom left */}
+        <div className="absolute bottom-0 left-0 right-0 p-sm md:p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div className="flex items-center gap-xs md:gap-2">
+            <Avatar className="h-5 w-5 md:h-8 md:w-8">
+              <AvatarFallback className="text-[8px] md:text-xs">
+                {getInitials(data.author.name)}
+              </AvatarFallback>
+            </Avatar>
+            <span className="text-white text-[10px] md:text-sm font-normal truncate">{data.author.name}</span>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 }
 
-export function MasonryGallery({ items, className }: MasonryGalleryProps) {
+export function MasonryGallery<T extends GalleryItem = GalleryItem>({
+  items,
+  className,
+  onItemClick,
+}: MasonryGalleryProps<T>) {
   const containerRef = useRef<HTMLDivElement>(null);
   const { columnWidth, columnCount, gutter } = useResponsiveMasonry(containerRef);
+
+  // Memoize the card renderer to prevent unnecessary re-renders
+  const CardRenderer = useMemo(
+    () => createGalleryCard<T>(onItemClick),
+    [onItemClick]
+  );
 
   return (
     <section className={cn("p-lg", className)}>
       <div className="max-w-gallery mx-auto" ref={containerRef}>
-        <Masonry<GalleryItem>
+        <Masonry<T>
           items={items}
-          render={GalleryCard}
+          render={CardRenderer}
           columnWidth={columnWidth}
           columnGutter={gutter}
           rowGutter={gutter}
