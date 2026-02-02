@@ -24,11 +24,11 @@ export function ProjectCard({
 }: ProjectCardProps) {
   return (
     <Card
-      className="group cursor-pointer border border-border bg-transparent shadow-none transition-colors"
+      className="group cursor-pointer border-0 bg-transparent shadow-none transition-colors"
       onClick={onOpen}
     >
-      <div className="p-sm">
-        <div className="relative overflow-hidden rounded-lg border border-border">
+      <div>
+        <div className="relative overflow-hidden rounded-lg">
           <AspectRatio ratio={4 / 3}>
             {project.thumbnailUrl ? (
               <Image
@@ -54,9 +54,9 @@ export function ProjectCard({
         </div>
       </div>
 
-      <CardContent className="px-md py-sm">
+      <CardContent className="mt-2 p-0">
         <h3 className="truncate text-sm font-medium">{project.title}</h3>
-        <p className="mt-0.5 text-xs text-muted-foreground">
+        <p className="mt-0 text-xs text-muted-foreground">
           {formatRelativeTime(project.updatedAt)}
         </p>
       </CardContent>
