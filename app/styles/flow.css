@@ -14,38 +14,6 @@
   stroke: var(--flow-canvas-dots) !important;
 }
 
-/* MiniMap */
-.react-flow__minimap {
-  background-color: var(--flow-minimap-bg) !important;
-  border: 1px solid var(--border) !important;
-  border-radius: 8px !important;
-}
-
-.react-flow__minimap-mask {
-  fill: color-mix(in oklch, var(--flow-minimap-mask) 80%, transparent) !important;
-}
-
-.react-flow__minimap-node {
-  fill: var(--flow-minimap-node) !important;
-}
-
-/* Controls */
-.react-flow__controls {
-  background-color: var(--flow-controls-bg) !important;
-  border: 1px solid var(--border) !important;
-  border-radius: 8px !important;
-}
-
-.react-flow__controls-button {
-  background-color: var(--flow-controls-bg) !important;
-  border-color: var(--border) !important;
-  fill: var(--muted-foreground) !important;
-}
-
-.react-flow__controls-button:hover {
-  background-color: var(--accent) !important;
-}
-
 /* Edges */
 .react-flow__edge-path {
   stroke: var(--flow-edge-stroke) !important;

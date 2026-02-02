@@ -62,11 +62,6 @@
     --flow-canvas-dots: oklch(0.78 0.01 286);
     --flow-edge-stroke: oklch(0.74 0.01 286);
     --flow-edge-stroke-highlighted: oklch(0.55 0.01 286);
-    --flow-minimap-bg: oklch(1 0 0);
-    --flow-minimap-node: oklch(0.6 0.01 286);
-    --flow-minimap-mask: oklch(1 0 0);
-    --flow-controls-bg: oklch(1 0 0);
-
     /* Node specific - Light mode */
     --node-bg: oklch(1 0 0);
     --node-border: oklch(0.74 0.01 286);
@@ -137,11 +132,6 @@
     --flow-canvas-dots: oklch(0.235 0.01 286);
     --flow-edge-stroke: oklch(0.35 0.01 286);
     --flow-edge-stroke-highlighted: oklch(0.6 0.01 286);
-    --flow-minimap-bg: oklch(0.145 0.014 285.8);
-    --flow-minimap-node: oklch(0.35 0.01 286);
-    --flow-minimap-mask: oklch(0 0 0);
-    --flow-controls-bg: oklch(0.145 0.014 285.8);
-
     /* Node specific - Dark mode */
     --node-bg: oklch(0.18 0.01 286);
     --node-border: oklch(0.35 0.01 286);

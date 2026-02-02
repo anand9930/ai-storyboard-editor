@@ -4,8 +4,6 @@ import { useCallback, useMemo, useState, useRef } from 'react';
 import {
   ReactFlow,
   Background,
-  Controls,
-  MiniMap,
   Panel,
   Connection,
   addEdge,
@@ -36,6 +34,7 @@ import { FIXED_MODELS } from '@/features/flow/types/nodes';
 import type { AppNode, ImageNodeData, TextNodeData, AspectRatio, ImageQuality } from '@/features/flow/types/nodes';
 import { nodeTypes, defaultEdgeOptions, isValidNodeConnection } from '@/features/flow/lib/flowConfig';
 import { getModelDefaults } from '@/lib/modelSpecs';
+import { ZoomSlider } from '@/components/zoom-slider';
 
 export default function FlowCanvas() {
   // Enable undo/redo keyboard shortcuts (Ctrl+Z / Ctrl+Y)
@@ -425,13 +424,12 @@ export default function FlowCanvas() {
           <LeftSidebar />
         </Panel>
 
-        {/* Bottom Right - Controls stacked above MiniMap */}
-        <Panel position="bottom-right" className="!bottom-4 !right-4 !m-0">
-          <div className="flex flex-col gap-2 items-end">
-            <Controls className="!static !transform-none" />
-            <MiniMap className="!static !transform-none" />
-          </div>
-        </Panel>
+        {/* Bottom Left - ZoomSlider */}
+        <ZoomSlider
+          position="bottom-left"
+          orientation="horizontal"
+          className="!bottom-4 !left-4 !m-0"
+        />
 
         {/* Dynamic Input Panel - Attached to selected node via NodeToolbar */}
         {showInputPanel && (
