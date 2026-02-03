@@ -69,8 +69,8 @@ function createGalleryCard<T extends GalleryItem>(onItemClick?: (item: T) => voi
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300" />
 
         {/* Author info - bottom left */}
-        <div className="absolute bottom-0 left-0 right-0 p-sm md:p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <div className="flex items-center gap-xs md:gap-2">
+        <div className="absolute bottom-0 left-0 right-0 p-2 md:p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div className="flex items-center gap-1 md:gap-2">
             <Avatar className="h-5 w-5 md:h-8 md:w-8">
               <AvatarFallback className="text-[8px] md:text-xs">
                 {getInitials(data.author.name)}
@@ -99,7 +99,7 @@ export function MasonryGallery<T extends GalleryItem = GalleryItem>({
   );
 
   return (
-    <section className={cn("p-lg", className)}>
+    <section className={cn("p-4", className)}>
       <div className="max-w-gallery mx-auto" ref={containerRef}>
         <Masonry<T>
           items={items}

@@ -16,7 +16,7 @@ export function ProjectsHeader({
   onNewProject,
 }: ProjectsHeaderProps) {
   return (
-    <div className="flex items-center justify-between gap-lg pb-lg">
+    <div className="flex items-center justify-between gap-4 pb-4">
       <div className="relative w-full max-w-sm">
         <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input

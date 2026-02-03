@@ -57,7 +57,7 @@ export function ExploreContent() {
   // Otherwise show the normal gallery content
   return (
     <main className="flex-1 overflow-auto">
-      <div className="py-xl px-lg">
+      <div className="py-6 px-4">
         {/* Tabs */}
         <div className="max-w-gallery mx-auto">
           <div className="flex items-center justify-end">

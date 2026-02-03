@@ -48,7 +48,7 @@ export function RenameProjectDialog({
           <DialogTitle>Rename Project</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
-          <div className="flex flex-col gap-sm py-lg">
+          <div className="flex flex-col gap-2 py-4">
             <Label htmlFor="project-title">Project Name</Label>
             <Input
               id="project-title"

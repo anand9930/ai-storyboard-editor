@@ -23,7 +23,7 @@ export function WorkflowViewer({ workflow, onClose, onClone }: WorkflowViewerPro
   }, [workflow.id, onClone]);
 
   return (
-    <main className="flex-1 flex flex-col h-full p-lg overflow-hidden">
+    <main className="flex-1 flex flex-col h-full p-4 overflow-hidden">
       {/* Header bar */}
       <ViewerHeader
         projectName={workflow.projectName}

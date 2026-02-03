@@ -1,4 +1,11 @@
-/* Main CSS entry point - imports all style modules */
+/* Main CSS entry point - Tailwind v4 */
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* Custom variant for dark mode (class-based) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Import modular style files */
 @import './styles/base.css';
 @import './styles/flow.css';
 @import './styles/editor.css';

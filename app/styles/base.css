@@ -1,174 +1,313 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* CSS Variables - Light mode (default) - OKLCH color format */
+:root {
+  /* Core shadcn variables */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.623 0.214 259.1);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.967 0.001 286.4);
+  --secondary-foreground: oklch(0.21 0.006 285.8);
+  --muted: oklch(0.967 0.001 286.4);
+  --muted-foreground: oklch(0.553 0.013 286.1);
+  --accent: oklch(0.967 0.001 286.4);
+  --accent-foreground: oklch(0.21 0.006 285.8);
+  --destructive: oklch(0.577 0.245 27.3);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.922 0.004 286.3);
+  --input: oklch(0.922 0.004 286.3);
+  --ring: oklch(0.623 0.214 259.1);
+  --radius: 0.625rem;
 
-@layer base {
-  /* Light mode (default) - OKLCH color format */
-  :root {
-    /* Core shadcn variables */
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.623 0.214 259.1);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.967 0.001 286.4);
-    --secondary-foreground: oklch(0.21 0.006 285.8);
-    --muted: oklch(0.967 0.001 286.4);
-    --muted-foreground: oklch(0.553 0.013 286.1);
-    --accent: oklch(0.967 0.001 286.4);
-    --accent-foreground: oklch(0.21 0.006 285.8);
-    --destructive: oklch(0.577 0.245 27.3);
-    --destructive-foreground: oklch(0.985 0 0);
-    --border: oklch(0.922 0.004 286.3);
-    --input: oklch(0.922 0.004 286.3);
-    --ring: oklch(0.623 0.214 259.1);
-    --radius: 0.625rem;
+  /* Chart colors */
+  --chart-1: oklch(0.623 0.214 259.1);
+  --chart-2: oklch(0.6 0.15 160);
+  --chart-3: oklch(0.7 0.15 50);
+  --chart-4: oklch(0.65 0.2 290);
+  --chart-5: oklch(0.65 0.2 350);
 
-    /* === Spacing Tokens === */
-    /* Semantic spacing scale (theme-independent) */
-    --spacing-xs: 0.25rem;    /* 4px - dense UI gaps */
-    --spacing-sm: 0.5rem;     /* 8px - compact containers */
-    --spacing-md: 0.75rem;    /* 12px - standard internal */
-    --spacing-lg: 1rem;       /* 16px - standard container */
-    --spacing-xl: 1.5rem;     /* 24px - generous container */
-    --spacing-section: 2rem;  /* 32px - between sections */
+  /* Flow/Canvas specific - Light mode */
+  --flow-canvas-bg: oklch(0.967 0.001 286.4);
+  --flow-canvas-dots: oklch(0.78 0.01 286);
+  --flow-edge-stroke: oklch(0.74 0.01 286);
+  --flow-edge-stroke-highlighted: oklch(0.55 0.01 286);
+  /* Node specific - Light mode */
+  --node-bg: oklch(1 0 0);
+  --node-border: oklch(0.74 0.01 286);
+  --node-border-selected: oklch(0.55 0.01 286);
 
-    /* Component-specific spacing */
-    --spacing-node-padding: 1rem;
-    --spacing-toolbar-gap: 0.25rem;
-    --spacing-toolbar-padding: 0.25rem;
-    --spacing-panel-padding: 1rem;
-    --spacing-popup-padding: 0.5rem;
+  /* Status colors - Light mode */
+  --status-error: oklch(0.577 0.245 27.3);
+  --status-success: oklch(0.527 0.154 150.1);
+  --status-warning: oklch(0.795 0.184 86.0);
+  --status-processing: oklch(0.623 0.214 259.1);
 
-    /* Fixed dimensions */
-    --node-default-size: 15rem;   /* 240px */
-    --panel-width-sm: 14rem;      /* 224px */
-    --panel-width-md: 17.5rem;    /* 280px */
-    --panel-width-lg: 31.25rem;   /* 500px */
-    --gallery-max-width: 81rem;   /* 1296px */
+  /* Accent highlights - Light mode */
+  --accent-blue: oklch(0.623 0.214 259.1);
+  --accent-yellow: oklch(0.795 0.184 86.0);
 
-    /* Chart colors */
-    --chart-1: oklch(0.623 0.214 259.1);
-    --chart-2: oklch(0.6 0.15 160);
-    --chart-3: oklch(0.7 0.15 50);
-    --chart-4: oklch(0.65 0.2 290);
-    --chart-5: oklch(0.65 0.2 350);
+  /* Scrollbar - Light mode */
+  --scrollbar-track: oklch(0.967 0.001 286.4);
+  --scrollbar-thumb: oklch(0.85 0.005 286);
+  --scrollbar-thumb-hover: oklch(0.74 0.01 286);
 
-    /* Flow/Canvas specific - Light mode */
-    --flow-canvas-bg: oklch(0.967 0.001 286.4);
-    --flow-canvas-dots: oklch(0.78 0.01 286);
-    --flow-edge-stroke: oklch(0.74 0.01 286);
-    --flow-edge-stroke-highlighted: oklch(0.55 0.01 286);
-    /* Node specific - Light mode */
-    --node-bg: oklch(1 0 0);
-    --node-border: oklch(0.74 0.01 286);
-    --node-border-selected: oklch(0.55 0.01 286);
+  /* Sidebar - Light mode */
+  --sidebar-background: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.385 0.013 286);
+  --sidebar-primary: oklch(0.21 0.006 285.8);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.967 0.001 286.4);
+  --sidebar-accent-foreground: oklch(0.21 0.006 285.8);
+  --sidebar-border: oklch(0.922 0.013 255);
+  --sidebar-ring: oklch(0.623 0.214 259.1);
 
-    /* Status colors - Light mode */
-    --status-error: oklch(0.577 0.245 27.3);
-    --status-success: oklch(0.527 0.154 150.1);
-    --status-warning: oklch(0.795 0.184 86.0);
-    --status-processing: oklch(0.623 0.214 259.1);
+  /* Tooltip - Light mode */
+  --tooltip: oklch(0.21 0.006 285.8);
+  --tooltip-foreground: oklch(0.985 0 0);
+}
 
-    /* Accent highlights - Light mode */
-    --accent-blue: oklch(0.623 0.214 259.1);
-    --accent-yellow: oklch(0.795 0.184 86.0);
+/* Dark mode - OKLCH color format */
+.dark {
+  /* Core shadcn variables */
+  --background: oklch(0.145 0.014 285.8);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.145 0.014 285.8);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.145 0.014 285.8);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.623 0.214 259.1);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.235 0.01 286);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.235 0.01 286);
+  --muted-foreground: oklch(0.7 0.01 286);
+  --accent: oklch(0.235 0.01 286);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.45 0.18 27);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.235 0.01 286);
+  --input: oklch(0.235 0.01 286);
+  --ring: oklch(0.623 0.214 259.1);
 
-    /* Scrollbar - Light mode */
-    --scrollbar-track: oklch(0.967 0.001 286.4);
-    --scrollbar-thumb: oklch(0.85 0.005 286);
-    --scrollbar-thumb-hover: oklch(0.74 0.01 286);
+  /* Chart colors - Dark mode */
+  --chart-1: oklch(0.623 0.214 259.1);
+  --chart-2: oklch(0.55 0.12 160);
+  --chart-3: oklch(0.65 0.12 50);
+  --chart-4: oklch(0.6 0.18 290);
+  --chart-5: oklch(0.6 0.18 350);
 
-    /* Sidebar - Light mode */
-    --sidebar-background: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.385 0.013 286);
-    --sidebar-primary: oklch(0.21 0.006 285.8);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.967 0.001 286.4);
-    --sidebar-accent-foreground: oklch(0.21 0.006 285.8);
-    --sidebar-border: oklch(0.922 0.013 255);
-    --sidebar-ring: oklch(0.623 0.214 259.1);
+  /* Flow/Canvas specific - Dark mode */
+  --flow-canvas-bg: oklch(0.145 0.014 285.8);
+  --flow-canvas-dots: oklch(0.235 0.01 286);
+  --flow-edge-stroke: oklch(0.35 0.01 286);
+  --flow-edge-stroke-highlighted: oklch(0.6 0.01 286);
+  /* Node specific - Dark mode */
+  --node-bg: oklch(0.18 0.01 286);
+  --node-border: oklch(0.35 0.01 286);
+  --node-border-selected: oklch(0.6 0.01 286);
 
-    /* Tooltip - Light mode (uses secondary-foreground for softer contrast) */
-    --tooltip: oklch(0.21 0.006 285.8);
-    --tooltip-foreground: oklch(0.985 0 0);
+  /* Status colors - Dark mode */
+  --status-error: oklch(0.577 0.245 27.3);
+  --status-success: oklch(0.527 0.154 150.1);
+  --status-warning: oklch(0.795 0.184 86.0);
+  --status-processing: oklch(0.623 0.214 259.1);
+
+  /* Accent highlights - Dark mode */
+  --accent-blue: oklch(0.623 0.214 259.1);
+  --accent-yellow: oklch(0.795 0.184 86.0);
+
+  /* Scrollbar - Dark mode */
+  --scrollbar-track: oklch(0.18 0.01 286);
+  --scrollbar-thumb: oklch(0.35 0.01 286);
+  --scrollbar-thumb-hover: oklch(0.45 0.01 286);
+
+  /* Sidebar - Dark mode */
+  --sidebar-background: oklch(0.18 0.01 286);
+  --sidebar-foreground: oklch(0.967 0.001 286.4);
+  --sidebar-primary: oklch(0.546 0.245 262.9);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.235 0.01 286);
+  --sidebar-accent-foreground: oklch(0.967 0.001 286.4);
+  --sidebar-border: oklch(0.235 0.01 286);
+  --sidebar-ring: oklch(0.623 0.214 259.1);
+
+  /* Tooltip - Dark mode */
+  --tooltip: oklch(0.967 0.001 286.4);
+  --tooltip-foreground: oklch(0.21 0.006 285.8);
+}
+
+/*
+ * Tailwind v4 theme extension
+ * NOTE: Using @theme (not @theme inline) to EXTEND default Tailwind theme
+ * This preserves built-in utilities like max-w-md, max-w-xs, etc.
+ */
+@theme {
+  /* Border radius - references the CSS variable */
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  /* Core colors - map CSS variables to Tailwind color tokens */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Chart colors */
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* Sidebar colors */
+  --color-sidebar: var(--sidebar-background);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Flow canvas colors */
+  --color-flow-canvas-bg: var(--flow-canvas-bg);
+  --color-flow-canvas-dots: var(--flow-canvas-dots);
+  --color-flow-edge-stroke: var(--flow-edge-stroke);
+
+  /* Node colors */
+  --color-node-bg: var(--node-bg);
+  --color-node-border: var(--node-border);
+  --color-node-border-selected: var(--node-border-selected);
+
+  /* Status colors */
+  --color-status-error: var(--status-error);
+  --color-status-success: var(--status-success);
+  --color-status-warning: var(--status-warning);
+  --color-status-processing: var(--status-processing);
+
+  /* Scrollbar colors */
+  --color-scrollbar-track: var(--scrollbar-track);
+  --color-scrollbar-thumb: var(--scrollbar-thumb);
+
+  /* Tooltip colors */
+  --color-tooltip: var(--tooltip);
+  --color-tooltip-foreground: var(--tooltip-foreground);
+
+  /*
+   * Custom spacing tokens
+   * NOTE: Do NOT define --spacing-xs/sm/md/lg/xl here!
+   * Those names conflict with Tailwind's built-in spacing scale
+   * and break max-w-xs, max-w-md, max-w-lg utilities.
+   */
+  --spacing-section: 2rem;
+  --spacing-node: 1rem;
+  --spacing-toolbar: 0.25rem;
+  --spacing-panel: 1rem;
+  --spacing-popup: 0.5rem;
+
+  /* Custom width tokens - create utilities like: w-node, w-panel-lg, max-w-gallery */
+  --width-node: 15rem;
+  --width-panel-sm: 14rem;
+  --width-panel-md: 17.5rem;
+  --width-panel-lg: 31.25rem;
+  --width-gallery: 81rem;
+
+  /* Accordion animations */
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+
+  @keyframes accordion-down {
+    from { height: 0; }
+    to { height: var(--radix-accordion-content-height); }
   }
 
-  /* Dark mode - OKLCH color format */
-  .dark {
-    /* Core shadcn variables */
-    --background: oklch(0.145 0.014 285.8);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.145 0.014 285.8);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.145 0.014 285.8);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.623 0.214 259.1);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.235 0.01 286);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.235 0.01 286);
-    --muted-foreground: oklch(0.7 0.01 286);
-    --accent: oklch(0.235 0.01 286);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.45 0.18 27);
-    --destructive-foreground: oklch(0.985 0 0);
-    --border: oklch(0.235 0.01 286);
-    --input: oklch(0.235 0.01 286);
-    --ring: oklch(0.623 0.214 259.1);
-
-    /* Chart colors - Dark mode */
-    --chart-1: oklch(0.623 0.214 259.1);
-    --chart-2: oklch(0.55 0.12 160);
-    --chart-3: oklch(0.65 0.12 50);
-    --chart-4: oklch(0.6 0.18 290);
-    --chart-5: oklch(0.6 0.18 350);
-
-    /* Flow/Canvas specific - Dark mode */
-    --flow-canvas-bg: oklch(0.145 0.014 285.8);
-    --flow-canvas-dots: oklch(0.235 0.01 286);
-    --flow-edge-stroke: oklch(0.35 0.01 286);
-    --flow-edge-stroke-highlighted: oklch(0.6 0.01 286);
-    /* Node specific - Dark mode */
-    --node-bg: oklch(0.18 0.01 286);
-    --node-border: oklch(0.35 0.01 286);
-    --node-border-selected: oklch(0.6 0.01 286);
-
-    /* Status colors - Dark mode */
-    --status-error: oklch(0.577 0.245 27.3);
-    --status-success: oklch(0.527 0.154 150.1);
-    --status-warning: oklch(0.795 0.184 86.0);
-    --status-processing: oklch(0.623 0.214 259.1);
-
-    /* Accent highlights - Dark mode */
-    --accent-blue: oklch(0.623 0.214 259.1);
-    --accent-yellow: oklch(0.795 0.184 86.0);
-
-    /* Scrollbar - Dark mode */
-    --scrollbar-track: oklch(0.18 0.01 286);
-    --scrollbar-thumb: oklch(0.35 0.01 286);
-    --scrollbar-thumb-hover: oklch(0.45 0.01 286);
-
-    /* Sidebar - Dark mode */
-    --sidebar-background: oklch(0.18 0.01 286);
-    --sidebar-foreground: oklch(0.967 0.001 286.4);
-    --sidebar-primary: oklch(0.546 0.245 262.9);
-    --sidebar-primary-foreground: oklch(1 0 0);
-    --sidebar-accent: oklch(0.235 0.01 286);
-    --sidebar-accent-foreground: oklch(0.967 0.001 286.4);
-    --sidebar-border: oklch(0.235 0.01 286);
-    --sidebar-ring: oklch(0.623 0.214 259.1);
-
-    /* Tooltip - Dark mode (light background for contrast against dark UI) */
-    --tooltip: oklch(0.967 0.001 286.4);
-    --tooltip-foreground: oklch(0.21 0.006 285.8);
+  @keyframes accordion-up {
+    from { height: var(--radix-accordion-content-height); }
+    to { height: 0; }
   }
 }
 
+/*
+ * Custom utilities - Tailwind v4 requires explicit @utility blocks
+ * NOTE: @theme only creates CSS variables, NOT utility classes!
+ * These must be defined separately to generate the actual classes.
+ */
+
+/* Width utilities */
+@utility max-w-gallery {
+  max-width: var(--width-gallery);
+}
+
+@utility w-node {
+  width: var(--width-node);
+}
+
+@utility w-panel-sm {
+  width: var(--width-panel-sm);
+}
+
+@utility w-panel-md {
+  width: var(--width-panel-md);
+}
+
+@utility w-panel-lg {
+  width: var(--width-panel-lg);
+}
+
+/* Spacing utilities */
+@utility p-node {
+  padding: var(--spacing-node);
+}
+
+@utility p-toolbar {
+  padding: var(--spacing-toolbar);
+}
+
+@utility gap-toolbar {
+  gap: var(--spacing-toolbar);
+}
+
+@utility p-panel {
+  padding: var(--spacing-panel);
+}
+
+@utility p-popup {
+  padding: var(--spacing-popup);
+}
+
+/* Base layer styles */
 @layer base {
+  /*
+    The default border color has changed to `currentcolor` in Tailwind CSS v4,
+    so we've added these compatibility styles to make sure everything still
+    looks the same as it did with Tailwind CSS v3.
+  */
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
   * {
     @apply border-border;
   }

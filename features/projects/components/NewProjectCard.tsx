@@ -10,7 +10,7 @@ interface NewProjectCardProps {
 export function NewProjectCard({ onClick }: NewProjectCardProps) {
   return (
     <Card
-      className="flex h-full cursor-pointer flex-col items-center justify-center gap-sm border-0 bg-muted shadow-none"
+      className="flex h-full cursor-pointer flex-col items-center justify-center gap-2 border-0 bg-muted shadow-none"
       onClick={onClick}
     >
       <div className="flex size-12 items-center justify-center rounded-full bg-background">

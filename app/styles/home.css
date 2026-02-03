@@ -10,12 +10,12 @@
   }
 }
 
-.animate-marquee {
+/* Tailwind v4 custom utility for marquee animation */
+@utility animate-marquee {
   animation: marquee 30s linear infinite;
-}
-
-.animate-marquee:hover {
-  animation-play-state: paused;
+  &:hover {
+    animation-play-state: paused;
+  }
 }
 
 /* Hero section italic styling */

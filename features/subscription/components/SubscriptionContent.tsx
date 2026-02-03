@@ -192,7 +192,7 @@ function PricingCard({
 
       <CardHeader>
         <CardTitle className="text-lg">{plan.name}</CardTitle>
-        <div className="flex items-baseline gap-sm pt-sm">
+        <div className="flex items-baseline gap-2 pt-2">
           {isYearly && (
             <span className="text-base text-muted-foreground line-through">
               ${originalPrice}
@@ -206,16 +206,16 @@ function PricingCard({
         )}
       </CardHeader>
 
-      <CardContent className="flex flex-1 flex-col gap-lg">
+      <CardContent className="flex flex-1 flex-col gap-4">
         <Button className="w-full" variant={isPopular ? 'default' : 'outline'}>
           Subscribe
         </Button>
 
         <Separator />
 
-        <ul className="flex flex-col gap-sm text-sm text-muted-foreground">
+        <ul className="flex flex-col gap-2 text-sm text-muted-foreground">
           {plan.features.map((feature, index) => (
-            <li key={index} className="flex items-start gap-sm">
+            <li key={index} className="flex items-start gap-2">
               <Check className="mt-0.5 size-4 shrink-0" />
               <span>
                 {feature.highlight && (
@@ -238,10 +238,10 @@ export function SubscriptionContent() {
 
   return (
     <main className="flex-1 overflow-auto">
-      <div className="mx-auto flex max-w-6xl flex-col gap-section p-lg py-xl">
+      <div className="mx-auto flex max-w-6xl flex-col gap-8 p-4 py-6">
         {/* Header Section */}
-        <section className="flex flex-col items-center gap-lg text-center">
-          <div className="flex flex-col gap-sm">
+        <section className="flex flex-col items-center gap-4 text-center">
+          <div className="flex flex-col gap-2">
             <h1 className="text-3xl font-bold">Purchase a subscription</h1>
             <p className="text-muted-foreground">
               Choose the plan that works for you
@@ -261,7 +261,7 @@ export function SubscriptionContent() {
         </section>
 
         {/* Pricing Cards */}
-        <section className="grid grid-cols-1 gap-lg sm:grid-cols-2 lg:grid-cols-4">
+        <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {PLANS.map((plan) => (
             <PricingCard
               key={plan.id}
@@ -272,7 +272,7 @@ export function SubscriptionContent() {
         </section>
 
         {/* FAQ Section */}
-        <section className="flex flex-col gap-lg">
+        <section className="flex flex-col gap-4">
           <h2 className="text-center text-2xl font-bold">
             Frequently Asked Questions
           </h2>

@@ -85,7 +85,7 @@ export function SignInFooter() {
       {/* Content section with backdrop blur */}
       <div className="bg-background/80 backdrop-blur-xl">
         {/* Sign-in CTA */}
-        <div className="flex flex-col items-center text-center pt-12 px-lg pb-lg">
+        <div className="flex flex-col items-center text-center pt-12 px-4 pb-4">
           <h2 className="text-xl md:text-2xl font-semibold">
             Sign in to see more
           </h2>
@@ -115,7 +115,7 @@ export function SignInFooter() {
         </div>
 
         {/* Footer navigation */}
-        <div className="pt-12 pb-4 px-lg">
+        <div className="pt-12 pb-4 px-4">
           <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
             {/* Text links */}
             <nav className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">

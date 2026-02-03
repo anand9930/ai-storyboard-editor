@@ -60,7 +60,7 @@ export function ProjectsContent() {
 
   return (
     <main className="flex-1 overflow-auto">
-      <div className="px-lg py-xl">
+      <div className="px-4 py-6">
         <div className="mx-auto max-w-gallery">
           <ProjectsHeader
             searchQuery={searchQuery}
