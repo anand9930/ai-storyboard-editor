@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import { HeroSection } from './HeroSection';
 import { LogoMarquee } from './LogoMarquee';
+import { SignInFooter } from './SignInFooter';
 import { MasonryGallery } from '@/components/ui/masonry-gallery';
 import { WorkflowViewer, mockWorkflows } from '@/features/workflow-viewer';
 import type { WorkflowData } from '@/features/workflow-viewer';
@@ -48,6 +49,7 @@ export function HomeContent() {
       <HeroSection />
       <LogoMarquee />
       <MasonryGallery items={galleryImages} onItemClick={handleImageClick} />
+      <SignInFooter />
     </main>
   );
 }
